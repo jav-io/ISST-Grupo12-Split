@@ -4,7 +4,7 @@
 
 ---
 
-## 🚀 MVP - Funcionalidad básica
+##  MVP - Funcionalidad básica
 
 - Crear grupos de gasto
 - Añadir miembros a un grupo
@@ -14,7 +14,7 @@
 
 ---
 
-## 🧠 Tecnologías previstas
+##  Tecnologías previstas
 
 - **Frontend:** HTML/CSS, JavaScript
 - **Backend:** Java + Spring Boot (REST API)
@@ -26,7 +26,7 @@
 
 ---
 
-## 📂 Estructura del repositorio
+## Estructura del repositorio
 split-it/
 ├── backend/
 │   └── README.md
@@ -42,7 +42,7 @@ split-it/
 
 ---
 
-## 👥 Equipo
+##  Equipo
 
 | Nombre                | Rol                  |
 |------------------------|-----------------------|
@@ -54,7 +54,7 @@ split-it/
 
 ---
 
-## 📌 Enlaces útiles
+##  Enlaces 
 
 - 📋 [Trello del equipo](https://trello.com/invite/b/67b468b6425fb87061c9c33e/ATTI845dd93022dd44fe13a1b588264011b168664F4D/isst-grupo12-split)
 - 📁 [Documentación de Sprint 1](./docs/)
