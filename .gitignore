@@ -1,0 +1,6 @@
+/target/         # Carpeta de compilación (se regenera cada vez)
+*.class          # Archivos Java compilados
+.idea/           # Archivos de configuración de IntelliJ
+.vscode/         # Configuración local de tu editor
+*.log            # Archivos de logs (registros)
+.env             # Variables de entorno (contraseñas, etc.)
