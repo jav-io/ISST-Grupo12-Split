@@ -26,22 +26,6 @@
 
 ---
 
-## Estructura del repositorio
-split-it/
-├── backend/
-│   └── README.md
-├── frontend/
-│   └── README.md
-├── docs/
-│   ├── ISST-VD.pdf
-│   ├── ISST-SDP.pdf
-│   └── ISST-SDD.pdf
-├── .gitignore
-├── README.md
-
-
----
-
 ##  Equipo
 
 | Nombre                | Rol                  |
