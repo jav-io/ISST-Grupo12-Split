@@ -31,8 +31,8 @@
 | Nombre                | Rol                  |
 |------------------------|-----------------------|
 | Javier de Ponte        | Product Owner         |
-| Nicolás García Sobrino | Scrum Master          |
-| Santiago Rayán Castro  | Backend Developer     |
+| Nicolás García Sobrino | Backed Developer      |
+| Santiago Rayán Castro  | Scrum Master          |
 | Pablo Bas Iglesias     | Frontend Developer    |
 | Rodrigo de la Nuez     | QA / Documentación    |
 
