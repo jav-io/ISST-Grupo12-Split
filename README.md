@@ -172,13 +172,37 @@ Esta convención facilita la integración con Spring y las herramientas de Java.
 
 ---
 
-## 🛠️ Próximos pasos
+## 🔄 Avances del Sprint 2
 
-Se van a implementar los siguientes módulos:
+Durante este sprint, hemos implementado los siguientes componentes:
 
-1. `Usuario.java` – modelo de usuario (entidad de BBDD)
-2. `UsuarioRepository.java` – interfaz para acceso a los usuarios
-3. `UsuarioService.java` – lógica del usuario
-4. `UsuarioController.java` – API REST para gestionar usuarios
+### 📋 Modelos de datos
 
-Cada clase estará bien explicada para facilitar el desarrollo en equipo.
+- **Usuario.java**: Entidad que representa a los usuarios registrados en el sistema. Almacena información básica como nombre, email y contraseña, y establece la relación con los grupos a través de la entidad Miembro.
+
+- **Grupo.java**: Entidad que representa un grupo de gastos compartidos. Contiene información sobre el nombre, descripción y fecha de creación del grupo, así como las relaciones con miembros y gastos.
+
+- **Miembro.java**: Entidad que establece la relación entre usuarios y grupos. Almacena el saldo actual del miembro en el grupo y su rol (administrador o miembro regular).
+
+- **Gasto.java**: Entidad que representa un gasto registrado en un grupo. Contiene información sobre el monto, fecha, descripción y categoría del gasto, así como el miembro que lo pagó.
+
+- **Deuda.java**: Entidad que representa una deuda generada por un gasto. Almacena información sobre el monto, si está saldada y la fecha de creación.
+
+### 🔧 Configuración
+
+- **application.properties**: Archivo de configuración que define la conexión a la base de datos PostgreSQL, configuración de JPA/Hibernate, puerto del servidor y configuración de Thymeleaf.
+
+- **pom.xml**: Archivo de configuración de Maven que define las dependencias del proyecto, incluyendo Spring Boot, PostgreSQL, Thymeleaf, Spring Security y otras herramientas necesarias.
+
+- **SplititApplication.java**: Clase principal que inicia la aplicación Spring Boot.
+
+### 📌 Próximos pasos
+
+Para completar el Sprint 2, necesitamos implementar:
+
+1. Repositorios JPA para acceso a datos
+2. Servicios para la lógica de negocio
+3. Controladores REST para exponer la API
+4. Plantillas HTML básicas para la interfaz de usuario
+5. Configuración de seguridad básica
+
