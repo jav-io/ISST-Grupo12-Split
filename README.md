@@ -206,3 +206,34 @@ Para completar el Sprint 2, necesitamos implementar:
 4. Plantillas HTML básicas para la interfaz de usuario
 5. Configuración de seguridad básica
 
+---
+
+## 🧪 Pruebas durante el desarrollo
+
+A continuación se documentan los pasos para **comprobar que el backend funciona** en cada fase del proyecto.  
+Cada desarrollador debe probar estos pasos para asegurarse de que su entorno está bien configurado.
+
+---
+
+### ✅ Paso 1: Verificar que la app arranca (sin frontend aún)
+
+1. Asegúrate de tener instalado:
+   - Java 17
+   - Maven (`mvn -v` debe funcionar)
+2. Entra en la carpeta del backend:
+
+```bash
+cd backend/splitit
+mvn spring-boot:run
+
+Si todo va bien, verás en la terminal algo como:
+
+Tomcat started on port(s): 8080
+Started SplititApplication in ...
+Abre el navegador y entra a:
+
+http://localhost:8080
+
+Verás una página en blanco o "Whitelabel Error Page", lo cual está bien (aún no hay HTML ni endpoints configurados).
+
+
