@@ -56,26 +56,27 @@ Este repositorio sigue una estructura organizada según las buenas prácticas de
 
 ```
 ISST-GRUPO12-SPLIT/
-├── .gitignore
-├── README.md
-├── docs/
-├── backend/
-│   └── splitit/
-│       ├── pom.xml
-│       ├── SplititApplication.java
-│       └── src/
-│           └── main/
-│               ├── java/com/splitit/
-│               │   ├── controller/
-│               │   ├── service/
-│               │   ├── model/
-│               │   └── repository/
-│               └── resources/
-│                   ├── application.properties
-│                   ├── templates/
-│                   └── static/
-│                       ├── css/
-│                       └── js/
+├── .gitignore              # Archivos y directorios ignorados por Git
+├── README.md               # Documentación principal del proyecto
+├── docs/                   # Documentación adicional del proyecto
+└── backend/                # Código del backend
+    └── splitit/            # Proyecto principal de Spring Boot
+        ├── pom.xml         # Configuración de Maven y dependencias
+        ├── SplititApplication.java  # Punto de entrada de la aplicación
+        └── src/            # Código fuente
+            └── main/       # Código principal
+                ├── java/com/splitit/  # Paquete principal
+                │   ├── controller/    # Controladores REST
+                │   ├── service/       # Servicios de negocio
+                │   ├── model/         # Entidades y modelos
+                │   └── repository/    # Repositorios para acceso a datos
+                └── resources/         # Recursos de la aplicación
+                    ├── application.properties  # Configuración
+                    ├── templates/     # Plantillas HTML (Thymeleaf)
+                    └── static/        # Recursos estáticos
+                        ├── css/       # Hojas de estilo
+                        └── js/        # Scripts JavaScript
+
 ```
 
 ---
