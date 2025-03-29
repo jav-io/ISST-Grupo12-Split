@@ -197,6 +197,11 @@ Un modelo es una clase Java que representa una tabla de la base de datos.
 
 - **SplititApplication.java**: Clase principal que inicia la aplicación Spring Boot.
 
+Tambien se ha actualizado repository que permite el acceso a datos de la BBD. La carpeta repository/ contiene interfaces Java que heredan de JpaRepository, y permiten acceder fácilmente a la base de datos sin tener que escribir SQL.
+Así separas la lógica (services) del acceso a la base de datos (repositories), y tu código queda limpio y modular.
+
+/var/folders/yj/5r7gvkzd4hg7fdsc_nzhpn5h0000gn/T/TemporaryItems/NSIRD_screencaptureui_KnmNZl/Captura de pantalla 2025-03-29 a las 19.56.26.png
+
 ### ⚙️ Configuración de la base de datos
 
 - Se ha creado y probado una base de datos local en PostgreSQL llamada `splitit`.
@@ -211,6 +216,7 @@ spring.datasource.username=postgres
 spring.datasource.password=password
 spring.jpa.hibernate.ddl-auto=update
 
+---
 
 ✅ Backend funcional
 La aplicación ya es capaz de iniciar correctamente y conectarse a la base de datos.
