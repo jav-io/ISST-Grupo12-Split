@@ -177,6 +177,7 @@ Esta convención facilita la integración con Spring y las herramientas de Java.
 Durante este sprint, hemos implementado los siguientes componentes:
 
 ### 📋 Modelos de datos
+Un modelo es una clase Java que representa una tabla de la base de datos.
 
 - **Usuario.java**: Entidad que representa a los usuarios registrados en el sistema. Almacena información básica como nombre, email y contraseña, y establece la relación con los grupos a través de la entidad Miembro.
 
@@ -196,44 +197,117 @@ Durante este sprint, hemos implementado los siguientes componentes:
 
 - **SplititApplication.java**: Clase principal que inicia la aplicación Spring Boot.
 
-### 📌 Próximos pasos
+### ⚙️ Configuración de la base de datos
 
-Para completar el Sprint 2, necesitamos implementar:
+- Se ha creado y probado una base de datos local en PostgreSQL llamada `splitit`.
+- Se ha creado el rol `postgres` con contraseña `password` y permisos suficientes.
+- Se ha configurado correctamente el archivo `application.properties`.
 
-1. Repositorios JPA para acceso a datos
-2. Servicios para la lógica de negocio
-3. Controladores REST para exponer la API
-4. Plantillas HTML básicas para la interfaz de usuario
-5. Configuración de seguridad básica
+Ejemplo:
+
+```properties
+spring.datasource.url=jdbc:postgresql://localhost:5432/splitit
+spring.datasource.username=postgres
+spring.datasource.password=password
+spring.jpa.hibernate.ddl-auto=update
+
+
+✅ Backend funcional
+La aplicación ya es capaz de iniciar correctamente y conectarse a la base de datos.
+
+Se muestran logs de Hibernate y SQL en consola como verificación.
+
+Se accede a la app vía navegador en http://localhost:8080.
+
+Aparece la pantalla de login por defecto de Spring Security (sin usuarios definidos aún).
+
 
 ---
 
-## 🧪 Pruebas durante el desarrollo
+##  Pruebas durante el desarrollo
 
 A continuación se documentan los pasos para **comprobar que el backend funciona** en cada fase del proyecto.  
 Cada desarrollador debe probar estos pasos para asegurarse de que su entorno está bien configurado.
+ 
+---
+
+##  ¿Cómo hemos comprobado que funciona?
+
+A continuación se detallan los pasos seguidos para arrancar la aplicación correctamente y asegurarnos de que el backend funciona en local:
+
+1. **Base de datos PostgreSQL local**  
+   Se instaló y arrancó PostgreSQL con `brew services start postgresql`.  
+   Se creó una base de datos llamada `splitit` y un rol de usuario llamado `postgres` con contraseña `password`.
+
+2. **Conexión desde Spring Boot a PostgreSQL**  
+   En el archivo `application.properties` se configuró correctamente la URL de conexión, el nombre de usuario y la contraseña.  
+   Spring Boot logra conectarse a la base de datos al arrancar.
+
+3. **Arranque del backend**  
+   Desde el directorio `backend/splitit`, se ejecutó el comando:
+
+   ```bash
+   mvn spring-boot:run
+   ```
+
+   Si todo está bien, en la consola aparece:
+
+   ```
+   Tomcat started on port(s): 8080 (http)
+   Started SplititApplication in ...
+   ```
+
+4. **Verificación en navegador**  
+   Abrimos `http://localhost:8080` y aparece la pantalla de login por defecto de Spring Security.
+
+   ![alt text](<Captura de pantalla 2025-03-29 a las 19.33.52.png>)
 
 ---
 
-### ✅ Paso 1: Verificar que la app arranca (sin frontend aún)
+## ⚠️ Pendiente
 
-1. Asegúrate de tener instalado:
-   - Java 17
-   - Maven (`mvn -v` debe funcionar)
-2. Entra en la carpeta del backend:
+Ahora que la aplicación ya arranca y se conecta a la base de datos, el siguiente paso es implementar la lógica real del backend. Esto incluye:
 
-```bash
-cd backend/splitit
-mvn spring-boot:run
+1. **Crear los repositorios JPA**  
+   Cada entidad necesita su propio repositorio para poder hacer operaciones en la base de datos. Por ejemplo:
 
-Si todo va bien, verás en la terminal algo como:
+   ```java
+   public interface UsuarioRepository extends JpaRepository<Usuario, Long> {}
+   ```
 
-Tomcat started on port(s): 8080
-Started SplititApplication in ...
-Abre el navegador y entra a:
+   Esto nos permitirá guardar, buscar o eliminar usuarios sin escribir SQL manualmente.
 
-http://localhost:8080
+2. **Crear servicios (`service/`)**  
+   Los servicios se encargan de la lógica de negocio. Por ejemplo:  
+   - Verificar que un email no esté repetido al registrar un usuario  
+   - Calcular el saldo de un miembro en un grupo  
+   - Repartir deudas automáticamente al registrar un gasto
 
-Verás una página en blanco o "Whitelabel Error Page", lo cual está bien (aún no hay HTML ni endpoints configurados).
+3. **Crear controladores REST (`controller/`)**  
+   Aquí definiremos los endpoints (URLs) para que el frontend se comunique con el backend. Ejemplo:
+
+   ```java
+   @PostMapping("/api/usuarios")
+   public ResponseEntity<Usuario> crearUsuario(@RequestBody UsuarioDTO usuarioDTO) { ... }
+   ```
+
+4. **Implementar registro de usuarios**  
+   Actualmente, solo existe el login por defecto de Spring Security.  
+   Es necesario permitir que un nuevo usuario se registre (formulario de alta, guardar en base de datos, etc.).
+
+5. **Configurar Spring Security**  
+   Ahora mismo la seguridad está activada por defecto:  
+   - No podemos acceder a ninguna página sin login  
+   - No hay usuarios definidos en memoria ni en base de datos  
+   
+   Hay dos opciones:
+   - Desactivar temporalmente la seguridad para poder desarrollar (solo en local)
+   - Configurar usuarios reales desde base de datos y ajustar los permisos (recomendado más adelante)
+
+---
+```
+
+
+
 
 
