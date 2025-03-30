@@ -200,7 +200,7 @@ Un modelo es una clase Java que representa una tabla de la base de datos.
 Tambien se ha actualizado repository que permite el acceso a datos de la BBD. La carpeta repository/ contiene interfaces Java que heredan de JpaRepository, y permiten acceder fácilmente a la base de datos sin tener que escribir SQL.
 Así separas la lógica (services) del acceso a la base de datos (repositories), y tu código queda limpio y modular.
 
-var/folders/yj/5r7gvkzd4hg7fdsc_nzhpn5h0000gn/T/TemporaryItems/NSIRD_screencaptureui_KnmNZl/Captura de pantalla 2025-03-29 a las 19.56.26.png
+/var/folders/yj/5r7gvkzd4hg7fdsc_nzhpn5h0000gn/T/TemporaryItems/NSIRD_screencaptureui_KnmNZl/Captura de pantalla 2025-03-29 a las 19.56.26.png
 
 ### ⚙️ Configuración de la base de datos
 
@@ -312,8 +312,3 @@ Ahora que la aplicación ya arranca y se conecta a la base de datos, el siguient
 
 ---
 ```
-
-
-
-
-
