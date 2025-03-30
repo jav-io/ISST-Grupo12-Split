@@ -2,6 +2,7 @@ com\splitit\model\Grupo.class
 com\splitit\model\Miembro.class
 com\splitit\repository\DeudaRepository.class
 com\splitit\service\UsuarioService.class
+com\splitit\config\SecurityConfig.class
 com\splitit\model\Deuda.class
 com\splitit\model\Usuario.class
 com\splitit\repository\UsuarioRepository.class

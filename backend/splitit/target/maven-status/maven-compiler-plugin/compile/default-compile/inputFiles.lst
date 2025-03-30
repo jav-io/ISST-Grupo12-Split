@@ -1,12 +1,13 @@
-C:\Users\pablo\Desktop\ISST-Grupo12-Split\backend\splitit\src\main\java\com\splitit\model\Gasto.java
 C:\Users\pablo\Desktop\ISST-Grupo12-Split\backend\splitit\src\main\java\com\splitit\repository\DeudaRepository.java
-C:\Users\pablo\Desktop\ISST-Grupo12-Split\backend\splitit\src\main\java\com\splitit\service\UsuarioService.java
-C:\Users\pablo\Desktop\ISST-Grupo12-Split\backend\splitit\src\main\java\com\splitit\repository\GrupoRepository.java
 C:\Users\pablo\Desktop\ISST-Grupo12-Split\backend\splitit\src\main\java\com\splitit\model\Miembro.java
 C:\Users\pablo\Desktop\ISST-Grupo12-Split\backend\splitit\src\main\java\com\splitit\repository\MiembroRepository.java
 C:\Users\pablo\Desktop\ISST-Grupo12-Split\backend\splitit\src\main\java\com\splitit\repository\UsuarioRepository.java
-C:\Users\pablo\Desktop\ISST-Grupo12-Split\backend\splitit\src\main\java\com\splitit\controller\UsuarioController.java
 C:\Users\pablo\Desktop\ISST-Grupo12-Split\backend\splitit\src\main\java\com\splitit\model\Deuda.java
+C:\Users\pablo\Desktop\ISST-Grupo12-Split\backend\splitit\src\main\java\com\splitit\model\Gasto.java
+C:\Users\pablo\Desktop\ISST-Grupo12-Split\backend\splitit\src\main\java\com\splitit\service\UsuarioService.java
+C:\Users\pablo\Desktop\ISST-Grupo12-Split\backend\splitit\src\main\java\com\splitit\repository\GrupoRepository.java
+C:\Users\pablo\Desktop\ISST-Grupo12-Split\backend\splitit\src\main\java\com\splitit\controller\UsuarioController.java
 C:\Users\pablo\Desktop\ISST-Grupo12-Split\backend\splitit\src\main\java\com\splitit\model\Usuario.java
+C:\Users\pablo\Desktop\ISST-Grupo12-Split\backend\splitit\src\main\java\com\splitit\config\SecurityConfig.java
 C:\Users\pablo\Desktop\ISST-Grupo12-Split\backend\splitit\src\main\java\com\splitit\SplititApplication.java
 C:\Users\pablo\Desktop\ISST-Grupo12-Split\backend\splitit\src\main\java\com\splitit\model\Grupo.java
