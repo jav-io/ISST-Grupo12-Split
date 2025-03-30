@@ -189,6 +189,18 @@ Un modelo es una clase Java que representa una tabla de la base de datos.
 
 - **Deuda.java**: Entidad que representa una deuda generada por un gasto. Almacena información sobre el monto, si está saldada y la fecha de creación.
 
+
+## Controladores REST
+
+Se implementaron controladores para exponer la API REST:
+
+- **UsuarioController**: Gestiona el registro, consulta y búsqueda de usuarios.
+- **GrupoController**: Gestiona la creación, consulta y búsqueda por ID de grupos.
+- **GastoController**: Permite registrar y consultar gastos.
+- **MiembroController**: Permite la gestión de la relación entre usuarios y grupos.
+- **DeudaController**: Gestiona el registro y consulta de deudas generadas por gastos.
+
+
 ### 🔧 Configuración
 
 - **application.properties**: Archivo de configuración que define la conexión a la base de datos PostgreSQL, configuración de JPA/Hibernate, puerto del servidor y configuración de Thymeleaf.
@@ -200,7 +212,7 @@ Un modelo es una clase Java que representa una tabla de la base de datos.
 Tambien se ha actualizado repository que permite el acceso a datos de la BBD. La carpeta repository/ contiene interfaces Java que heredan de JpaRepository, y permiten acceder fácilmente a la base de datos sin tener que escribir SQL.
 Así separas la lógica (services) del acceso a la base de datos (repositories), y tu código queda limpio y modular.
 
-/var/folders/yj/5r7gvkzd4hg7fdsc_nzhpn5h0000gn/T/TemporaryItems/NSIRD_screencaptureui_KnmNZl/Captura de pantalla 2025-03-29 a las 19.56.26.png
+
 
 ### ⚙️ Configuración de la base de datos
 
@@ -296,6 +308,7 @@ Ahora que la aplicación ya arranca y se conecta a la base de datos, el siguient
    @PostMapping("/api/usuarios")
    public ResponseEntity<Usuario> crearUsuario(@RequestBody UsuarioDTO usuarioDTO) { ... }
    ```
+
 
 4. **Implementar registro de usuarios**  
    Actualmente, solo existe el login por defecto de Spring Security.  
