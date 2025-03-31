@@ -35,4 +35,16 @@ public class GastoController {
         Gasto gasto = gastoService.buscarPorId(id);
         return ResponseEntity.ok(gasto);
     }
-}
+
+     // Endpoint para editar un gasto
+     @PutMapping("/{id}")
+     public ResponseEntity<Gasto> editarGasto(@PathVariable Long id, @RequestBody Gasto gastoActualizado) {
+         Gasto gastoEditado = gastoService.editarGasto(id, gastoActualizado);
+         return ResponseEntity.ok(gastoEditado);
+     }
+ }
+
+
+
+
+
