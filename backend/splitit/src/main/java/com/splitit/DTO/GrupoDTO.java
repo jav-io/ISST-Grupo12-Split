@@ -31,5 +31,6 @@ public class GrupoDTO {
     }
     public void setIdCreador(Long idCreador) {
         this.idCreador = idCreador;
+ 
     }
 }
