@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consultar Saldo - Split.it</title>
+    <style>
+        /* Reutilizo el diseño de los formularios anteriores */
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Consultar Saldo</h1>
+        <form action="/api/consultar-saldo" method="GET">
+            <div class="form-group">
+                <label for="grupoId">ID del Grupo:</label>
+                <input type="text" id="grupoId" name="grupoId" required>
+            </div>
+            <button type="submit">Consultar Saldo</button>
+        </form>
+
+        <div id="saldo">
+            <!-- El saldo se mostrará aquí -->
+        </div>
+
+        <div class="back-link">
+            <a href="index.html">Volver al Inicio</a>
+        </div>
+    </div>
+
+</body>
+</html>

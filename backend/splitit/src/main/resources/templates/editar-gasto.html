@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Gasto - Split.it</title>
+    <style>
+        /* Reutilizo el diseño de los formularios anteriores */
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Editar Gasto</h1>
+        <form action="/api/editar-gasto" method="POST">
+            <div class="form-group">
+                <label for="gastoId">ID del Gasto:</label>
+                <input type="text" id="gastoId" name="gastoId" required>
+            </div>
+            <div class="form-group">
+                <label for="nuevoNombre">Nuevo Nombre del Gasto:</label>
+                <input type="text" id="nuevoNombre" name="nuevoNombre">
+            </div>
+            <div class="form-group">
+                <label for="nuevaCantidad">Nueva Cantidad:</label>
+                <input type="number" id="nuevaCantidad" name="nuevaCantidad">
+            </div>
+            <div class="form-group">
+                <label for="nuevaCategoria">Nueva Categoría:</label>
+                <input type="text" id="nuevaCategoria" name="nuevaCategoria">
+            </div>
+            <button type="submit">Editar Gasto</button>
+        </form>
+        <div class="back-link">
+            <a href="index.html">Volver al Inicio</a>
+        </div>
+    </div>
+
+</body>
+</html>
