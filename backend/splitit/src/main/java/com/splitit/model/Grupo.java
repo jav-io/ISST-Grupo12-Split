@@ -4,6 +4,7 @@ package com.splitit.model;
 import jakarta.persistence.*;
 import java.util.Date;
 import java.util.List;
+import jakarta.validation.constraints.NotBlank;
 
 /**
  * Entidad que representa un grupo de gastos compartidos.

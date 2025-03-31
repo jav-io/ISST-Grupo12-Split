@@ -14,6 +14,7 @@ com\splitit\service\MiembroService.class
 com\splitit\SplititApplication.class
 com\splitit\controller\GrupoController.class
 com\splitit\controller\UsuarioController.class
+com\splitit\dto\GrupoDTO.class
 com\splitit\model\Gasto.class
 com\splitit\repository\GrupoRepository.class
 com\splitit\repository\MiembroRepository.class
