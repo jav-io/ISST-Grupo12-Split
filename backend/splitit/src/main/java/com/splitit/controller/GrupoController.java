@@ -1,5 +1,7 @@
 package com.splitit.controller;
 
+
+import com.splitit.dto.GrupoDTO;
 import com.splitit.model.Grupo;
 import com.splitit.service.GrupoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,6 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import jakarta.validation.Valid;
+
 
 @RestController
 @RequestMapping("/api/grupos")
@@ -15,10 +19,10 @@ public class GrupoController {
     @Autowired
     private GrupoService grupoService;
 
-    // Crear un nuevo grupo
+    // Endpoint para crear un grupo, recibiendo el DTO
     @PostMapping
-    public ResponseEntity<Grupo> crearGrupo(@RequestBody Grupo grupo) {
-        Grupo nuevoGrupo = grupoService.crearGrupo(grupo);
+    public ResponseEntity<Grupo> crearGrupo(@Valid @RequestBody GrupoDTO grupoDTO) {
+        Grupo nuevoGrupo = grupoService.crearGrupo(grupoDTO);
         return ResponseEntity.ok(nuevoGrupo);
     }
 
