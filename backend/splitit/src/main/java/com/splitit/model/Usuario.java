@@ -1,38 +1,29 @@
-// backend/splitit/src/main/java/com/splitit/model/Usuario.java
 package com.splitit.model;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import java.util.List;
 
-/**
- * Entidad que representa a un usuario del sistema.
- * Cada usuario puede participar en múltiples grupos como miembro.
- */
 @Entity
 @Table(name = "usuario")
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "idUsuario")
 public class Usuario {
 
-    // Identificador único del usuario, se genera automáticamente
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idUsuario;
 
-    // Nombre completo del usuario
     private String nombre;
 
-    // Email del usuario, debe ser único en el sistema
     @Column(unique = true)
     private String email;
 
-    // Contraseña del usuario (se almacenará encriptada)
     private String password;
 
-    // Indica si el usuario tiene una cuenta premium
     private boolean isPremium;
 
-    // Relación con la entidad Miembro: un usuario puede ser miembro de varios grupos
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
-    @JsonManagedReference
     private List<Miembro> miembros;
 
     // Constructor vacío requerido por JPA
