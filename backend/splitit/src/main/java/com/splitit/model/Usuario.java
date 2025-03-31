@@ -32,6 +32,7 @@ public class Usuario {
 
     // Relación con la entidad Miembro: un usuario puede ser miembro de varios grupos
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
+    @JsonManagedReference
     private List<Miembro> miembros;
 
     // Constructor vacío requerido por JPA

@@ -26,6 +26,7 @@ public class Miembro {
     // Relación con la entidad Usuario: cada miembro está asociado a un usuario
     @ManyToOne
     @JoinColumn(name = "idUsuario")
+    @JsonBackReference
     private Usuario usuario;
 
     // Relación con la entidad Grupo: cada miembro pertenece a un grupo
