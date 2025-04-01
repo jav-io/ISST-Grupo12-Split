@@ -58,4 +58,12 @@ public class GastoDTO {
     public void setIdParticipantes(List<Long> idParticipantes) {
         this.idParticipantes = idParticipantes;
     }
+    private Long idUsuarioPagador;
+    public void setIdUsuarioPagador(Long idUsuarioPagador) {
+        this.idUsuarioPagador = idUsuarioPagador;
+    }
+    public Long getIdUsuarioPagador() {
+        return idUsuarioPagador;
+    }
+
 }

@@ -5,6 +5,9 @@ import com.splitit.model.Usuario;
 import com.splitit.dto.GrupoDTO;
 import com.splitit.model.Grupo;
 import com.splitit.repository.GrupoRepository;
+import com.splitit.repository.MiembroRepository;
+import com.splitit.repository.UsuarioRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +25,12 @@ public class GrupoService {
 
     @Autowired
     private UsuarioService usuarioService; // Para obtener el usuario creador
+
+    @Autowired
+    private MiembroRepository miembroRepository;
+
+    @Autowired
+    private UsuarioRepository usuarioRepository;
 
 
     public Grupo crearGrupo(GrupoDTO grupoDTO) {
@@ -63,13 +72,39 @@ public List<Grupo> obtenerGruposPorUsuario(Long idUsuario) {
 }
 
 // Método 2: crear grupo a partir de un DTO (alias del ya existente)
-public Grupo crearGrupoDesdeDTO(GrupoDTO grupoDTO) {
-    return crearGrupo(grupoDTO);
+public void crearGrupoDesdeDTO(GrupoDTO grupoDTO) {
+    Grupo grupo = new Grupo();
+    grupo.setNombre(grupoDTO.getNombre());
+    grupo.setDescripcion(grupoDTO.getDescripcion());
+    grupo.setFechaCreacion(new Date());
+
+    Grupo grupoGuardado = grupoRepository.save(grupo);
+
+    // Simular añadir al creador como miembro
+    Miembro miembro = new Miembro();
+    miembro.setGrupo(grupoGuardado);
+    Usuario usuario = usuarioRepository.findById(grupoDTO.getIdCreador())
+    .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+    miembro.setUsuario(usuario);
+    miembroRepository.save(miembro);
 }
+
 
 // Método 3: obtener grupo por ID
 public Grupo obtenerGrupoPorId(Long id) {
     return buscarPorId(id);
+}
+
+public GrupoDTO obtenerGrupoDTOporId(Long id) {
+    Grupo grupo = grupoRepository.findById(id)
+        .orElseThrow(() -> new RuntimeException("Grupo no encontrado"));
+    
+    GrupoDTO dto = new GrupoDTO();
+    dto.setNombre(grupo.getNombre());
+    dto.setDescripcion(grupo.getDescripcion());
+    dto.setIdCreador(grupo.getIdCreador()); // ✅
+    dto.setFechaCreacion(grupo.getFechaCreacion());
+    return dto;
 }
 
 }

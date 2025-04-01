@@ -21,6 +21,17 @@ public class Grupo {
 
     private String descripcion;
 
+    private Long idCreador;
+
+    public Long getIdCreador() {
+        return idCreador;
+    }
+
+    public void setIdCreador(Long idCreador) {
+        this.idCreador = idCreador;
+    }
+
+
     @Temporal(TemporalType.DATE)
     private Date fechaCreacion;
 

@@ -17,7 +17,7 @@
     }
     nav a:hover { color: #0d6efd; }
     .form-container {
-      max-width: 600px; margin: 60px auto; background: white;
+      max-width: 700px; margin: 60px auto; background: white;
       padding: 40px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     }
     h2 { margin-bottom: 30px; text-align: center; }
@@ -25,12 +25,25 @@
     input, textarea {
       width: 100%; padding: 12px; border-radius: 6px; border: 1px solid #ccc;
     }
-    button {
+    .miembro {
+      margin-top: 15px;
+      display: flex;
+      gap: 10px;
+    }
+    .miembro input {
+      flex: 1;
+    }
+    .add-miembro-btn {
+      margin-top: 10px; padding: 8px 16px; background-color: #0d6efd;
+      color: white; border: none; border-radius: 6px; font-weight: 600;
+      cursor: pointer;
+    }
+    button[type="submit"] {
       margin-top: 30px; width: 100%; padding: 14px;
       background-color: #0d6efd; color: white; border: none;
       border-radius: 8px; font-weight: 600; cursor: pointer;
     }
-    button:hover { background-color: #0b5ed7; }
+    button:hover, .add-miembro-btn:hover { background-color: #0b5ed7; }
   </style>
 </head>
 <body>
@@ -44,6 +57,7 @@
 
   <div class="form-container">
     <h2>Crear nuevo grupo</h2>
+
     <form th:action="@{/crear-grupo}" th:object="${grupoDTO}" method="post">
       <label for="nombre">Nombre del grupo</label>
       <input type="text" id="nombre" th:field="*{nombre}" placeholder="Ej. Piso compartido" required />
@@ -51,15 +65,38 @@
       <label for="descripcion">Descripción</label>
       <textarea id="descripcion" th:field="*{descripcion}" rows="3" placeholder="Describe el grupo..." required></textarea>
 
-      <!-- ID del usuario creador (por ahora hardcoded como 2L para que no dé error) -->
+      <!-- ID del usuario creador -->
       <input type="hidden" th:field="*{idCreador}" th:value="2" />
+
+      <!-- Miembros iniciales -->
+      <div id="miembros">
+        <label>Miembros del grupo</label>
+        <div class="miembro">
+          <input type="text" name="miembros[0].nombre" placeholder="Nombre del miembro" />
+          <input type="email" name="miembros[0].email" placeholder="Email del miembro" />
+        </div>
+      </div>
+      <button type="button" class="add-miembro-btn" onclick="agregarMiembro()">+ Añadir otro miembro</button>
 
       <button type="submit">Crear grupo</button>
     </form>
   </div>
 
-  <footer>
-    &copy; 2025 Split.it – Todos los derechos reservados.
-  </footer>
+  <footer>&copy; 2025 Split.it – Todos los derechos reservados.</footer>
+
+  <script>
+    let miembroIndex = 1;
+    function agregarMiembro() {
+      const container = document.getElementById('miembros');
+      const div = document.createElement('div');
+      div.className = 'miembro';
+      div.innerHTML = `
+        <input type="text" name="miembros[${miembroIndex}].nombre" placeholder="Nombre del miembro" />
+        <input type="email" name="miembros[${miembroIndex}].email" placeholder="Email del miembro" />
+      `;
+      container.appendChild(div);
+      miembroIndex++;
+    }
+  </script>
 </body>
 </html>

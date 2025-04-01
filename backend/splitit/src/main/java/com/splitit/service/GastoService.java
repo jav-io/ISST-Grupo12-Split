@@ -173,4 +173,19 @@ public class GastoService {
 
         return resultado;
     }
+    // Obtiene todos los gastos de un grupo
+public List<Gasto> obtenerGastosPorGrupo(Long idGrupo) {
+    return gastoRepository.findByGrupo_IdGrupo(idGrupo);
+}
+
+// Obtiene un gasto por su ID
+public Gasto obtenerGastoPorId(Long id) {
+    return gastoRepository.findById(id).orElseThrow(() -> new RuntimeException("Gasto no encontrado"));
+}
+
+// Actualiza un gasto
+public void actualizarGasto(Gasto gasto) {
+    gastoRepository.save(gasto);
+}
+
 }
