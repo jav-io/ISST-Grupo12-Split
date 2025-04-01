@@ -28,50 +28,60 @@ public class GastoService {
     private MiembroService miembroService;
 
     // Método para crear gasto a partir de GastoDTO (ya existente)
-    public Gasto crearGasto(GastoDTO gastoDTO) {
-        if (gastoDTO.getMonto() <= 0) {
-            throw new RuntimeException("El monto debe ser mayor que cero.");
-        }
-        // Obtener el grupo
-        Grupo grupo = grupoService.buscarPorId(gastoDTO.getIdGrupo());
-        // Obtener el miembro pagador
-        Miembro pagador = miembroService.buscarPorId(gastoDTO.getIdPagador());
-        // Crear la entidad Gasto
-        Gasto gasto = new Gasto();
-        gasto.setMonto(gastoDTO.getMonto());
-        gasto.setDescripcion(gastoDTO.getDescripcion());
-        gasto.setCategoria(gastoDTO.getCategoria());
-        gasto.setGrupo(grupo);
-        gasto.setPagador(pagador);
-        gasto.setFecha(new Date());
-        // Inicializamos la lista de deudas si no está ya inicializada
-        if (gasto.getDeudas() == null) {
-            gasto.setDeudas(new ArrayList<>());
-        }
-        Gasto gastoGuardado = gastoRepository.save(gasto);
-        
-        // Calcular el monto por participante
-        List<Long> participantesIds = gastoDTO.getIdParticipantes();
-        if (participantesIds.isEmpty()) {
-            throw new RuntimeException("Debe haber al menos un participante para compartir el gasto.");
-        }
-        float montoPorParticipante = gastoDTO.getMonto() / participantesIds.size();
-        
-        // Crear deudas para cada participante
-        for (Long idParticipante : participantesIds) {
-            Miembro participante = miembroService.buscarPorId(idParticipante);
-            // Se asume que la clase Deuda está correctamente implementada
-            // y que la relación cascade en Gasto se encarga de persistirla.
-            var deuda = new com.splitit.model.Deuda();
-            deuda.setMonto(montoPorParticipante);
-            deuda.setDeudor(participante);
-            deuda.setGasto(gastoGuardado);
-            gastoGuardado.getDeudas().add(deuda);
-        }
-        
-        return gastoRepository.save(gastoGuardado);
+   public Gasto crearGasto(GastoDTO gastoDTO) {
+    if (gastoDTO.getMonto() <= 0) {
+        throw new RuntimeException("El monto debe ser mayor que cero.");
     }
-
+    
+    // Obtener el grupo a partir del idGrupo del DTO
+    Grupo grupo = grupoService.buscarPorId(gastoDTO.getIdGrupo());
+    
+    // Obtener el miembro pagador (se asume que ya es miembro del grupo)
+    Miembro pagador = miembroService.buscarPorId(gastoDTO.getIdPagador());
+    
+    // Validar que el miembro pagador pertenezca al grupo correcto
+    if (!pagador.getGrupo().getIdGrupo().equals(grupo.getIdGrupo())) {
+        throw new RuntimeException("El pagador no pertenece al grupo especificado.");
+    }
+    
+    // Crear la entidad Gasto
+    Gasto gasto = new Gasto();
+    gasto.setMonto(gastoDTO.getMonto());
+    gasto.setDescripcion(gastoDTO.getDescripcion());
+    gasto.setCategoria(gastoDTO.getCategoria());
+    gasto.setGrupo(grupo);
+    gasto.setPagador(pagador);
+    gasto.setFecha(new Date());
+    
+    // Inicializar la lista de deudas si no está ya inicializada
+    if (gasto.getDeudas() == null) {
+        gasto.setDeudas(new ArrayList<>());
+    }
+    Gasto gastoGuardado = gastoRepository.save(gasto);
+    
+    // Calcular el monto por participante
+    List<Long> participantesIds = gastoDTO.getIdParticipantes();
+    if (participantesIds.isEmpty()) {
+        throw new RuntimeException("Debe haber al menos un participante para compartir el gasto.");
+    }
+    float montoPorParticipante = gastoDTO.getMonto() / participantesIds.size();
+    
+    // Para cada participante, validar que pertenezca al grupo y crear la deuda
+    for (Long idParticipante : participantesIds) {
+        Miembro participante = miembroService.buscarPorId(idParticipante);
+        // Validar que el participante pertenezca al mismo grupo que el gasto
+        if (!participante.getGrupo().getIdGrupo().equals(grupo.getIdGrupo())) {
+            throw new RuntimeException("El participante con id " + idParticipante + " no pertenece al grupo " + grupo.getIdGrupo());
+        }
+        Deuda deuda = new Deuda();
+        deuda.setMonto(montoPorParticipante);
+        deuda.setDeudor(participante);
+        deuda.setGasto(gastoGuardado);
+        gastoGuardado.getDeudas().add(deuda);
+    }
+    
+    return gastoRepository.save(gastoGuardado);
+}
     public List<Gasto> obtenerTodos() {
         return gastoRepository.findAll();
     }

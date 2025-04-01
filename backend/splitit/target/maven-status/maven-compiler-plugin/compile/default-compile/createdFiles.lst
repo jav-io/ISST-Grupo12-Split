@@ -15,7 +15,9 @@ com\splitit\service\GastoService.class
 com\splitit\model\Miembro.class
 com\splitit\repository\DeudaRepository.class
 com\splitit\service\UsuarioService.class
+com\splitit\dto\GastoConParticipantesDTO.class
 com\splitit\config\SecurityConfig.class
+com\splitit\dto\ParticipanteDTO.class
 com\splitit\service\GrupoService.class
 com\splitit\model\Usuario.class
 com\splitit\controller\GrupoController.class
