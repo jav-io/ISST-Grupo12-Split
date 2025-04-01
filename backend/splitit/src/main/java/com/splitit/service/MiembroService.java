@@ -46,4 +46,9 @@ public class MiembroService {
         miembro.setSaldoActual(0);
         return miembroRepository.save(miembro);
     }
+
+    // ✅ Método añadido para actualizar el saldo u otros datos de un miembro
+    public Miembro actualizarMiembro(Miembro miembro) {
+        return miembroRepository.save(miembro);
+    }
 }
