@@ -1,12 +1,15 @@
 package com.splitit.controller;
 
 import com.splitit.model.Gasto;
+import com.splitit.dto.GastoDTO;
 import com.splitit.service.GastoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import jakarta.validation.Valid;
+
 
 @RestController
 @RequestMapping("/api/gastos")
@@ -15,12 +18,14 @@ public class GastoController {
     @Autowired
     private GastoService gastoService;
 
-    // Registrar un nuevo gasto
+    // Endpoint para crear un gasto a partir de GastoDTO
     @PostMapping
-    public ResponseEntity<Gasto> crearGasto(@RequestBody Gasto gasto) {
-        Gasto nuevoGasto = gastoService.crearGasto(gasto);
+    public ResponseEntity<Gasto> crearGasto(@Valid @RequestBody GastoDTO gastoDTO) {
+        Gasto nuevoGasto = gastoService.crearGasto(gastoDTO);
         return ResponseEntity.ok(nuevoGasto);
     }
+
+  
 
     // Obtener todos los gastos
     @GetMapping
