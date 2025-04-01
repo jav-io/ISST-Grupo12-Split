@@ -212,6 +212,7 @@ Se implementaron controladores para exponer la API REST:
 Tambien se ha actualizado repository que permite el acceso a datos de la BBD. La carpeta repository/ contiene interfaces Java que heredan de JpaRepository, y permiten acceder fácilmente a la base de datos sin tener que escribir SQL.
 Así separas la lógica (services) del acceso a la base de datos (repositories), y tu código queda limpio y modular.
 
+![alt text](<Captura de pantalla 2025-04-01 a las 17.31.52.png>)
 
 
 ### ⚙️ Configuración de la base de datos

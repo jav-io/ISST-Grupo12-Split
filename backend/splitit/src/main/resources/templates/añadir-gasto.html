@@ -1,92 +1,58 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Split.it - Registrar Gasto</title>
+  <title>Añadir Gasto</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet" />
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-    body { background: linear-gradient(135deg, #f8f9fa, #e9ecef); color: #343a40; }
-    header { background-color: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.1); padding: 20px 40px; display: flex; justify-content: space-between; align-items: center; }
-    header h1 { font-size: 1.8rem; color: #2c3e50; }
-    nav a { margin-left: 20px; color: #2c3e50; text-decoration: none; font-weight: 600; transition: color 0.3s; }
+    body { background: #f5f7fa; color: #343a40; }
+    header, footer {
+      background: #fff; padding: 20px 40px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    nav a { margin-left: 20px; color: #2c3e50; font-weight: 600; text-decoration: none; }
     nav a:hover { color: #0d6efd; }
-    .container { max-width: 600px; margin: 60px auto; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
-    h2 { text-align: center; margin-bottom: 20px; }
-    form label { display: block; margin-top: 15px; font-weight: 600; }
-    form input { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 6px; }
-    button { margin-top: 20px; width: 100%; padding: 12px; background-color: #0d6efd; color: #fff; border: none; font-weight: 600; border-radius: 6px; cursor: pointer; }
+    .form-container {
+      max-width: 600px; margin: 40px auto; padding: 30px;
+      background: white; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    label { display: block; margin: 15px 0 5px; font-weight: 600; }
+    input, textarea, select {
+      width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px;
+    }
+    button {
+      background-color: #0d6efd; color: white; border: none;
+      padding: 12px 20px; margin-top: 20px; border-radius: 6px; font-weight: 600;
+      cursor: pointer;
+    }
     button:hover { background-color: #0b5ed7; }
-    .mensaje { margin-top: 15px; text-align: center; font-weight: 600; }
   </style>
 </head>
 <body>
   <header>
     <h1>Split.it</h1>
     <nav>
-      <a href="/dashboard.html">Dashboard</a>
+      <a href="/">Inicio</a>
+      <a href="/dashboard">Panel</a>
     </nav>
   </header>
 
-  <div class="container">
-    <h2>Registrar nuevo gasto</h2>
-    <form id="gastoForm">
-      <label for="descripcion">Descripción</label>
-      <input type="text" id="descripcion" required />
-
-      <label for="monto">Monto (€)</label>
-      <input type="number" id="monto" step="0.01" required />
-
-      <label for="idPagador">ID del usuario que paga</label>
-      <input type="number" id="idPagador" required />
-
-      <button type="submit">Guardar Gasto</button>
+  <div class="form-container">
+    <h2>Añadir nuevo gasto</h2>
+    <form th:action="@{/añadir-gasto}" method="post">
+      <label>Descripción</label>
+      <input type="text" name="descripcion" placeholder="Ej. Compra en supermercado" required />
+      <label>Monto (€)</label>
+      <input type="number" step="0.01" name="monto" required />
+      <label>Fecha</label>
+      <input type="date" name="fecha" required />
+      <button type="submit">Guardar gasto</button>
     </form>
-    <div class="mensaje" id="mensaje"></div>
   </div>
 
-  <footer>
-    &copy; 2025 Split.it – Todos los derechos reservados.
-  </footer>
-
-  <script>
-    const params = new URLSearchParams(window.location.search);
-    const grupoId = params.get("grupoId");
-    const form = document.getElementById('gastoForm');
-    const mensaje = document.getElementById('mensaje');
-
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-
-      const gasto = {
-        descripcion: form.descripcion.value,
-        monto: parseFloat(form.monto.value),
-        idPagador: parseInt(form.idPagador.value),
-        grupoId: parseInt(grupoId)
-      };
-
-      try {
-        const res = await fetch('http://localhost:8080/gastos', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(gasto)
-        });
-
-        if (res.ok) {
-          mensaje.textContent = "✅ Gasto añadido correctamente";
-          mensaje.style.color = "green";
-          form.reset();
-        } else {
-          mensaje.textContent = "❌ Error al guardar el gasto";
-          mensaje.style.color = "red";
-        }
-      } catch (err) {
-        mensaje.textContent = "❌ Error de conexión con el servidor";
-        mensaje.style.color = "red";
-      }
-    });
-  </script>
+  <footer>&copy; 2025 Split.it – Todos los derechos reservados.</footer>
 </body>
 </html>

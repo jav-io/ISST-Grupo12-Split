@@ -1,5 +1,7 @@
 package com.splitit.controller;
 
+import jakarta.validation.Valid;
+import com.splitit.dto.InvitacionDTO;
 import com.splitit.model.Miembro;
 import com.splitit.service.MiembroService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +16,17 @@ public class MiembroController {
 
     @Autowired
     private MiembroService miembroService;
+
+
+    // Endpoint para invitar a un usuario a un grupo
+    @PostMapping("/invitar")
+    public ResponseEntity<Miembro> invitarMiembro(@Valid @RequestBody InvitacionDTO invitacionDTO) {
+        Miembro nuevoMiembro = miembroService.invitarMiembro(
+                invitacionDTO.getIdGrupo(),
+                invitacionDTO.getIdUsuario()
+        );
+        return ResponseEntity.ok(nuevoMiembro);
+    }
 
     // Agregar un nuevo miembro a un grupo
     @PostMapping

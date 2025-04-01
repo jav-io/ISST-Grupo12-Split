@@ -2,8 +2,8 @@ package com.splitit.repository;
 
 import com.splitit.model.Grupo;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import java.util.List;
 
-@Repository
 public interface GrupoRepository extends JpaRepository<Grupo, Long> {
+    List<Grupo> findByMiembros_Usuario_Id(Long idUsuario);
 }

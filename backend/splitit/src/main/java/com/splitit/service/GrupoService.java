@@ -56,4 +56,20 @@ public class GrupoService {
         return grupoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Grupo no encontrado"));
     }
+
+    // Método 1: obtener grupos por usuario
+public List<Grupo> obtenerGruposPorUsuario(Long idUsuario) {
+    return grupoRepository.findByMiembros_Usuario_Id(idUsuario);
+}
+
+// Método 2: crear grupo a partir de un DTO (alias del ya existente)
+public Grupo crearGrupoDesdeDTO(GrupoDTO grupoDTO) {
+    return crearGrupo(grupoDTO);
+}
+
+// Método 3: obtener grupo por ID
+public Grupo obtenerGrupoPorId(Long id) {
+    return buscarPorId(id);
+}
+
 }

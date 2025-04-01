@@ -1,47 +1,39 @@
-// backend/splitit/src/main/java/com/splitit/model/Grupo.java
 package com.splitit.model;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import java.util.Date;
 import java.util.List;
 
-/**
- * Entidad que representa un grupo de gastos compartidos.
- * Un grupo contiene múltiples miembros y gastos.
- */
 @Entity
 @Table(name = "grupo")
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "idGrupo")
 public class Grupo {
 
-    // Identificador único del grupo, se genera automáticamente
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idGrupo;
 
-    // Nombre del grupo
+    @NotBlank(message = "El nombre del grupo es obligatorio")
     private String nombre;
 
-    // Descripción opcional del grupo
     private String descripcion;
 
-    // Fecha de creación del grupo
     @Temporal(TemporalType.DATE)
     private Date fechaCreacion;
 
-    // Relación con la entidad Miembro: un grupo tiene múltiples miembros
     @OneToMany(mappedBy = "grupo", cascade = CascadeType.ALL)
     private List<Miembro> miembros;
 
-    // Relación con la entidad Gasto: un grupo tiene múltiples gastos
     @OneToMany(mappedBy = "grupo", cascade = CascadeType.ALL)
     private List<Gasto> gastos;
 
-    // Constructor vacío que inicializa la fecha de creación
     public Grupo() {
         this.fechaCreacion = new Date();
     }
 
-    // Constructor con parámetros básicos
     public Grupo(String nombre, String descripcion) {
         this.nombre = nombre;
         this.descripcion = descripcion;
