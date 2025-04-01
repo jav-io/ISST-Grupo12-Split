@@ -1,16 +1,15 @@
 package com.splitit.controller;
 
-
 import com.splitit.dto.GrupoDTO;
+import com.splitit.dto.SaldoGrupoDTO;
 import com.splitit.model.Grupo;
 import com.splitit.service.GrupoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import jakarta.validation.Valid;
-
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/grupos")
@@ -19,24 +18,26 @@ public class GrupoController {
     @Autowired
     private GrupoService grupoService;
 
-    // Endpoint para crear un grupo, recibiendo el DTO
     @PostMapping
     public ResponseEntity<Grupo> crearGrupo(@Valid @RequestBody GrupoDTO grupoDTO) {
-        Grupo nuevoGrupo = grupoService.crearGrupo(grupoDTO);
-        return ResponseEntity.ok(nuevoGrupo);
+        Grupo grupoCreado = grupoService.crearGrupo(grupoDTO);
+        return ResponseEntity.ok(grupoCreado);
     }
 
-    // Obtener todos los grupos
     @GetMapping
     public ResponseEntity<List<Grupo>> obtenerTodos() {
-        List<Grupo> grupos = grupoService.obtenerTodos();
-        return ResponseEntity.ok(grupos);
+        return ResponseEntity.ok(grupoService.obtenerTodos());
     }
 
-    // Buscar grupo por ID
-    @GetMapping("/{id}")
-    public ResponseEntity<Grupo> buscarPorId(@PathVariable Long id) {
-        Grupo grupo = grupoService.buscarPorId(id);
-        return ResponseEntity.ok(grupo);
+    @GetMapping("/{idGrupo}")
+    public ResponseEntity<Grupo> buscarPorId(@PathVariable Long idGrupo) {
+        return ResponseEntity.ok(grupoService.buscarPorId(idGrupo));
+    }
+
+    // ✅ Endpoint para consultar saldos por grupo
+    @GetMapping("/{idGrupo}/saldos")
+    public ResponseEntity<List<SaldoGrupoDTO>> consultarSaldos(@PathVariable Long idGrupo) {
+        List<SaldoGrupoDTO> saldos = grupoService.consultarSaldosGrupo(idGrupo);
+        return ResponseEntity.ok(saldos);
     }
 }
