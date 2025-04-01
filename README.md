@@ -5,14 +5,25 @@
 
 ---
 
+## ✨ Identidad Visual
+
+La imagen de marca de Split.it está basada en un símbolo clave: el **dólar ($) dividido diagonalmente**, que representa gráficamente el concepto de "split".
+
+- Diseño minimalista con **colores azules** que transmiten confianza y tecnología.
+- ✅ El símbolo `$` integrado como primera letra en `plit.it`.
+
+---
+
 ## ✅ MVP - Funcionalidad básica
 
-- Crear grupos de gasto
-- Añadir miembros a un grupo
-- Registrar gastos realizados por los usuarios
-- Calcular saldos pendientes entre miembros
-- Consultar historial de transacciones por grupo
-
+- 📌 Creación de grupos de gasto con descripción y administrador asignado automáticamente.
+- 👥 Añadir miembros a grupos y asignarles roles: `ADMIN` o `MEMBER`.
+- 💳 Registrar gastos indicando:
+  - Pagador
+  - Importe
+  - Descripción
+  - Categoría
+  - Fecha
 ---
 
 ## 🧰 Tecnologías previstas
@@ -22,7 +33,7 @@
 | **Frontend**  | HTML, CSS, JavaScript      |
 | **Backend**   | Java con Spring Boot (REST API) |
 | **Base de datos** | PostgreSQL             |
-| **UI/UX**     | Figma                      |
+| Seguridad   | Spring Security             |
 | **Control de versiones** | Git + GitHub     |
 | **Gestión de tareas** | Trello             |
 | **Metodología** | Scrum                     |
@@ -56,26 +67,28 @@ Este repositorio sigue una estructura organizada según las buenas prácticas de
 
 ```
 ISST-GRUPO12-SPLIT/
-├── .gitignore              # Archivos y directorios ignorados por Git
-├── README.md               # Documentación principal del proyecto
-├── docs/                   # Documentación adicional del proyecto
-└── backend/                # Código del backend
-    └── splitit/            # Proyecto principal de Spring Boot
-        ├── pom.xml         # Configuración de Maven y dependencias
-        ├── SplititApplication.java  # Punto de entrada de la aplicación
-        └── src/            # Código fuente
-            └── main/       # Código principal
-                ├── java/com/splitit/  # Paquete principal
-                │   ├── controller/    # Controladores REST
-                │   ├── service/       # Servicios de negocio
-                │   ├── model/         # Entidades y modelos
-                │   └── repository/    # Repositorios para acceso a datos
-                └── resources/         # Recursos de la aplicación
-                    ├── application.properties  # Configuración
-                    ├── templates/     # Plantillas HTML (Thymeleaf)
-                    └── static/        # Recursos estáticos
-                        ├── css/       # Hojas de estilo
-                        └── js/        # Scripts JavaScript
+├── .gitignore                      # Archivos y directorios ignorados por Git
+├── README.md                       # Documentación principal del proyecto
+├── docs/                           # Documentación adicional del proyecto
+└── backend/                        # Código del backend
+    └── splitit/                    # Proyecto principal de Spring Boot
+        ├── pom.xml                 # Configuración de Maven y dependencias
+        ├── src/                    # Código fuente
+        │   └── main/
+        │       ├── java/com/splitit/       # Paquete principal
+        │       │   ├── controller/         # Controladores REST
+        │       │   ├── service/            # Servicios de negocio
+        │       │   ├── repository/         # Repositorios JPA
+        │       │   ├── model/              # Entidades: Usuario, Grupo, Gasto, etc.
+        │       │   ├── dto/                # Clases DTO para validación de entrada
+        │       │   └── config/             # Configuración de seguridad
+        │       └── resources/              # Recursos de configuración
+        │           ├── application.properties  # Configuración de Spring Boot
+        │           ├── static/             # Recursos estáticos para frontend
+        │           │   ├── css/            # Estilos CSS
+        │           │   └── js/             # Lógica JavaScript
+        │           └── public/             # Archivos HTML del frontend
+        └── SplititApplication.java         # Punto de entrada de la app Spring Boot
 
 ```
 
