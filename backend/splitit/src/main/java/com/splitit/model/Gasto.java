@@ -41,6 +41,7 @@ public class Gasto {
 
     public Gasto() {
         this.fecha = new Date();
+        this.deudas = new ArrayList<>();
     }
 
     public Gasto(float monto, String descripcion, String categoria, Grupo grupo, Miembro pagador) {
