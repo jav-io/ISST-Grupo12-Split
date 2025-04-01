@@ -98,6 +98,39 @@ public class GastoService {
         gastoExistente.setCategoria(gastoActualizado.getCategoria());
         return gastoRepository.save(gastoExistente);
     }
+
+    public List<GastoResponseDTO> obtenerGastosResponse() {
+        List<Gasto> gastos = gastoRepository.findAll();
+        List<GastoResponseDTO> respuesta = new ArrayList<>();
+    
+        for (Gasto gasto : gastos) {
+            // Convertir la lista de deudas a una lista simple de deudores
+            List<DeudorSimpleDTO> deudores = gasto.getDeudas().stream()
+                .map(deuda -> new DeudorSimpleDTO(
+                        deuda.getDeudor().getUsuario().getIdUsuario(),
+                        deuda.getDeudor().getUsuario().getNombre()))
+                .distinct()
+                .toList();
+    
+            // Obtener información del grupo y pagador
+            Grupo grupo = gasto.getGrupo();
+            Usuario pagador = gasto.getPagador().getUsuario();
+    
+            respuesta.add(new GastoResponseDTO(
+                gasto.getIdGasto(),
+                gasto.getMonto(),
+                gasto.getFecha(),
+                gasto.getDescripcion(),
+                gasto.getCategoria(),
+                grupo.getIdGrupo(),
+                grupo.getNombre(),
+                pagador.getIdUsuario(),
+                pagador.getNombre(),
+                deudores
+            ));
+        }
+        return respuesta;
+    }
     
     // Nuevo método para obtener gastos con participantes extendidos
     public List<GastoConParticipantesDTO> obtenerGastosConParticipantes() {

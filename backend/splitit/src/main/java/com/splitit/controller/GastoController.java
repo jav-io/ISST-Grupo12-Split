@@ -25,6 +25,13 @@ public class GastoController {
         return ResponseEntity.ok(nuevoGasto);
     }
 
+
+    @GetMapping("/response")
+    public ResponseEntity<List<GastoResponseDTO>> obtenerGastosResponse() {
+        return ResponseEntity.ok(gastoService.obtenerGastosResponse());
+    }
+
+    
     // Endpoint para obtener todos los gastos con participantes (incluye pagador con nombre)
     @GetMapping
     public ResponseEntity<List<GastoConParticipantesDTO>> obtenerTodosConParticipantes() {
