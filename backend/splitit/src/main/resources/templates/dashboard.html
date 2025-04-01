@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Split.it - Dashboard</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+    body { background: linear-gradient(135deg, #f8f9fa, #e9ecef); color: #343a40; }
+    header { background-color: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.1); padding: 20px 40px; display: flex; justify-content: space-between; align-items: center; }
+    header h1 { font-size: 1.8rem; color: #2c3e50; }
+    nav a { margin-left: 20px; color: #2c3e50; text-decoration: none; font-weight: 600; transition: color 0.3s; }
+    nav a:hover { color: #0d6efd; }
+    .container { max-width: 800px; margin: 60px auto; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
+    h2 { text-align: center; margin-bottom: 20px; }
+    .grupo { background-color: #f1f3f5; padding: 20px; border-radius: 10px; margin-bottom: 15px; }
+    .grupo h3 { margin-bottom: 5px; }
+    .grupo p { margin-bottom: 10px; }
+    .grupo button { margin-right: 10px; padding: 8px 16px; background-color: #0d6efd; border: none; color: white; border-radius: 6px; cursor: pointer; }
+    .grupo button:hover { background-color: #0b5ed7; }
+    .boton-crear { margin-top: 20px; display: block; width: 100%; padding: 12px; font-size: 1rem; font-weight: 600; background-color: #198754; color: white; border: none; border-radius: 6px; cursor: pointer; }
+    .boton-crear:hover { background-color: #157347; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Split.it</h1>
+    <nav>
+      <a href="/index.html">Inicio</a>
+      <a href="/login">Cerrar sesión</a>
+    </nav>
+  </header>
+
+  <div class="container">
+    <h2>Dashboard de Grupos</h2>
+
+    <div id="listaGrupos">
+      <!-- Aquí se cargarán los grupos del usuario -->
+    </div>
+
+    <button class="boton-crear" onclick="window.location.href='crear-grupo.html'">
+      + Crear nuevo grupo
+    </button>
+  </div>
+
+  <footer>
+    &copy; 2025 Split.it – Todos los derechos reservados.
+  </footer>
+
+  <script>
+    async function cargarGrupos() {
+      try {
+        const res = await fetch('http://localhost:8080/usuarios/1/grupos'); // ⚠️ modificar el ID según el login real
+        const grupos = await res.json();
+        const contenedor = document.getElementById('listaGrupos');
+
+        if (grupos.length === 0) {
+          contenedor.innerHTML = "<p>No perteneces a ningún grupo aún.</p>";
+          return;
+        }
+
+        grupos.forEach(grupo => {
+          const div = document.createElement('div');
+          div.classList.add('grupo');
+          div.innerHTML = `
+            <h3>${grupo.nombre}</h3>
+            <p>${grupo.descripcion || 'Sin descripción'}</p>
+            <button onclick="verDetalles(${grupo.id})">Ver Detalles</button>
+            <button onclick="window.location.href='añadir-gasto.html?grupoId=${grupo.id}'">Añadir Gasto</button>
+          `;
+          contenedor.appendChild(div);
+        });
+      } catch (err) {
+        console.error("Error cargando grupos:", err);
+      }
+    }
+
+    function verDetalles(idGrupo) {
+      window.location.href = `detalle-grupo.html?grupoId=${idGrupo}`;
+    }
+
+    cargarGrupos();
+  </script>
+</body>
+</html>
