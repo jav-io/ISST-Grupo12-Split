@@ -1,6 +1,7 @@
 package com.splitit.controller;
 
 import com.splitit.dto.GastoDTO;
+import com.splitit.dto.GastoResponseDTO;
 import com.splitit.dto.GastoConParticipantesDTO;
 import com.splitit.model.Gasto;
 import com.splitit.service.GastoService;

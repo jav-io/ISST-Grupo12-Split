@@ -1,16 +1,18 @@
 package com.splitit.service;
 
+import com.splitit.dto.DeudorSimpleDTO;
 import com.splitit.dto.GastoDTO;
 import com.splitit.dto.GastoConParticipantesDTO;
+import com.splitit.dto.GastoResponseDTO;
 import com.splitit.dto.ParticipanteDTO;
 import com.splitit.model.Deuda;
 import com.splitit.model.Gasto;
 import com.splitit.model.Grupo;
 import com.splitit.model.Miembro;
+import com.splitit.model.Usuario;
 import com.splitit.repository.GastoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -100,37 +102,45 @@ public class GastoService {
     }
 
     public List<GastoResponseDTO> obtenerGastosResponse() {
-        List<Gasto> gastos = gastoRepository.findAll();
-        List<GastoResponseDTO> respuesta = new ArrayList<>();
-    
-        for (Gasto gasto : gastos) {
-            // Convertir la lista de deudas a una lista simple de deudores
-            List<DeudorSimpleDTO> deudores = gasto.getDeudas().stream()
-                .map(deuda -> new DeudorSimpleDTO(
-                        deuda.getDeudor().getUsuario().getIdUsuario(),
-                        deuda.getDeudor().getUsuario().getNombre()))
-                .distinct()
-                .toList();
-    
-            // Obtener información del grupo y pagador
-            Grupo grupo = gasto.getGrupo();
-            Usuario pagador = gasto.getPagador().getUsuario();
-    
-            respuesta.add(new GastoResponseDTO(
-                gasto.getIdGasto(),
-                gasto.getMonto(),
-                gasto.getFecha(),
-                gasto.getDescripcion(),
-                gasto.getCategoria(),
-                grupo.getIdGrupo(),
-                grupo.getNombre(),
-                pagador.getIdUsuario(),
-                pagador.getNombre(),
-                deudores
-            ));
+    List<Gasto> gastos = gastoRepository.findAll();
+    List<GastoResponseDTO> respuesta = new ArrayList<>();
+
+    for (Gasto gasto : gastos) {
+        if (gasto.getPagador() == null || gasto.getPagador().getUsuario() == null) {
+            // Puedes registrar un log o ignorarlo directamente
+            System.out.println("Gasto con ID " + gasto.getIdGasto() + " no tiene pagador definido. Se omite.");
+            continue;
         }
-        return respuesta;
+
+        // Convertir la lista de deudas a lista de deudores simples
+        List<DeudorSimpleDTO> deudores = gasto.getDeudas().stream()
+            .filter(deuda -> deuda.getDeudor() != null && deuda.getDeudor().getUsuario() != null)
+            .map(deuda -> new DeudorSimpleDTO(
+                    deuda.getDeudor().getUsuario().getIdUsuario(),
+                    deuda.getDeudor().getUsuario().getNombre()))
+            .distinct()
+            .toList();
+
+        Grupo grupo = gasto.getGrupo();
+        Usuario pagador = gasto.getPagador().getUsuario();
+
+        respuesta.add(new GastoResponseDTO(
+            gasto.getIdGasto(),
+            gasto.getMonto(),
+            gasto.getFecha(),
+            gasto.getDescripcion(),
+            gasto.getCategoria(),
+            grupo.getIdGrupo(),
+            grupo.getNombre(),
+            pagador.getIdUsuario(),
+            pagador.getNombre(),
+            deudores
+        ));
     }
+
+    return respuesta;
+}
+
     
     // Nuevo método para obtener gastos con participantes extendidos
     public List<GastoConParticipantesDTO> obtenerGastosConParticipantes() {
