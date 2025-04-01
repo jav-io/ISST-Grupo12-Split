@@ -73,7 +73,7 @@ public class GastoService {
         }
         // Guardamos nuevamente el gasto con las deudas (la cascada se encargará de persistirlas)
         return gastoRepository.save(gastoGuardado);
-        
+    }    
 
     public List<Gasto> obtenerTodos() {
         return gastoRepository.findAll();

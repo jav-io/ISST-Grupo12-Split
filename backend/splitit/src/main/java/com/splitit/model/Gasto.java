@@ -1,6 +1,7 @@
 // backend/splitit/src/main/java/com/splitit/model/Gasto.java
 package com.splitit.model;
 
+import java.util.ArrayList;
 import jakarta.persistence.*;
 import java.util.Date;
 import java.util.List;
