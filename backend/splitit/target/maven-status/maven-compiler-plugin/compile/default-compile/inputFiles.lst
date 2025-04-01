@@ -4,6 +4,7 @@ C:\Users\pablo\Desktop\ISST-Grupo12-Split\backend\splitit\src\main\java\com\spli
 C:\Users\pablo\Desktop\ISST-Grupo12-Split\backend\splitit\src\main\java\com\splitit\model\Miembro.java
 C:\Users\pablo\Desktop\ISST-Grupo12-Split\backend\splitit\src\main\java\com\splitit\DTO\ParticipanteDTO.java
 C:\Users\pablo\Desktop\ISST-Grupo12-Split\backend\splitit\src\main\java\com\splitit\repository\UsuarioRepository.java
+C:\Users\pablo\Desktop\ISST-Grupo12-Split\backend\splitit\src\main\java\com\splitit\DTO\SaldoGrupoDTO.java
 C:\Users\pablo\Desktop\ISST-Grupo12-Split\backend\splitit\src\main\java\com\splitit\controller\GrupoController.java
 C:\Users\pablo\Desktop\ISST-Grupo12-Split\backend\splitit\src\main\java\com\splitit\service\DeudaService.java
 C:\Users\pablo\Desktop\ISST-Grupo12-Split\backend\splitit\src\main\java\com\splitit\controller\DeudaController.java
@@ -12,6 +13,7 @@ C:\Users\pablo\Desktop\ISST-Grupo12-Split\backend\splitit\src\main\java\com\spli
 C:\Users\pablo\Desktop\ISST-Grupo12-Split\backend\splitit\src\main\java\com\splitit\controller\UsuarioController.java
 C:\Users\pablo\Desktop\ISST-Grupo12-Split\backend\splitit\src\main\java\com\splitit\controller\MiembroController.java
 C:\Users\pablo\Desktop\ISST-Grupo12-Split\backend\splitit\src\main\java\com\splitit\DTO\InvitacionDTO.java
+C:\Users\pablo\Desktop\ISST-Grupo12-Split\backend\splitit\src\main\java\com\splitit\DTO\DetalleSaldoDTO.java
 C:\Users\pablo\Desktop\ISST-Grupo12-Split\backend\splitit\src\main\java\com\splitit\repository\MiembroRepository.java
 C:\Users\pablo\Desktop\ISST-Grupo12-Split\backend\splitit\src\main\java\com\splitit\model\Deuda.java
 C:\Users\pablo\Desktop\ISST-Grupo12-Split\backend\splitit\src\main\java\com\splitit\repository\GastoRepository.java

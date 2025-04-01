@@ -12,12 +12,14 @@ com\splitit\dto\GrupoDTO.class
 com\splitit\model\Gasto.class
 com\splitit\repository\GrupoRepository.class
 com\splitit\service\GastoService.class
+com\splitit\dto\SaldoGrupoDTO.class
 com\splitit\model\Miembro.class
 com\splitit\repository\DeudaRepository.class
 com\splitit\dto\GastoResponseDTO.class
 com\splitit\service\UsuarioService.class
 com\splitit\dto\GastoConParticipantesDTO.class
 com\splitit\config\SecurityConfig.class
+com\splitit\dto\DetalleSaldoDTO.class
 com\splitit\dto\DeudorSimpleDTO.class
 com\splitit\dto\ParticipanteDTO.class
 com\splitit\service\GrupoService.class
