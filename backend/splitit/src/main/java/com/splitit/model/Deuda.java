@@ -1,43 +1,34 @@
-// backend/splitit/src/main/java/com/splitit/model/Deuda.java
 package com.splitit.model;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 
-/**
- * Entidad que representa la deuda de un miembro hacia un gasto.
- * Es decir, cuánto debe un miembro por haber participado en un gasto.
- */
+import java.util.Date;
+
 @Entity
 @Table(name = "deuda")
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "idDeuda")
 public class Deuda {
 
-    // Identificador único de la deuda
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idDeuda;
 
-    // Monto que debe el miembro
     private float monto;
 
-    // El miembro que debe pagar esta deuda
+    private boolean saldada = false;
+
+    @Temporal(TemporalType.DATE)
+    private Date fecha = new Date();
+
     @ManyToOne
-    @JoinColumn(name = "idDeudor")
+    @JoinColumn(name = "idMiembro")
     private Miembro deudor;
 
-    // El gasto al que pertenece esta deuda
     @ManyToOne
     @JoinColumn(name = "idGasto")
     private Gasto gasto;
-
-    // Constructor vacío
-    public Deuda() {}
-
-    // Constructor con parámetros
-    public Deuda(float monto, Miembro deudor, Gasto gasto) {
-        this.monto = monto;
-        this.deudor = deudor;
-        this.gasto = gasto;
-    }
 
     // Getters y setters
     public Long getIdDeuda() {
@@ -54,6 +45,22 @@ public class Deuda {
 
     public void setMonto(float monto) {
         this.monto = monto;
+    }
+
+    public boolean isSaldada() {
+        return saldada;
+    }
+
+    public void setSaldada(boolean saldada) {
+        this.saldada = saldada;
+    }
+
+    public Date getFecha() {
+        return fecha;
+    }
+
+    public void setFecha(Date fecha) {
+        this.fecha = fecha;
     }
 
     public Miembro getDeudor() {

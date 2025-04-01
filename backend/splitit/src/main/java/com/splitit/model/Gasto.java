@@ -1,6 +1,7 @@
 // backend/splitit/src/main/java/com/splitit/model/Gasto.java
 package com.splitit.model;
 
+import java.util.ArrayList;
 import jakarta.persistence.*;
 import java.util.Date;
 import java.util.List;
@@ -41,6 +42,7 @@ public class Gasto {
 
     public Gasto() {
         this.fecha = new Date();
+        this.deudas = new ArrayList<>();
     }
 
     public Gasto(float monto, String descripcion, String categoria, Grupo grupo, Miembro pagador) {
