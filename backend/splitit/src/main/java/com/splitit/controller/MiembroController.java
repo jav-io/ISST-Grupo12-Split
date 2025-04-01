@@ -1,6 +1,6 @@
 package com.splitit.controller;
 
-
+import jakarta.validation.Valid;
 import com.splitit.dto.InvitacionDTO;
 import com.splitit.model.Miembro;
 import com.splitit.service.MiembroService;
