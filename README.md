@@ -237,14 +237,6 @@ Así separas la lógica (services) del acceso a la base de datos (repositories),
 - Se ha creado el rol `postgres` con contraseña `password` y permisos suficientes.
 - Se ha configurado correctamente el archivo `application.properties`.
 
-Ejemplo:
-
-```properties
-spring.datasource.url=jdbc:postgresql://localhost:5432/splitit
-spring.datasource.username=postgres
-spring.datasource.password=password
-spring.jpa.hibernate.ddl-auto=update
-
 ---
 
 ✅ Backend funcional
@@ -297,41 +289,56 @@ A continuación se detallan los pasos seguidos para arrancar la aplicación corr
 
    ![alt text](<Captura de pantalla 2025-03-29 a las 19.33.52.png>)
 
+📋 Historias de usuario cumplidas
+ID	Historia	Estado
+HU-1	Como usuario, quiero poder crear un grupo y ser su administrador	✅
+HU-2	Como administrador, quiero poder añadir miembros al grupo	✅
+HU-3	Como miembro, quiero poder registrar un gasto con todos los datos clave	✅
+HU-4	Como usuario, quiero poder ver los detalles de un grupo y sus gastos	✅
+HU-5	Como usuario, quiero poder editar un gasto registrado	✅
+
+
+La base de datos responde a las peticiones como mostramos en el video, algunas funcionalidad e historias de usuarios se puedes ya desplegar desde el frontend como la de crear grupo. 
+
+✅ Avances respecto al backend
+Se han creado todos los controladores REST necesarios.
+
+Se ha conectado con una base de datos PostgreSQL funcional.
+
+Se ha verificado el guardado y recuperación de entidades.
+
+Se utiliza correctamente Thymeleaf en frontend.
+
+Se ha empezado a aplicar buenas prácticas de DTOs y capas de servicio.
+
+---
+
+💻 Interfaz de usuario
+index.html: página de inicio.
+
+dashboard.html: muestra los grupos del usuario.
+
+crear-grupo.html: formulario para crear nuevo grupo.
+
+detalle-grupo.html: vista con los gastos del grupo.
+
+añadir-gasto.html: formulario para añadir un gasto.
+
+editar-gasto.html: editar un gasto existente.
+
+Todas las vistas están implementadas usando Thymeleaf.
+
 ---
 
 ## ⚠️ Pendiente
 
-Ahora que la aplicación ya arranca y se conecta a la base de datos, el siguiente paso es implementar la lógica real del backend. Esto incluye:
+A parte de continuar con el Sprint3 para terminar toda la funcionalidad de la aplicación con todas las historias de usuario del Trello, debemos depurar algunas cuestiones de seguridad y de funcionalidad de la app. 
 
-1. **Crear los repositorios JPA**  
-   Cada entidad necesita su propio repositorio para poder hacer operaciones en la base de datos. Por ejemplo:
-
-   ```java
-   public interface UsuarioRepository extends JpaRepository<Usuario, Long> {}
-   ```
-
-   Esto nos permitirá guardar, buscar o eliminar usuarios sin escribir SQL manualmente.
-
-2. **Crear servicios (`service/`)**  
-   Los servicios se encargan de la lógica de negocio. Por ejemplo:  
-   - Verificar que un email no esté repetido al registrar un usuario  
-   - Calcular el saldo de un miembro en un grupo  
-   - Repartir deudas automáticamente al registrar un gasto
-
-3. **Crear controladores REST (`controller/`)**  
-   Aquí definiremos los endpoints (URLs) para que el frontend se comunique con el backend. Ejemplo:
-
-   ```java
-   @PostMapping("/api/usuarios")
-   public ResponseEntity<Usuario> crearUsuario(@RequestBody UsuarioDTO usuarioDTO) { ... }
-   ```
-
-
-4. **Implementar registro de usuarios**  
+1. **Implementar registro de usuarios**  
    Actualmente, solo existe el login por defecto de Spring Security.  
    Es necesario permitir que un nuevo usuario se registre (formulario de alta, guardar en base de datos, etc.).
 
-5. **Configurar Spring Security**  
+2. **Configurar Spring Security**  
    Ahora mismo la seguridad está activada por defecto:  
    - No podemos acceder a ninguna página sin login  
    - No hay usuarios definidos en memoria ni en base de datos  
@@ -339,6 +346,8 @@ Ahora que la aplicación ya arranca y se conecta a la base de datos, el siguient
    Hay dos opciones:
    - Desactivar temporalmente la seguridad para poder desarrollar (solo en local)
    - Configurar usuarios reales desde base de datos y ajustar los permisos (recomendado más adelante)
+  
+  3. **Que el frontend haga todas las peticiones posibles ya funcionales en el backend**
 
 ---
-```
+
