@@ -50,7 +50,7 @@ La imagen de marca de Split.it está basada en un símbolo clave: el **dólar ($
 | Javier de Ponte        | Product Owner         |
 | Nicolás García Sobrino | Frontend Developer     |
 | Santiago Rayán Castro  | Scrum Master          |
-| Pablo Bas Iglesias     | Frontend Developer
+| Pablo Bas Iglesias     | Backend Developer
 | Rodrigo de la Nuez     | QA / Documentación    |
 
 ---
