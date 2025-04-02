@@ -289,13 +289,16 @@ A continuación se detallan los pasos seguidos para arrancar la aplicación corr
 
    ![alt text](<Captura de pantalla 2025-03-29 a las 19.33.52.png>)
 
-📋 Historias de usuario cumplidas
-ID	Historia	Estado
-HU-1	Como usuario, quiero poder crear un grupo y ser su administrador	✅
-HU-2	Como administrador, quiero poder añadir miembros al grupo	✅
-HU-3	Como miembro, quiero poder registrar un gasto con todos los datos clave	✅
-HU-4	Como usuario, quiero poder ver los detalles de un grupo y sus gastos	✅
-HU-5	Como usuario, quiero poder editar un gasto registrado	✅
+### 📋 Historias de usuario cumplidas
+
+| ID   | Historia                                                                 | Estado |
+|------|--------------------------------------------------------------------------|--------|
+| HU-1 | Como usuario, quiero poder crear un grupo y ser su administrador         | ✅     |
+| HU-2 | Como administrador, quiero poder añadir miembros al grupo                | ✅     |
+| HU-3 | Como miembro, quiero poder registrar un gasto con todos los datos clave  | ✅     |
+| HU-4 | Como usuario, quiero poder ver los detalles de un grupo y sus gastos     | ✅     |
+| HU-5 | Como usuario, quiero poder editar un gasto registrado                    | ✅     |
+
 
 
 La base de datos responde a las peticiones como mostramos en el video, algunas funcionalidad e historias de usuarios se puedes ya desplegar desde el frontend como la de crear grupo. 
@@ -350,4 +353,12 @@ A parte de continuar con el Sprint3 para terminar toda la funcionalidad de la ap
   3. **Que el frontend haga todas las peticiones posibles ya funcionales en el backend**
 
 ---
+
+
+
+
+
+
+
+
 
