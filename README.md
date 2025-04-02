@@ -1,7 +1,10 @@
 
 # 📘 Split.it - ISST Grupo 12
 
-![Logo Split.it](logo_split.it_definitivo.png)
+<p align="center">
+  <img src="logo.png" alt="Logo Split.it" width="300"/>
+</p>
+
 **Split.it** es una aplicación web colaborativa para la gestión de gastos compartidos entre amigos, familiares o compañeros de piso. Permite crear grupos, registrar gastos y calcular automáticamente cuánto debe pagar o recibir cada miembro, de forma sencilla, rápida y visual.
 
 ---
