@@ -33,7 +33,7 @@ La imagen de marca de Split.it está basada en un símbolo clave: el **dólar ($
 
 | Parte         | Tecnología                 |
 |---------------|----------------------------|
-| **Frontend**  | HTML, CSS, JavaScript      |
+| **Frontend**  | Thymeleaf     |
 | **Backend**   | Java con Spring Boot (REST API) |
 | **Base de datos** | PostgreSQL             |
 | Seguridad   | Spring Security             |
