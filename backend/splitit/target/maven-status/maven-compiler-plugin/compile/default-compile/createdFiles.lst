@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-=======
 com\splitit\controller\GastoController.class
 com\splitit\model\Grupo.class
 com\splitit\service\DeudaService.class
@@ -31,4 +29,3 @@ com\splitit\controller\UsuarioController.class
 com\splitit\controller\DeudaController.class
 com\splitit\repository\MiembroRepository.class
 com\splitit\repository\GastoRepository.class
->>>>>>> a59245116f3c0fa0e44ed810655613636af44250
