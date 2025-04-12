@@ -5,7 +5,6 @@ import com.splitit.dto.SaldoGrupoDTO;
 import com.splitit.model.Usuario;
 import com.splitit.dto.GrupoDTO;
 import com.splitit.model.Grupo;
-import com.splitit.model.Deuda;
 import com.splitit.repository.GrupoRepository;
 import com.splitit.repository.MiembroRepository;
 import com.splitit.repository.UsuarioRepository;
@@ -25,7 +24,6 @@ public class GrupoService {
     private MiembroService miembroService;
 
     @Autowired
-<<<<<<< HEAD
     private UsuarioService usuarioService; // Para obtener el usuario creador
 
     @Autowired
@@ -34,9 +32,6 @@ public class GrupoService {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
-=======
-    private UsuarioService usuarioService;
->>>>>>> a59245116f3c0fa0e44ed810655613636af44250
 
     public Grupo crearGrupo(GrupoDTO grupoDTO) {
         if (grupoDTO.getNombre() == null || grupoDTO.getNombre().trim().isEmpty()) {
@@ -68,23 +63,26 @@ public class GrupoService {
 
     // Método para consultar saldos en un grupo
     public List<SaldoGrupoDTO> consultarSaldosGrupo(Long idGrupo) {
-    Grupo grupo = buscarPorId(idGrupo);
-    List<Miembro> miembros = grupo.getMiembros();
-
-    List<SaldoGrupoDTO> saldos = new ArrayList<>();
-
-    for (Miembro miembro : miembros) {
-        Usuario usuario = miembro.getUsuario();
-        if (usuario == null) continue;
-
-        saldos.add(new SaldoGrupoDTO(
-            usuario.getIdUsuario(),
-            usuario.getNombre(),
-            miembro.getSaldoActual()
-        ));
+        List<SaldoGrupoDTO> saldos = new ArrayList<>();
+        List<Miembro> miembros = grupoRepository.findById(idGrupo)
+            .orElseThrow(() -> new RuntimeException("Grupo no encontrado"))
+            .getMiembros();
+    
+        for (Miembro miembro : miembros) {
+            Usuario usuario = miembro.getUsuario();
+            if (usuario == null) continue;
+    
+            saldos.add(new SaldoGrupoDTO(
+                usuario.getIdUsuario(),
+                usuario.getNombre(),
+                miembro.getSaldoActual()
+            ));
+        }
+    
+        return saldos;
     }
+    
 
-<<<<<<< HEAD
     // Método 1: obtener grupos por usuario
 public List<Grupo> obtenerGruposPorUsuario(Long idUsuario) {
     return grupoRepository.findByMiembros_Usuario_Id(idUsuario);
@@ -124,9 +122,7 @@ public GrupoDTO obtenerGrupoDTOporId(Long id) {
     dto.setIdCreador(grupo.getIdCreador()); // ✅
     dto.setFechaCreacion(grupo.getFechaCreacion());
     return dto;
-=======
-    return saldos;
->>>>>>> a59245116f3c0fa0e44ed810655613636af44250
+
 }
 
 }
