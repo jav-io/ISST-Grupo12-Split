@@ -1,18 +1,20 @@
 package com.splitit.service;
 
-import com.splitit.model.Miembro;
-import com.splitit.dto.SaldoGrupoDTO;
-import com.splitit.model.Usuario;
 import com.splitit.dto.GrupoDTO;
+import com.splitit.dto.SaldoGrupoDTO;
 import com.splitit.model.Grupo;
+<<<<<<< HEAD
+=======
+import com.splitit.model.Miembro;
+import com.splitit.model.Usuario;
+>>>>>>> 2014263f02741eee59e1e26c301b6add06c897db
 import com.splitit.repository.GrupoRepository;
-import com.splitit.repository.MiembroRepository;
-import com.splitit.repository.UsuarioRepository;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 @Service
 public class GrupoService {
@@ -24,6 +26,7 @@ public class GrupoService {
     private MiembroService miembroService;
 
     @Autowired
+<<<<<<< HEAD
     private UsuarioService usuarioService; // Para obtener el usuario creador
 
     @Autowired
@@ -32,6 +35,9 @@ public class GrupoService {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
+=======
+    private UsuarioService usuarioService;
+>>>>>>> 2014263f02741eee59e1e26c301b6add06c897db
 
     public Grupo crearGrupo(GrupoDTO grupoDTO) {
         if (grupoDTO.getNombre() == null || grupoDTO.getNombre().trim().isEmpty()) {
@@ -54,15 +60,15 @@ public class GrupoService {
 
     public Grupo buscarPorId(Long id) {
         return grupoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Grupo no encontrado."));
+                .orElseThrow(() -> new RuntimeException("Grupo no encontrado"));
     }
 
     public List<Grupo> obtenerTodos() {
         return grupoRepository.findAll();
     }
 
-    // Método para consultar saldos en un grupo
     public List<SaldoGrupoDTO> consultarSaldosGrupo(Long idGrupo) {
+<<<<<<< HEAD
         List<SaldoGrupoDTO> saldos = new ArrayList<>();
         List<Miembro> miembros = grupoRepository.findById(idGrupo)
             .orElseThrow(() -> new RuntimeException("Grupo no encontrado"))
@@ -72,17 +78,32 @@ public class GrupoService {
             Usuario usuario = miembro.getUsuario();
             if (usuario == null) continue;
     
+=======
+        Grupo grupo = buscarPorId(idGrupo);
+        List<Miembro> miembros = grupo.getMiembros();
+
+        List<SaldoGrupoDTO> saldos = new ArrayList<>();
+        for (Miembro miembro : miembros) {
+            Usuario usuario = miembro.getUsuario();
+            if (usuario == null) continue;
+
+>>>>>>> 2014263f02741eee59e1e26c301b6add06c897db
             saldos.add(new SaldoGrupoDTO(
                 usuario.getIdUsuario(),
                 usuario.getNombre(),
                 miembro.getSaldoActual()
             ));
         }
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> 2014263f02741eee59e1e26c301b6add06c897db
         return saldos;
     }
     
 
+<<<<<<< HEAD
     // Método 1: obtener grupos por usuario
 public List<Grupo> obtenerGruposPorUsuario(Long idUsuario) {
     return grupoRepository.findByMiembros_Usuario_Id(idUsuario);
@@ -125,4 +146,28 @@ public GrupoDTO obtenerGrupoDTOporId(Long id) {
 
 }
 
+=======
+    // 🔁 Métodos añadidos para compatibilidad con VistaController
+
+    public List<Grupo> obtenerGruposPorUsuario(Long idUsuario) {
+        List<Grupo> grupos = new ArrayList<>();
+        for (Grupo grupo : grupoRepository.findAll()) {
+            for (Miembro miembro : grupo.getMiembros()) {
+                if (miembro.getUsuario() != null && miembro.getUsuario().getIdUsuario().equals(idUsuario)) {
+                    grupos.add(grupo);
+                    break;
+                }
+            }
+        }
+        return grupos;
+    }
+
+    public Grupo crearGrupoDesdeDTO(GrupoDTO grupoDTO) {
+        return crearGrupo(grupoDTO); // Alias
+    }
+
+    public Grupo obtenerGrupoPorId(Long id) {
+        return buscarPorId(id); // Alias
+    }
+>>>>>>> 2014263f02741eee59e1e26c301b6add06c897db
 }
