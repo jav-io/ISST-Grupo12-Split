@@ -11,10 +11,12 @@ import com.splitit.model.Grupo;
 import com.splitit.model.Miembro;
 import com.splitit.model.Usuario;
 import com.splitit.repository.GastoRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.sql.Date;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Service
@@ -30,8 +32,12 @@ public class GastoService {
     private MiembroService miembroService;
 
     public Gasto crearGasto(GastoDTO gastoDTO) {
-        if (gastoDTO.getMonto() <= 0) {
+        if (gastoDTO.getMonto() == null || gastoDTO.getMonto() <= 0) {
             throw new RuntimeException("El monto debe ser mayor que cero.");
+        }
+
+        if (gastoDTO.getIdGrupo() == null || gastoDTO.getIdPagador() == null) {
+            throw new RuntimeException("Faltan datos obligatorios: grupo o pagador.");
         }
 
         Grupo grupo = grupoService.buscarPorId(gastoDTO.getIdGrupo());
@@ -47,37 +53,40 @@ public class GastoService {
         gasto.setCategoria(gastoDTO.getCategoria());
         gasto.setGrupo(grupo);
         gasto.setPagador(pagador);
-        gasto.setFecha(new Date());
 
-        if (gasto.getDeudas() == null) {
-            gasto.setDeudas(new ArrayList<>());
-        }
+        gasto.setFecha(gastoDTO.getFecha() != null
+                ? Date.valueOf(gastoDTO.getFecha())
+                : new Date(System.currentTimeMillis()));
+
+        gasto.setDeudas(new ArrayList<>());
         Gasto gastoGuardado = gastoRepository.save(gasto);
 
         List<Long> participantesIds = gastoDTO.getIdParticipantes();
-        if (participantesIds.isEmpty()) {
+        if (participantesIds == null || participantesIds.isEmpty()) {
             throw new RuntimeException("Debe haber al menos un participante para compartir el gasto.");
         }
+
         float montoPorParticipante = gastoDTO.getMonto() / participantesIds.size();
 
         for (Long idParticipante : participantesIds) {
             Miembro participante = miembroService.buscarPorId(idParticipante);
+
             if (!participante.getGrupo().getIdGrupo().equals(grupo.getIdGrupo())) {
                 throw new RuntimeException("El participante con id " + idParticipante + " no pertenece al grupo " + grupo.getIdGrupo());
             }
+
             Deuda deuda = new Deuda();
             deuda.setMonto(montoPorParticipante);
             deuda.setDeudor(participante);
             deuda.setGasto(gastoGuardado);
             gastoGuardado.getDeudas().add(deuda);
 
-            // Actualización de saldo
             if (!participante.getIdMiembro().equals(pagador.getIdMiembro())) {
                 participante.setSaldoActual(participante.getSaldoActual() - montoPorParticipante);
                 miembroService.actualizarMiembro(participante);
-            }        }
+            }
+        }
 
-        // El pagador recupera lo que ha pagado por otros
         float totalRecupera = montoPorParticipante * (participantesIds.size() - 1);
         pagador.setSaldoActual(pagador.getSaldoActual() + totalRecupera);
         miembroService.actualizarMiembro(pagador);
@@ -169,19 +178,16 @@ public class GastoService {
 
         return resultado;
     }
-    // Obtiene todos los gastos de un grupo
-public List<Gasto> obtenerGastosPorGrupo(Long idGrupo) {
-    return gastoRepository.findByGrupo_IdGrupo(idGrupo);
-}
 
-// Obtiene un gasto por su ID
-public Gasto obtenerGastoPorId(Long id) {
-    return gastoRepository.findById(id).orElseThrow(() -> new RuntimeException("Gasto no encontrado"));
-}
+    public List<Gasto> obtenerGastosPorGrupo(Long idGrupo) {
+        return gastoRepository.findByGrupo_IdGrupo(idGrupo);
+    }
 
-// Actualiza un gasto
-public void actualizarGasto(Gasto gasto) {
-    gastoRepository.save(gasto);
-}
+    public Gasto obtenerGastoPorId(Long id) {
+        return gastoRepository.findById(id).orElseThrow(() -> new RuntimeException("Gasto no encontrado"));
+    }
 
+    public void actualizarGasto(Gasto gasto) {
+        gastoRepository.save(gasto);
+    }
 }

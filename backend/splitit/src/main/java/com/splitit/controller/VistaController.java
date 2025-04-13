@@ -4,7 +4,11 @@ import com.splitit.dto.GrupoDTO;
 import com.splitit.dto.GastoDTO;
 import com.splitit.model.Gasto;
 import com.splitit.model.Grupo;
+import com.splitit.model.Usuario;
 import com.splitit.service.GrupoService;
+
+import jakarta.servlet.http.HttpSession;
+
 import com.splitit.service.GastoService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,14 +33,16 @@ public class VistaController {
         return "index";
     }
 
-    // Mostrar el dashboard con los grupos del usuario
-    @GetMapping("/dashboard")
-    public String dashboard(Model model) {
-        Long idUsuarioSimulado = 2L;
-        List<Grupo> grupos = grupoService.obtenerGruposPorUsuario(idUsuarioSimulado);
+  @GetMapping("/dashboard")
+    public String dashboard(Model model, HttpSession session) {
+        Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
+        if (usuario == null) return "redirect:/login";
+
+        List<Grupo> grupos = grupoService.obtenerGruposPorUsuario(usuario.getIdUsuario());
         model.addAttribute("grupos", grupos);
         return "dashboard";
     }
+
 
     // Formulario para crear grupo
     @GetMapping("/crear-grupo")
@@ -47,11 +53,15 @@ public class VistaController {
 
     // Procesamiento del formulario para crear grupo
     @PostMapping("/crear-grupo")
-    public String crearGrupo(@ModelAttribute GrupoDTO grupoDTO) {
-        grupoDTO.setIdCreador(2L); // ID simulado
+    public String crearGrupo(@ModelAttribute GrupoDTO grupoDTO, HttpSession session) {
+        Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
+        if (usuario == null) return "redirect:/login";
+
+        grupoDTO.setIdCreador(usuario.getIdUsuario());
         grupoService.crearGrupoDesdeDTO(grupoDTO);
         return "redirect:/dashboard";
     }
+
 
     // Vista de detalle de grupo con gastos asociados
     @GetMapping("/detalle-grupo/{id}")
@@ -76,11 +86,25 @@ public class VistaController {
 
     // Procesamiento del formulario para añadir gasto
     @PostMapping("/añadir-gasto")
-    public String añadirGasto(@ModelAttribute GastoDTO gastoDTO) {
-        gastoDTO.setIdUsuarioPagador(2L); // Simulado
+    public String añadirGasto(@ModelAttribute GastoDTO gastoDTO, HttpSession session) {
+        Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
+        if (usuario == null) return "redirect:/login";
+    
+        // Obtener el miembro correspondiente a ese usuario en el grupo
+        Long idMiembro = grupoService
+            .buscarPorId(gastoDTO.getIdGrupo())
+            .getMiembros()
+            .stream()
+            .filter(m -> m.getUsuario().getIdUsuario().equals(usuario.getIdUsuario()))
+            .findFirst()
+            .orElseThrow(() -> new RuntimeException("No eres miembro de este grupo"))
+            .getIdMiembro();
+    
+        gastoDTO.setIdPagador(idMiembro);
         gastoService.crearGasto(gastoDTO);
         return "redirect:/detalle-grupo/" + gastoDTO.getIdGrupo();
     }
+    
     
 
     // Vista para formulario de editar gasto
@@ -97,4 +121,5 @@ public class VistaController {
         gastoService.actualizarGasto(gasto);
         return "redirect:/detalle-grupo/" + gasto.getGrupo().getIdGrupo();
     }
+
 }

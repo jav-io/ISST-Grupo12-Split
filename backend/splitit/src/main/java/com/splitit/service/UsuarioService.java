@@ -19,6 +19,8 @@ public class UsuarioService {
         if (existente.isPresent()) {
             throw new RuntimeException("El email ya está en uso.");
         }
+
+        // SIN ENCRIPTAR LA CONTRASEÑA
         return usuarioRepository.save(usuario);
     }
 
@@ -30,4 +32,21 @@ public class UsuarioService {
         return usuarioRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
     }
+
+    public Usuario autenticarUsuario(String email, String password) {
+        Usuario usuario = usuarioRepository.findByEmail(email)
+            .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+    
+        System.out.println("[DEBUG] Email: " + email);
+        System.out.println("[DEBUG] Password introducida: [" + password + "]");
+        System.out.println("[DEBUG] Password almacenada: [" + usuario.getPassword() + "]");
+    
+        if (!usuario.getPassword().trim().equals(password.trim())) {
+            throw new RuntimeException("Contraseña incorrecta");
+        }
+    
+        return usuario;
+    }
+    
+
 }

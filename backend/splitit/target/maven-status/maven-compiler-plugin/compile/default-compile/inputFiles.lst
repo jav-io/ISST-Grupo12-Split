@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+/Users/nicolasgsobrino/Desktop/ISST/Proyecto Split.it/ISST-Grupo12-Split/backend/splitit/src/main/java/com/splitit/service/UsuarioDetailsService.java
 /Users/nicolasgsobrino/Desktop/ISST/Proyecto Split.it/ISST-Grupo12-Split/backend/splitit/src/main/java/com/splitit/repository/DeudaRepository.java
 /Users/nicolasgsobrino/Desktop/ISST/Proyecto Split.it/ISST-Grupo12-Split/backend/splitit/src/main/java/com/splitit/dto/DeudorSimpleDTO.java
 /Users/nicolasgsobrino/Desktop/ISST/Proyecto Split.it/ISST-Grupo12-Split/backend/splitit/src/main/java/com/splitit/dto/DetalleSaldoDTO.java
@@ -30,38 +30,5 @@
 /Users/nicolasgsobrino/Desktop/ISST/Proyecto Split.it/ISST-Grupo12-Split/backend/splitit/src/main/java/com/splitit/controller/UsuarioController.java
 /Users/nicolasgsobrino/Desktop/ISST/Proyecto Split.it/ISST-Grupo12-Split/backend/splitit/src/main/java/com/splitit/repository/MiembroRepository.java
 /Users/nicolasgsobrino/Desktop/ISST/Proyecto Split.it/ISST-Grupo12-Split/backend/splitit/src/main/java/com/splitit/service/DeudaService.java
+/Users/nicolasgsobrino/Desktop/ISST/Proyecto Split.it/ISST-Grupo12-Split/backend/splitit/src/main/java/com/splitit/controller/AuthController.java
 /Users/nicolasgsobrino/Desktop/ISST/Proyecto Split.it/ISST-Grupo12-Split/backend/splitit/src/main/java/com/splitit/service/UsuarioService.java
-=======
-C:\Users\pablo\Desktop\ISST-Grupo12-Split\backend\splitit\src\main\java\com\splitit\DTO\DeudorSimpleDTO.java
-C:\Users\pablo\Desktop\ISST-Grupo12-Split\backend\splitit\src\main\java\com\splitit\repository\DeudaRepository.java
-C:\Users\pablo\Desktop\ISST-Grupo12-Split\backend\splitit\src\main\java\com\splitit\controller\GastoController.java
-C:\Users\pablo\Desktop\ISST-Grupo12-Split\backend\splitit\src\main\java\com\splitit\model\Miembro.java
-C:\Users\pablo\Desktop\ISST-Grupo12-Split\backend\splitit\src\main\java\com\splitit\DTO\ParticipanteDTO.java
-C:\Users\pablo\Desktop\ISST-Grupo12-Split\backend\splitit\src\main\java\com\splitit\repository\UsuarioRepository.java
-C:\Users\pablo\Desktop\ISST-Grupo12-Split\backend\splitit\src\main\java\com\splitit\DTO\SaldoGrupoDTO.java
-C:\Users\pablo\Desktop\ISST-Grupo12-Split\backend\splitit\src\main\java\com\splitit\controller\GrupoController.java
-C:\Users\pablo\Desktop\ISST-Grupo12-Split\backend\splitit\src\main\java\com\splitit\service\DeudaService.java
-C:\Users\pablo\Desktop\ISST-Grupo12-Split\backend\splitit\src\main\java\com\splitit\controller\DeudaController.java
-C:\Users\pablo\Desktop\ISST-Grupo12-Split\backend\splitit\src\main\java\com\splitit\DTO\GastoConParticipantesDTO.java
-C:\Users\pablo\Desktop\ISST-Grupo12-Split\backend\splitit\src\main\java\com\splitit\repository\GrupoRepository.java
-C:\Users\pablo\Desktop\ISST-Grupo12-Split\backend\splitit\src\main\java\com\splitit\controller\UsuarioController.java
-C:\Users\pablo\Desktop\ISST-Grupo12-Split\backend\splitit\src\main\java\com\splitit\controller\MiembroController.java
-C:\Users\pablo\Desktop\ISST-Grupo12-Split\backend\splitit\src\main\java\com\splitit\DTO\InvitacionDTO.java
-C:\Users\pablo\Desktop\ISST-Grupo12-Split\backend\splitit\src\main\java\com\splitit\DTO\DetalleSaldoDTO.java
-C:\Users\pablo\Desktop\ISST-Grupo12-Split\backend\splitit\src\main\java\com\splitit\repository\MiembroRepository.java
-C:\Users\pablo\Desktop\ISST-Grupo12-Split\backend\splitit\src\main\java\com\splitit\model\Deuda.java
-C:\Users\pablo\Desktop\ISST-Grupo12-Split\backend\splitit\src\main\java\com\splitit\repository\GastoRepository.java
-C:\Users\pablo\Desktop\ISST-Grupo12-Split\backend\splitit\src\main\java\com\splitit\controller\VistaController.java
-C:\Users\pablo\Desktop\ISST-Grupo12-Split\backend\splitit\src\main\java\com\splitit\model\Gasto.java
-C:\Users\pablo\Desktop\ISST-Grupo12-Split\backend\splitit\src\main\java\com\splitit\service\GrupoService.java
-C:\Users\pablo\Desktop\ISST-Grupo12-Split\backend\splitit\src\main\java\com\splitit\service\UsuarioService.java
-C:\Users\pablo\Desktop\ISST-Grupo12-Split\backend\splitit\src\main\java\com\splitit\DTO\GastoResponseDTO.java
-C:\Users\pablo\Desktop\ISST-Grupo12-Split\backend\splitit\src\main\java\com\splitit\service\GastoService.java
-C:\Users\pablo\Desktop\ISST-Grupo12-Split\backend\splitit\src\main\java\com\splitit\DTO\GastoDTO.java
-C:\Users\pablo\Desktop\ISST-Grupo12-Split\backend\splitit\src\main\java\com\splitit\model\Usuario.java
-C:\Users\pablo\Desktop\ISST-Grupo12-Split\backend\splitit\src\main\java\com\splitit\DTO\GrupoDTO.java
-C:\Users\pablo\Desktop\ISST-Grupo12-Split\backend\splitit\src\main\java\com\splitit\config\SecurityConfig.java
-C:\Users\pablo\Desktop\ISST-Grupo12-Split\backend\splitit\src\main\java\com\splitit\service\MiembroService.java
-C:\Users\pablo\Desktop\ISST-Grupo12-Split\backend\splitit\src\main\java\com\splitit\SplititApplication.java
-C:\Users\pablo\Desktop\ISST-Grupo12-Split\backend\splitit\src\main\java\com\splitit\model\Grupo.java
->>>>>>> 2014263f02741eee59e1e26c301b6add06c897db

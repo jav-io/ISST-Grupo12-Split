@@ -42,14 +42,18 @@
 
   <div class="form-container">
     <h2>Añadir nuevo gasto</h2>
-    <form th:action="@{/añadir-gasto}" method="post">
+    <form th:action="@{/añadir-gasto}" th:object="${gasto}" method="post">
       <label>Descripción</label>
-      <input type="text" name="descripcion" placeholder="Ej. Compra en supermercado" required />
+      <input type="text" th:field="*{descripcion}" placeholder="Ej. Compra en supermercado" required />
+      
       <label>Monto (€)</label>
-      <input type="number" step="0.01" name="monto" required />
+      <input type="number" step="0.01" th:field="*{monto}" required />
+      
       <label>Fecha</label>
-      <input type="date" name="fecha" required />
+      <input type="date" th:field="*{fecha}" required />
+      
       <input type="hidden" th:field="*{idGrupo}" />
+      
       <button type="submit">Guardar gasto</button> 
     </form>
   </div>
