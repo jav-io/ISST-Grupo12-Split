@@ -1,10 +1,12 @@
 package com.splitit.controller;
 
 import com.splitit.dto.GrupoDTO;
+import com.splitit.dto.SaldoGrupoDTO;
 import com.splitit.dto.GastoConParticipantesDTO;
 import com.splitit.dto.GastoDTO;
 import com.splitit.model.Gasto;
 import com.splitit.model.Grupo;
+import com.splitit.model.Miembro;
 import com.splitit.model.Usuario;
 import com.splitit.service.GrupoService;
 
@@ -13,11 +15,14 @@ import jakarta.servlet.http.HttpSession;
 import com.splitit.service.GastoService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Date;
+
 
 @Controller
 public class VistaController {
@@ -145,16 +150,54 @@ public class VistaController {
     // Vista para formulario de editar gasto
     @GetMapping("/editar-gasto/{id}")
     public String mostrarFormularioEditarGasto(@PathVariable Long id, Model model) {
-        Gasto gasto = gastoService.obtenerGastoPorId(id);
+        Gasto gasto = gastoService.buscarPorId(id);
+        Grupo grupo = gasto.getGrupo();
+        List<Miembro> miembros = grupo.getMiembros();
+
+        List<Long> gastoParticipantesIds = gasto.getDeudas().stream()
+            .map(deuda -> deuda.getDeudor().getIdMiembro())
+            .toList();
+
         model.addAttribute("gasto", gasto);
+        model.addAttribute("participantes", miembros); // necesario para el formulario
+        model.addAttribute("miembros", miembros); // opcional, si lo usas en otra parte
+        model.addAttribute("gastoParticipantesIds", gastoParticipantesIds);
+
         return "editar-gasto";
     }
 
+
     // Procesamiento del formulario para editar gasto
     @PostMapping("/editar-gasto")
-    public String editarGasto(@ModelAttribute Gasto gasto) {
-        gastoService.actualizarGasto(gasto);
-        return "redirect:/detalle-grupo/" + gasto.getGrupo().getIdGrupo();
+    public String actualizarGasto(
+            @RequestParam Long id,
+            @RequestParam String descripcion,
+            @RequestParam Float monto,
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date fecha,
+            @RequestParam Long idGrupo,
+            @RequestParam Long idPagador,
+            @RequestParam List<Long> idParticipantes
+    ) {
+        gastoService.editarGastoConParticipantes(id, descripcion, monto, fecha, idGrupo, idPagador, idParticipantes);
+        return "redirect:/detalle-grupo/" + idGrupo;
     }
+
+
+    //redirige a saldos del grupo
+    @GetMapping("/saldo-grupo/{id}")
+    public String mostrarSaldoGrupo(@PathVariable Long id, Model model, HttpSession session) {
+
+        Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
+        if (usuario == null) return "redirect:/login";
+
+        Grupo grupo = grupoService.obtenerGrupoPorId(id);
+        List<SaldoGrupoDTO> saldos = grupoService.consultarSaldosGrupo(id);
+
+        model.addAttribute("grupo", grupo);
+        model.addAttribute("saldos", saldos);
+
+        return "saldo-grupo";
+    }
+
 
 }

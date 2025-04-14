@@ -1,6 +1,6 @@
 
 <p align="center">
-  <img src="logo2.png" alt="Logo Split.it" width="300"/>
+  <img src="imagenes/logo2.png" alt="Logo Split.it" width="300"/>
 </p>
 
 # 📘 Split.it - ISST Grupo 12

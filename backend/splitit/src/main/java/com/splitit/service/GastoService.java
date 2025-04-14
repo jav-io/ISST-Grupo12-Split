@@ -152,8 +152,13 @@ public class GastoService {
     public List<GastoConParticipantesDTO> obtenerGastosConParticipantes() {
         List<Gasto> gastos = gastoRepository.findAll();
         List<GastoConParticipantesDTO> resultado = new ArrayList<>();
-
+    
         for (Gasto gasto : gastos) {
+            if (gasto.getPagador() == null || gasto.getPagador().getUsuario() == null) {
+                // Si no hay pagador o el usuario del pagador es null, lo ignoramos
+                continue;
+            }
+    
             List<ParticipanteDTO> participantes = gasto.getDeudas().stream()
                     .map(deuda -> {
                         var usuario = deuda.getDeudor().getUsuario();
@@ -161,7 +166,7 @@ public class GastoService {
                     })
                     .distinct()
                     .toList();
-
+    
             var pagador = gasto.getPagador().getUsuario();
             resultado.add(new GastoConParticipantesDTO(
                     gasto.getIdGasto(),
@@ -175,10 +180,10 @@ public class GastoService {
                     participantes
             ));
         }
-
+    
         return resultado;
     }
-
+    
     public List<Gasto> obtenerGastosPorGrupo(Long idGrupo) {
         return gastoRepository.findByGrupo_IdGrupo(idGrupo);
     }
@@ -190,4 +195,65 @@ public class GastoService {
     public void actualizarGasto(Gasto gasto) {
         gastoRepository.save(gasto);
     }
+
+    public void editarGastoConParticipantes(Long id, String descripcion, Float monto, java.util.Date fecha,
+                                        Long idGrupo, Long idPagador, List<Long> nuevosParticipantes) {
+
+        Gasto gasto = buscarPorId(id);
+        Grupo grupo = grupoService.buscarPorId(idGrupo);
+        Miembro pagador = grupo.getMiembros().stream()
+                .filter(m -> m.getIdMiembro().equals(idPagador))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Pagador no válido"));
+
+        // Revertir saldos actuales antes de editar
+        for (Deuda deuda : gasto.getDeudas()) {
+            Miembro deudor = deuda.getDeudor();
+            deudor.setSaldoActual(deudor.getSaldoActual() + deuda.getMonto());
+            miembroRepository.save(deudor);
+        }
+
+        pagador.setSaldoActual(pagador.getSaldoActual() -
+            gasto.getMonto() * (gasto.getDeudas().size() / (float) gasto.getDeudas().size()));
+        miembroRepository.save(pagador);
+
+        // Eliminar deudas previas
+        deudaRepository.deleteAll(gasto.getDeudas());
+        gasto.getDeudas().clear();
+
+        // Actualizar info
+        gasto.setDescripcion(descripcion);
+        gasto.setMonto(monto);
+        gasto.setFecha(fecha);
+        gasto.setGrupo(grupo);
+        gasto.setPagador(pagador);
+
+        // Nueva lógica de reparto
+        float montoPorPersona = monto / nuevosParticipantes.size();
+
+        for (Long idMiembro : nuevosParticipantes) {
+            Miembro participante = grupo.getMiembros().stream()
+                    .filter(m -> m.getIdMiembro().equals(idMiembro))
+                    .findFirst()
+                    .orElseThrow(() -> new RuntimeException("Participante no encontrado"));
+
+            if (!participante.getIdMiembro().equals(pagador.getIdMiembro())) {
+                Deuda deuda = new Deuda();
+                deuda.setGasto(gasto);
+                deuda.setDeudor(participante);
+                deuda.setMonto(montoPorPersona);
+                deudaRepository.save(deuda);
+
+                participante.setSaldoActual(participante.getSaldoActual() - montoPorPersona);
+                miembroRepository.save(participante);
+            }
+        }
+
+        float totalRecuperado = montoPorPersona * (nuevosParticipantes.size() - 1);
+        pagador.setSaldoActual(pagador.getSaldoActual() + totalRecuperado);
+        miembroRepository.save(pagador);
+
+        gastoRepository.save(gasto);
+    }
+
 }
