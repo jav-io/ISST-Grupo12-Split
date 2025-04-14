@@ -198,8 +198,8 @@
 
   <div class="form-container">
     <h2>Añadir nuevo gasto</h2>
-    <form th:action="@{/añadir-gasto}" method="post">
-      <input type="hidden" name="idGrupo" th:value="${grupoId}" />
+    <form th:action="@{/añadir-gasto}" th:object="${gasto}" method="post">
+      <input type="hidden" th:field="*{idGrupo}" />
 
       <label for="descripcion">Descripción</label>
       <input type="text" id="descripcion" name="descripcion" placeholder="Ej. Cena en restaurante" required />
@@ -217,7 +217,7 @@
 
       <label for="idPagador">¿Quién ha pagado?</label>
       <select id="idPagador" name="idPagador" required>
-        <option th:each="miembro : ${miembros}"
+        <option th:each="miembro : ${participantes}"
                 th:value="${miembro.idMiembro}"
                 th:text="${miembro.usuario.nombre}">
         </option>
@@ -225,7 +225,7 @@
 
       <label for="participantes">Participantes involucrados</label>
       <select id="participantes" multiple name="idParticipantes" required>
-        <option th:each="miembro : ${miembros}"
+        <option th:each="miembro : ${participantes}"
                 th:value="${miembro.idMiembro}"
                 th:text="${miembro.usuario.nombre}">
         </option>

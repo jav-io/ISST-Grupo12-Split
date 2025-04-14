@@ -44,33 +44,38 @@ public class GastoService {
             throw new RuntimeException("Debe haber al menos un participante para compartir el gasto.");
         }
     
-        // Obtener el grupo y validar pagador
+        // Obtener grupo y pagador
         Grupo grupo = grupoService.buscarPorId(gastoDTO.getIdGrupo());
         Miembro pagador = grupo.getMiembros().stream()
             .filter(m -> m.getIdMiembro().equals(gastoDTO.getIdPagador()))
             .findFirst()
             .orElseThrow(() -> new RuntimeException("El pagador no es miembro del grupo."));
     
-        // Crear el gasto
+        // Crear y guardar gasto
         Gasto gasto = new Gasto();
         gasto.setDescripcion(gastoDTO.getDescripcion());
         gasto.setMonto(gastoDTO.getMonto());
         gasto.setFecha(Date.valueOf(gastoDTO.getFecha()));
         gasto.setGrupo(grupo);
         gasto.setPagador(pagador);
+        gasto = gastoRepository.save(gasto); // necesario para registrar ID
     
-        gasto = gastoRepository.save(gasto); // Guardar gasto para que tenga ID
+        // Comprobamos si el pagador está entre los participantes
+        boolean pagadorParticipa = gastoDTO.getIdParticipantes().contains(pagador.getIdMiembro());
     
-        // Calcular reparto
-        float montoPorPersona = gastoDTO.getMonto() / gastoDTO.getIdParticipantes().size();
+        // Cantidad a pagar por participante
+        int numParticipantes = gastoDTO.getIdParticipantes().size();
+        float montoPorPersona = gastoDTO.getMonto() / numParticipantes;
     
-        // Registrar deudas
+        float totalRecuperado = 0f;
+    
         for (Long idMiembro : gastoDTO.getIdParticipantes()) {
             Miembro participante = grupo.getMiembros().stream()
                 .filter(m -> m.getIdMiembro().equals(idMiembro))
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("Participante no pertenece al grupo."));
     
+            // Si no es el pagador, se le crea una deuda
             if (!participante.getIdMiembro().equals(pagador.getIdMiembro())) {
                 Deuda deuda = new Deuda();
                 deuda.setDeudor(participante);
@@ -78,19 +83,21 @@ public class GastoService {
                 deuda.setMonto(montoPorPersona);
                 deudaRepository.save(deuda);
     
-                // Disminuir saldo del deudor
+                // Actualizar saldo: debe dinero
                 participante.setSaldoActual(participante.getSaldoActual() - montoPorPersona);
                 miembroRepository.save(participante);
+    
+                totalRecuperado += montoPorPersona;
             }
         }
     
-        // Aumentar saldo del pagador (recupera el dinero que los otros le deben)
-        float totalRecuperado = montoPorPersona * (gastoDTO.getIdParticipantes().size() - 1);
+        // El pagador recupera solo lo que los demás le deben (no a sí mismo)
         pagador.setSaldoActual(pagador.getSaldoActual() + totalRecuperado);
         miembroRepository.save(pagador);
     
         return gasto;
     }
+    
     
     
 
