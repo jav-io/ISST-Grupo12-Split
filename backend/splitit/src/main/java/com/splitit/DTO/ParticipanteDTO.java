@@ -3,25 +3,21 @@ import com.splitit.dto.ParticipanteDTO;
 
 
 public class ParticipanteDTO {
-    private Long idUsuario;
+
     private String nombre;
+    private String email;
 
-    public ParticipanteDTO() {
-        // Constructor vacío necesario para Spring y Thymeleaf
-    }
+    public ParticipanteDTO() {}
 
-    public ParticipanteDTO(Long idUsuario, String nombre) {
-        this.idUsuario = idUsuario;
+    public ParticipanteDTO(String nombre, String email) {
         this.nombre = nombre;
+        this.email = email;
     }
 
-    // Getters y setters
-    public Long getIdUsuario() {
-        return idUsuario;
-    }
-
-    public void setIdUsuario(Long idUsuario) {
-        this.idUsuario = idUsuario;
+    // Añade este constructor también:
+    public ParticipanteDTO(Long id, String nombre) {
+        this.nombre = nombre;
+        this.email = ""; // o puedes crear también un campo id si realmente necesitas el ID
     }
 
     public String getNombre() {
@@ -31,5 +27,14 @@ public class ParticipanteDTO {
     public void setNombre(String nombre) {
         this.nombre = nombre;
     }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
 }
+
 

@@ -30,13 +30,19 @@
       background: white; padding: 25px; margin-top: 30px;
       border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     }
-    .gasto, .miembro {
+    .gasto {
       padding: 10px 0; border-bottom: 1px solid #dee2e6;
-      display: flex; justify-content: space-between;
     }
-    .gasto:last-child, .miembro:last-child { border-bottom: none; }
-    .gasto a { color: #0d6efd; text-decoration: none; font-weight: 500; }
+    .gasto:last-child { border-bottom: none; }
+    .gasto-header {
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .gasto a {
+      color: #0d6efd; text-decoration: none; font-weight: 500;
+    }
     .gasto a:hover { text-decoration: underline; }
+    ul { margin: 8px 0 0 20px; }
+    li { margin-bottom: 4px; }
   </style>
 </head>
 <body>
@@ -53,29 +59,39 @@
     <p><span>Nombre:</span> <span th:text="${grupo.nombre}">Nombre grupo</span></p>
     <p><span>Descripción:</span> <span th:text="${grupo.descripcion}">Descripción grupo</span></p>
     <p><span>Fecha de creación:</span> <span th:text="${#dates.format(grupo.fechaCreacion, 'dd/MM/yyyy')}">01/01/2025</span></p>
-
+    <div class="section">
+      <h3>Miembros del grupo</h3>
+      <ul>
+        <li th:each="miembro : ${grupo.miembros}">
+          <span th:text="${miembro.usuario.nombre}">Nombre</span> –
+          <span th:text="${miembro.usuario.email}">email@mail.com</span>
+          <span th:if="${miembro.rolEnGrupo == 'ADMIN'}" style="font-weight: bold; color: #0d6efd;"> (Admin)</span>
+        </li>
+      </ul>
+    </div>
+    
     <div class="section">
       <h3>Gastos del grupo</h3>
       <div th:if="${gastos.empty}">
         <p>No hay gastos registrados aún.</p>
       </div>
       <div th:each="gasto : ${gastos}" class="gasto">
-        <div>
-          <strong th:text="${gasto.descripcion}">Descripción</strong> - 
-          <span th:text="${gasto.monto} + ' €'">100 €</span>
+        <div class="gasto-header">
+          <div>
+            <strong th:text="${gasto.descripcion}">Descripción</strong> - 
+            <span th:text="${gasto.monto} + ' €'">100 €</span>
+          </div>
+          <a th:href="@{'/editar-gasto/' + ${gasto.idGasto}}">Editar</a>
         </div>
-        <a th:href="@{'/editar-gasto/' + ${gasto.idGasto}}">Editar</a>
+        <div style="margin-top: 10px;">
+          <span style="font-weight: 600;">Participantes:</span>
+          <ul th:if="${gasto.participantes.size() > 0}">
+            <li th:each="p : ${gasto.participantes}" th:text="${p.nombre}">Nombre</li>
+          </ul>
+          <span th:if="${gasto.participantes.size() == 0}" style="font-weight: bold;">Ninguno</span>
+        </div>
       </div>
-      <a th:href="@{/añadir-gasto/{idGrupo}(idGrupo=${grupo.idGrupo})}">Añadir gasto</a>
-
-    </div>
-
-    <div class="section">
-      <h3>Participantes</h3>
-      <div th:each="miembro : ${miembros}" class="miembro">
-        <span th:text="${miembro.nombre}">Nombre Participante</span>
-        <span th:text="${miembro.saldo} + ' €'">0 €</span>
-      </div>
+      <a th:href="@{'/añadir-gasto/' + ${grupo.idGrupo}}" class="btn btn-primary">Añadir gasto</a>
     </div>
 
     <a class="btn" th:href="@{/dashboard}">← Volver al panel</a>

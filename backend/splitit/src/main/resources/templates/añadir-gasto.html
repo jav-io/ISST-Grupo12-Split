@@ -6,6 +6,7 @@
   <title>Añadir Gasto</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
     body { background: #f5f7fa; color: #343a40; }
@@ -29,6 +30,7 @@
       cursor: pointer;
     }
     button:hover { background-color: #0b5ed7; }
+    
   </style>
 </head>
 <body>
@@ -53,11 +55,30 @@
       <input type="date" th:field="*{fecha}" required />
       
       <input type="hidden" th:field="*{idGrupo}" />
+
+      <label>Participantes involucrados</label>
+      <select id="participantes" multiple name="idParticipantes" required>
+        <option th:each="miembro : ${participantes}"
+                th:value="${miembro.idMiembro}"
+                th:text="${miembro.usuario.nombre}">
+        </option>
+      </select>
       
       <button type="submit">Guardar gasto</button> 
     </form>
   </div>
 
   <footer>&copy; 2025 Split.it – Todos los derechos reservados.</footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+  <script>
+    new Choices('#participantes', {
+      removeItemButton: true,
+      placeholderValue: 'Selecciona participantes...',
+      searchEnabled: true,
+      shouldSort: false
+    });
+  </script>
+  
 </body>
 </html>

@@ -13,13 +13,10 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/", "/login", "/register", "/dashboard", "/css/**", "/js/**").permitAll()
-                .anyRequest().authenticated()
+                .anyRequest().permitAll()  // 🔓 Permitir todo sin seguridad
             )
-
-            // ⚠️ Desactivamos el login automático de Spring Security
-            .formLogin(form -> form.disable())
-            .logout(logout -> logout.disable()); // También desactivamos el logout automático
+            .formLogin(form -> form.disable())  // ❌ Desactivar login automático de Spring Security
+            .logout(logout -> logout.disable()); // ❌ Desactivar logout automático
 
         return http.build();
     }

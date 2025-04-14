@@ -1,6 +1,7 @@
 package com.splitit.controller;
 
 import com.splitit.dto.GrupoDTO;
+import com.splitit.dto.GastoConParticipantesDTO;
 import com.splitit.dto.GastoDTO;
 import com.splitit.model.Gasto;
 import com.splitit.model.Grupo;
@@ -29,9 +30,13 @@ public class VistaController {
 
     // Página de inicio
     @GetMapping("/")
-    public String inicio() {
+    public String inicio(HttpSession session) {
+        if (session.getAttribute("usuarioLogueado") != null) {
+            return "redirect:/dashboard";
+        }
         return "index";
     }
+    
 
   @GetMapping("/dashboard")
     public String dashboard(Model model, HttpSession session) {
@@ -54,43 +59,72 @@ public class VistaController {
     // Procesamiento del formulario para crear grupo
     @PostMapping("/crear-grupo")
     public String crearGrupo(@ModelAttribute GrupoDTO grupoDTO, HttpSession session) {
-        Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
-        if (usuario == null) return "redirect:/login";
+        Usuario creador = (Usuario) session.getAttribute("usuarioLogueado");
+        if (creador == null) return "redirect:/login";
 
-        grupoDTO.setIdCreador(usuario.getIdUsuario());
-        grupoService.crearGrupoDesdeDTO(grupoDTO);
+        grupoDTO.setIdCreador(creador.getIdUsuario());
+        grupoService.crearGrupoDesdeDTO(grupoDTO); // solo pasamos grupoDTO
+
         return "redirect:/dashboard";
     }
+
+    
 
 
     // Vista de detalle de grupo con gastos asociados
     @GetMapping("/detalle-grupo/{id}")
-    public String mostrarDetalleGrupo(@PathVariable Long id, Model model) {
+    public String mostrarDetalleGrupo(@PathVariable Long id, Model model, HttpSession session) {
+        Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
+        if (usuario == null) return "redirect:/login";
+
         Grupo grupo = grupoService.obtenerGrupoPorId(id);
-        List<Gasto> gastos = gastoService.obtenerGastosPorGrupo(id);
+
+        boolean esMiembro = grupo.getMiembros()
+            .stream()
+            .anyMatch(m -> m.getUsuario().getIdUsuario().equals(usuario.getIdUsuario()));
+
+        if (!esMiembro) {
+            return "redirect:/dashboard"; // o mostrar error
+        }
+
+        // Obtenemos los gastos con sus participantes correctamente mapeados
+        List<GastoConParticipantesDTO> gastos = gastoService.obtenerGastosConParticipantes()
+            .stream()
+            .filter(g -> g.getIdGrupo().equals(id)) // Solo los del grupo actual
+            .toList();
+
         model.addAttribute("grupo", grupo);
         model.addAttribute("gastos", gastos);
         return "detalle-grupo";
     }
+        
 
 
     // Vista para formulario de añadir gasto
     @GetMapping("/añadir-gasto/{idGrupo}")
     public String mostrarFormularioAñadirGasto(@PathVariable Long idGrupo, Model model) {
         GastoDTO gastoDTO = new GastoDTO();
-        gastoDTO.setIdGrupo(idGrupo); // ESTO es esencial
+        gastoDTO.setIdGrupo(idGrupo);
         model.addAttribute("gasto", gastoDTO);
+
+        Grupo grupo = grupoService.obtenerGrupoPorId(idGrupo);
+        model.addAttribute("participantes", grupo.getMiembros());
+
         return "añadir-gasto";
     }
+
+    
+    
     
 
     // Procesamiento del formulario para añadir gasto
     @PostMapping("/añadir-gasto")
-    public String añadirGasto(@ModelAttribute GastoDTO gastoDTO, HttpSession session) {
+    public String añadirGasto(@ModelAttribute GastoDTO gastoDTO,
+                              @RequestParam List<Long> idParticipantes,
+                              HttpSession session) {
         Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
         if (usuario == null) return "redirect:/login";
     
-        // Obtener el miembro correspondiente a ese usuario en el grupo
         Long idMiembro = grupoService
             .buscarPorId(gastoDTO.getIdGrupo())
             .getMiembros()
@@ -101,6 +135,7 @@ public class VistaController {
             .getIdMiembro();
     
         gastoDTO.setIdPagador(idMiembro);
+        gastoDTO.setIdParticipantes(idParticipantes); // importante
         gastoService.crearGasto(gastoDTO);
         return "redirect:/detalle-grupo/" + gastoDTO.getIdGrupo();
     }

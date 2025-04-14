@@ -20,8 +20,38 @@ public class GrupoDTO {
 
     private List<ParticipanteDTO> miembros;
 
-    // Getters y Setters
+    // ✅ NUEVO: lista de miembros a crear (nombre + email)
+    private List<NuevoMiembroDTO> nuevosMiembros;
 
+    public static class NuevoMiembroDTO {
+        private String nombre;
+        private String email;
+
+        public NuevoMiembroDTO() {}
+
+        public NuevoMiembroDTO(String nombre, String email) {
+            this.nombre = nombre;
+            this.email = email;
+        }
+
+        public String getNombre() {
+            return nombre;
+        }
+
+        public void setNombre(String nombre) {
+            this.nombre = nombre;
+        }
+
+        public String getEmail() {
+            return email;
+        }
+
+        public void setEmail(String email) {
+            this.email = email;
+        }
+    }
+
+    // Getters y Setters
     public String getNombre() {
         return nombre;
     }
@@ -60,5 +90,13 @@ public class GrupoDTO {
 
     public void setMiembros(List<ParticipanteDTO> miembros) {
         this.miembros = miembros;
+    }
+
+    public List<NuevoMiembroDTO> getNuevosMiembros() {
+        return nuevosMiembros;
+    }
+
+    public void setNuevosMiembros(List<NuevoMiembroDTO> nuevosMiembros) {
+        this.nuevosMiembros = nuevosMiembros;
     }
 }

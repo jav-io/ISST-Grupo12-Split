@@ -1,6 +1,7 @@
 package com.splitit.service;
 
 import com.splitit.dto.GrupoDTO;
+import com.splitit.dto.ParticipanteDTO;
 import com.splitit.dto.SaldoGrupoDTO;
 import com.splitit.model.Grupo;
 import com.splitit.model.Miembro;
@@ -14,6 +15,8 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
+
 
 @Service
 public class GrupoService {
@@ -84,6 +87,7 @@ public class GrupoService {
     }
 
     public Grupo crearGrupoDesdeDTO(GrupoDTO grupoDTO) {
+        // Crear grupo
         Grupo grupo = new Grupo();
         grupo.setNombre(grupoDTO.getNombre());
         grupo.setDescripcion(grupoDTO.getDescripcion());
@@ -91,15 +95,49 @@ public class GrupoService {
 
         Grupo grupoGuardado = grupoRepository.save(grupo);
 
-        Miembro miembro = new Miembro();
-        miembro.setGrupo(grupoGuardado);
-        Usuario usuario = usuarioRepository.findById(grupoDTO.getIdCreador())
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-        miembro.setUsuario(usuario);
-        miembroRepository.save(miembro);
+        // Crear miembro ADMIN (creador del grupo)
+        Usuario usuarioCreador = usuarioRepository.findById(grupoDTO.getIdCreador())
+            .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        Miembro miembroAdmin = new Miembro(usuarioCreador, grupoGuardado, "ADMIN");
+        miembroAdmin.setSaldoActual(0);
+        miembroRepository.save(miembroAdmin);
+
+        // Crear los demás miembros desde DTO
+        if (grupoDTO.getMiembros() != null) {
+            for (ParticipanteDTO participante : grupoDTO.getMiembros()) {
+                if (participante.getEmail() == null || participante.getEmail().equals(usuarioCreador.getEmail())) {
+                    continue; // No añadir al creador de nuevo
+                }
+
+                // Buscar si ya existe el usuario
+                Optional<Usuario> optionalUsuario = usuarioRepository.findByEmail(participante.getEmail());
+                Usuario usuario;
+                
+                if (optionalUsuario.isPresent()) {
+                    usuario = optionalUsuario.get();
+                } else {
+                    // Crear nuevo usuario si no existe
+                    usuario = new Usuario();
+                    usuario.setNombre(participante.getNombre());
+                    usuario.setEmail(participante.getEmail());
+                    usuario = usuarioRepository.save(usuario);
+                }
+                
+
+                // Crear miembro
+                Miembro nuevoMiembro = new Miembro(usuario, grupoGuardado, "MIEMBRO");
+                nuevoMiembro.setSaldoActual(0);
+                miembroRepository.save(nuevoMiembro);
+            }
+        }
 
         return grupoGuardado;
     }
+
+    
+    
+    
 
     public Grupo obtenerGrupoPorId(Long id) {
         return buscarPorId(id);

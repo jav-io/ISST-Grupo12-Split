@@ -10,7 +10,9 @@ import com.splitit.model.Gasto;
 import com.splitit.model.Grupo;
 import com.splitit.model.Miembro;
 import com.splitit.model.Usuario;
+import com.splitit.repository.DeudaRepository;
 import com.splitit.repository.GastoRepository;
+import com.splitit.repository.MiembroRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,70 +31,68 @@ public class GastoService {
     private GrupoService grupoService;
 
     @Autowired
-    private MiembroService miembroService;
+    private DeudaRepository deudaRepository;
+
+    @Autowired
+    private MiembroRepository miembroRepository;
+
+
 
     public Gasto crearGasto(GastoDTO gastoDTO) {
-        if (gastoDTO.getMonto() == null || gastoDTO.getMonto() <= 0) {
-            throw new RuntimeException("El monto debe ser mayor que cero.");
-        }
-
-        if (gastoDTO.getIdGrupo() == null || gastoDTO.getIdPagador() == null) {
-            throw new RuntimeException("Faltan datos obligatorios: grupo o pagador.");
-        }
-
-        Grupo grupo = grupoService.buscarPorId(gastoDTO.getIdGrupo());
-        Miembro pagador = miembroService.buscarPorId(gastoDTO.getIdPagador());
-
-        if (!pagador.getGrupo().getIdGrupo().equals(grupo.getIdGrupo())) {
-            throw new RuntimeException("El pagador no pertenece al grupo especificado.");
-        }
-
-        Gasto gasto = new Gasto();
-        gasto.setMonto(gastoDTO.getMonto());
-        gasto.setDescripcion(gastoDTO.getDescripcion());
-        gasto.setCategoria(gastoDTO.getCategoria());
-        gasto.setGrupo(grupo);
-        gasto.setPagador(pagador);
-
-        gasto.setFecha(gastoDTO.getFecha() != null
-                ? Date.valueOf(gastoDTO.getFecha())
-                : new Date(System.currentTimeMillis()));
-
-        gasto.setDeudas(new ArrayList<>());
-        Gasto gastoGuardado = gastoRepository.save(gasto);
-
-        List<Long> participantesIds = gastoDTO.getIdParticipantes();
-        if (participantesIds == null || participantesIds.isEmpty()) {
+        // Validar participantes
+        if (gastoDTO.getIdParticipantes() == null || gastoDTO.getIdParticipantes().isEmpty()) {
             throw new RuntimeException("Debe haber al menos un participante para compartir el gasto.");
         }
-
-        float montoPorParticipante = gastoDTO.getMonto() / participantesIds.size();
-
-        for (Long idParticipante : participantesIds) {
-            Miembro participante = miembroService.buscarPorId(idParticipante);
-
-            if (!participante.getGrupo().getIdGrupo().equals(grupo.getIdGrupo())) {
-                throw new RuntimeException("El participante con id " + idParticipante + " no pertenece al grupo " + grupo.getIdGrupo());
-            }
-
-            Deuda deuda = new Deuda();
-            deuda.setMonto(montoPorParticipante);
-            deuda.setDeudor(participante);
-            deuda.setGasto(gastoGuardado);
-            gastoGuardado.getDeudas().add(deuda);
-
+    
+        // Obtener el grupo y validar pagador
+        Grupo grupo = grupoService.buscarPorId(gastoDTO.getIdGrupo());
+        Miembro pagador = grupo.getMiembros().stream()
+            .filter(m -> m.getIdMiembro().equals(gastoDTO.getIdPagador()))
+            .findFirst()
+            .orElseThrow(() -> new RuntimeException("El pagador no es miembro del grupo."));
+    
+        // Crear el gasto
+        Gasto gasto = new Gasto();
+        gasto.setDescripcion(gastoDTO.getDescripcion());
+        gasto.setMonto(gastoDTO.getMonto());
+        gasto.setFecha(Date.valueOf(gastoDTO.getFecha()));
+        gasto.setGrupo(grupo);
+        gasto.setPagador(pagador);
+    
+        gasto = gastoRepository.save(gasto); // Guardar gasto para que tenga ID
+    
+        // Calcular reparto
+        float montoPorPersona = gastoDTO.getMonto() / gastoDTO.getIdParticipantes().size();
+    
+        // Registrar deudas
+        for (Long idMiembro : gastoDTO.getIdParticipantes()) {
+            Miembro participante = grupo.getMiembros().stream()
+                .filter(m -> m.getIdMiembro().equals(idMiembro))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Participante no pertenece al grupo."));
+    
             if (!participante.getIdMiembro().equals(pagador.getIdMiembro())) {
-                participante.setSaldoActual(participante.getSaldoActual() - montoPorParticipante);
-                miembroService.actualizarMiembro(participante);
+                Deuda deuda = new Deuda();
+                deuda.setDeudor(participante);
+                deuda.setGasto(gasto);
+                deuda.setMonto(montoPorPersona);
+                deudaRepository.save(deuda);
+    
+                // Disminuir saldo del deudor
+                participante.setSaldoActual(participante.getSaldoActual() - montoPorPersona);
+                miembroRepository.save(participante);
             }
         }
-
-        float totalRecupera = montoPorParticipante * (participantesIds.size() - 1);
-        pagador.setSaldoActual(pagador.getSaldoActual() + totalRecupera);
-        miembroService.actualizarMiembro(pagador);
-
-        return gastoRepository.save(gastoGuardado);
+    
+        // Aumentar saldo del pagador (recupera el dinero que los otros le deben)
+        float totalRecuperado = montoPorPersona * (gastoDTO.getIdParticipantes().size() - 1);
+        pagador.setSaldoActual(pagador.getSaldoActual() + totalRecuperado);
+        miembroRepository.save(pagador);
+    
+        return gasto;
     }
+    
+    
 
     public List<Gasto> obtenerTodos() {
         return gastoRepository.findAll();
