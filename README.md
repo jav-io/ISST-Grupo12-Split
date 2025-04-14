@@ -176,22 +176,6 @@ Recursos y configuración del backend:
 
 ---
 
-## ❓ ¿Por qué aparece así en VSCode?
-
-VSCode muestra `backend/splitit` como un proyecto independiente porque:
-
-- Spring Boot sigue la estructura estándar de Maven
-- `src/main/java` es donde va el código fuente
-- `resources/` incluye la configuración y archivos web
-
-Esta convención facilita la integración con Spring y las herramientas de Java.
-
----
-
-## 🔄 Avances del Sprint 2
-
-Durante este sprint, hemos implementado los siguientes componentes:
-
 ### 📋 Modelos de datos
 Un modelo es una clase Java que representa una tabla de la base de datos.
 
@@ -248,111 +232,55 @@ Se accede a la app vía navegador en http://localhost:8080.
 
 Aparece la pantalla de login por defecto de Spring Security (sin usuarios definidos aún).
 
+## ✅ Verificación de almacenamiento y recuperación de datos
 
----
+Durante el desarrollo y pruebas de la aplicación, se han seguido los siguientes pasos para comprobar que los datos introducidos en los formularios se almacenan correctamente en la base de datos y se pueden recuperar sin errores.
 
-##  Pruebas durante el desarrollo
+### 🔹 Comprobación 1: Almacenamiento correcto
 
-A continuación se documentan los pasos para **comprobar que el backend funciona** en cada fase del proyecto.  
-Cada desarrollador debe probar estos pasos para asegurarse de que su entorno está bien configurado.
- 
----
+1. Se accede al formulario de creación o edición de gasto (`/añadir-gasto` o `/editar-gasto`).
+2. Se introduce información válida (descripción, importe, fecha, pagador, participantes...).
+3. Al enviar el formulario, los datos se procesan en el backend y se guardan en la base de datos PostgreSQL a través de los servicios y repositorios.
+4. Se verifica el almacenamiento accediendo directamente a la base de datos:
 
-##  ¿Cómo hemos comprobado que funciona?
+#### Acceso por terminal (psql)
 
-A continuación se detallan los pasos seguidos para arrancar la aplicación correctamente y asegurarnos de que el backend funciona en local:
+```bash
+psql -U postgres -d splitit
 
-1. **Base de datos PostgreSQL local**  
-   Se instaló y arrancó PostgreSQL con `brew services start postgresql`.  
-   Se creó una base de datos llamada `splitit` y un rol de usuario llamado `postgres` con contraseña `password`.
-
-2. **Conexión desde Spring Boot a PostgreSQL**  
-   En el archivo `application.properties` se configuró correctamente la URL de conexión, el nombre de usuario y la contraseña.  
-   Spring Boot logra conectarse a la base de datos al arrancar.
-
-3. **Arranque del backend**  
-   Desde el directorio `backend/splitit`, se ejecutó el comando:
-
-   ```bash
-   mvn spring-boot:run
-   ```
-
-   Si todo está bien, en la consola aparece:
-
-   ```
-   Tomcat started on port(s): 8080 (http)
-   Started SplititApplication in ...
-   ```
-
-4. **Verificación en navegador**  
-   Abrimos `http://localhost:8080` y aparece la pantalla de login por defecto de Spring Security.
-
-   ![alt text](<Captura de pantalla 2025-03-29 a las 19.33.52.png>)
-
-### 📋 Historias de usuario cumplidas
-
-| ID   | Historia                                                                 | Estado |
-|------|--------------------------------------------------------------------------|--------|
-| HU-1 | Como usuario, quiero poder crear un grupo y ser su administrador         | ✅     |
-| HU-2 | Como administrador, quiero poder añadir miembros al grupo                | ✅     |
-| HU-3 | Como miembro, quiero poder registrar un gasto con todos los datos clave  | ✅     |
-| HU-4 | Como usuario, quiero poder ver los detalles de un grupo y sus gastos     | ✅     |
-| HU-5 | Como usuario, quiero poder editar un gasto registrado                    | ✅     |
+SELECT * FROM gasto;
+SELECT * FROM deuda;
+SELECT * FROM miembro;
 
 
+# 1. Arrancar PostgreSQL
+brew services start postgresql
 
-La base de datos responde a las peticiones como mostramos en el video, algunas funcionalidad e historias de usuarios se puedes ya desplegar desde el frontend como la de crear grupo. 
+# 2. Iniciar la aplicación
+cd backend/splitit
+mvn spring-boot:run
 
-✅ Avances respecto al backend
-Se han creado todos los controladores REST necesarios.
+# 3. Acceder al navegador
+http://localhost:8080
 
-Se ha conectado con una base de datos PostgreSQL funcional.
+# 4. Crear grupo, añadir gasto, editar gasto...
 
-Se ha verificado el guardado y recuperación de entidades.
+🔍 Acceder a la base de datos para consultar las tablas
+bash
+Copiar
+Editar
 
-Se utiliza correctamente Thymeleaf en frontend.
+psql -U postgres -d splitit
 
-Se ha empezado a aplicar buenas prácticas de DTOs y capas de servicio.
+# Ver todas las tablas
+\dt
 
----
-
-💻 Interfaz de usuario
-index.html: página de inicio.
-
-dashboard.html: muestra los grupos del usuario.
-
-crear-grupo.html: formulario para crear nuevo grupo.
-
-detalle-grupo.html: vista con los gastos del grupo.
-
-añadir-gasto.html: formulario para añadir un gasto.
-
-editar-gasto.html: editar un gasto existente.
-
-Todas las vistas están implementadas usando Thymeleaf.
-
----
-
-## ⚠️ Pendiente
-
-A parte de continuar con el Sprint3 para terminar toda la funcionalidad de la aplicación con todas las historias de usuario del Trello, debemos depurar algunas cuestiones de seguridad y de funcionalidad de la app. 
-
-1. **Implementar registro de usuarios**  
-   Actualmente, solo existe el login por defecto de Spring Security.  
-   Es necesario permitir que un nuevo usuario se registre (formulario de alta, guardar en base de datos, etc.).
-
-2. **Configurar Spring Security**  
-   Ahora mismo la seguridad está activada por defecto:  
-   - No podemos acceder a ninguna página sin login  
-   - No hay usuarios definidos en memoria ni en base de datos  
-   
-   Hay dos opciones:
-   - Desactivar temporalmente la seguridad para poder desarrollar (solo en local)
-   - Configurar usuarios reales desde base de datos y ajustar los permisos (recomendado más adelante)
-  
-  3. **Que el frontend haga todas las peticiones posibles ya funcionales en el backend**
-
----
+# Consultar contenido de cada tabla
+SELECT * FROM usuario;
+SELECT * FROM grupo;
+SELECT * FROM miembro;
+SELECT * FROM gasto;
+SELECT * FROM deuda;
 
 
 
