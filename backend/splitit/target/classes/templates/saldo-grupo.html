@@ -2,77 +2,208 @@
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
-  <title>Saldo del Grupo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Split.it - Saldo del Grupo</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet" />
   <style>
-    body {
-      font-family: 'Inter', sans-serif;
-      background: #f5f7fa;
-      padding: 40px;
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+    body { 
+      background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+      color: #343a40;
+      min-height: 100vh;
       display: flex;
-      justify-content: center;
+      flex-direction: column;
     }
-
-    .saldo-container {
-      background: white;
-      padding: 30px;
-      border-radius: 12px;
-      max-width: 700px;
-      width: 100%;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-    }
-
-    .grupo-header {
+    
+    header {
+      background-color: #ffffff;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      padding: 20px 40px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 25px;
+    }
+    
+    header h1 { 
+      font-size: 1.8rem; 
+      color: #2c3e50; 
+      font-weight: 800;
+    }
+    
+    nav {
+      display: flex;
+      align-items: center;
+    }
+    
+    nav a {
+      margin-left: 20px;
+      color: #2c3e50;
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.3s;
+      padding: 8px 12px;
+      border-radius: 6px;
+    }
+    
+    nav a:hover { 
+      color: #0d6efd; 
+      background-color: #f8f9fa;
+    }
+    
+    main {
+      flex: 1;
+      padding: 60px 20px;
+      max-width: 1200px;
+      margin: 0 auto;
     }
 
-    .grupo-header h2 {
-      font-size: 24px;
+    .saldo-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 40px;
+    }
+
+    .saldo-header h2 {
+      font-size: 2.2rem;
+      color: #2c3e50;
+      font-weight: 800;
+    }
+
+    .btn-volver {
+      display: inline-block;
+      background: linear-gradient(to right, #0d6efd, #6610f2);
+      color: #fff;
+      padding: 12px 24px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .btn-volver:hover { 
+      background: linear-gradient(to right, #084298, #520dc2);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .saldos-container {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 25px;
+      width: 100%;
+    }
+
+    .saldo-card {
+      background: white;
+      padding: 25px 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .saldo-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+    }
+
+    .saldo-icon {
+      font-size: 2.5rem;
+      color: #0d6efd;
+      margin-bottom: 15px;
+    }
+
+    .saldo-nombre {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 10px;
       color: #2c3e50;
     }
 
-    .btn-saldo {
-      background-color: #0d6efd;
-      color: white;
-      padding: 10px 16px;
-      border: none;
-      border-radius: 6px;
-      font-weight: 600;
-      text-decoration: none;
-      font-size: 14px;
+    .saldo-monto {
+      font-size: 1.8rem;
+      font-weight: 800;
     }
 
-    .btn-saldo:hover {
-      background-color: #0b5ed7;
+    .saldo-positivo {
+      color: #28a745;
     }
 
-    ul {
-      list-style: none;
-      padding: 0;
+    .saldo-negativo {
+      color: #dc3545;
     }
 
-    li {
-      padding: 12px 0;
-      border-bottom: 1px solid #e0e0e0;
-      font-size: 16px;
-      color: #34495e;
+    .saldo-neutro {
+      color: #6c757d;
+    }
+
+    footer {
+      text-align: center;
+      padding: 30px;
+      font-size: 0.9rem;
+      background-color: #dee2e6;
+      margin-top: auto;
+    }
+
+    @media (max-width: 992px) {
+      .saldos-container {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    
+    @media (max-width: 576px) {
+      .saldos-container {
+        grid-template-columns: 1fr;
+      }
+      
+      .saldo-header {
+        flex-direction: column;
+        gap: 20px;
+      }
+      
+      header {
+        padding: 15px 20px;
+      }
+      
+      nav a {
+        margin-left: 10px;
+        padding: 6px 10px;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="saldo-container">
-    <div class="grupo-header">
-      <h2 th:text="'Saldo del grupo: ' + ${grupo.nombre}"></h2>
-      <a class="btn-saldo" th:href="@{/detalle-grupo/{id}(id=${grupo.idGrupo})}">← Volver al grupo</a>
+  <header>
+    <h1>Split.it</h1>
+    <nav>
+      <a th:href="@{/}"><i class="fas fa-home"></i> Inicio</a>
+      <a th:href="@{/dashboard}"><i class="fas fa-tachometer-alt"></i> Panel</a>
+      <a th:href="@{'/detalle-grupo/' + ${grupo.idGrupo}}"><i class="fas fa-users"></i> Volver al grupo</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="saldo-header">
+      <h2 th:text="'Saldo del grupo: ' + ${grupo.nombre}">Saldo del grupo</h2>
+      <a class="btn-volver" th:href="@{/detalle-grupo/{id}(id=${grupo.idGrupo})}"><i class="fas fa-arrow-left"></i> Volver al grupo</a>
     </div>
 
-    <ul>
-        <li th:each="saldo : ${saldos}"
-        th:text="${saldo.nombre + ': ' + saldo.saldoActual + ' €'}">
-    </li>    
-    </ul>
-  </div>
+    <div class="saldos-container">
+      <div th:each="saldo : ${saldos}" class="saldo-card">
+        <i th:class="${saldo.saldoActual > 0 ? 'fas fa-arrow-up saldo-icon saldo-positivo' : (saldo.saldoActual < 0 ? 'fas fa-arrow-down saldo-icon saldo-negativo' : 'fas fa-equals saldo-icon saldo-neutro')}"></i>
+        <div class="saldo-nombre" th:text="${saldo.nombre}">Nombre usuario</div>
+        <div th:class="${saldo.saldoActual > 0 ? 'saldo-monto saldo-positivo' : (saldo.saldoActual < 0 ? 'saldo-monto saldo-negativo' : 'saldo-monto saldo-neutro')}" 
+             th:text="${saldo.saldoActual + ' €'}">0.00 €</div>
+      </div>
+    </div>
+  </main>
+
+  <footer>&copy; 2025 Split.it – Todos los derechos reservados.</footer>
 </body>
 </html>
