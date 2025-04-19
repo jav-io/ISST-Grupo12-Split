@@ -133,7 +133,7 @@ Un modelo es una clase Java que representa una tabla de la base de datos.
 
 - **Deuda.java**: Entidad que representa una deuda generada por un gasto. Almacena información sobre el monto, si está saldada y la fecha de creación.
   
---
+---
 ## Estructura general de la aplicación (MVC + capas)
 
 Split.it sigue una arquitectura en capas típica de aplicaciones web en Spring Boot, combinando el patrón MVC (Modelo-Vista-Controlador) con servicios y repositorios. A continuación se explica cada componente y cómo interactúan entre ellos:
