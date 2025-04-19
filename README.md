@@ -101,10 +101,10 @@ ISST-GRUPO12-SPLIT/
 
 Contiene todo el backend de la aplicación usando Java y Spring Boot.
 
-### 📄 `pom.xml`
+## 📄 `pom.xml`
 Archivo de configuración del proyecto para Maven: versiones, dependencias, compilación y herramientas. 
 
-### 📄 `SplititApplication.java`
+## 📄 `SplititApplication.java`
 Punto de entrada de la aplicación. Arranca Spring Boot y lanza el servidor web.
 
 ---
@@ -120,6 +120,20 @@ Organiza el código Java del backend en capas:
 | `model/`       | Entidades (tablas de base de datos) |
 | `repository/`  | Acceso a datos (consultas a la base de datos) |
 
+## 📋 Modelos de datos
+Un modelo es una clase Java que representa una tabla de la base de datos.
+
+- **Usuario.java**: Entidad que representa a los usuarios registrados en el sistema. Almacena información básica como nombre, email y contraseña, y establece la relación con los grupos a través de la entidad Miembro.
+
+- **Grupo.java**: Entidad que representa un grupo de gastos compartidos. Contiene información sobre el nombre, descripción y fecha de creación del grupo, así como las relaciones con miembros y gastos.
+
+- **Miembro.java**: Entidad que establece la relación entre usuarios y grupos. Almacena el saldo actual del miembro en el grupo y su rol (administrador o miembro regular).
+
+- **Gasto.java**: Entidad que representa un gasto registrado en un grupo. Contiene información sobre el monto, fecha, descripción y categoría del gasto, así como el miembro que lo pagó.
+
+- **Deuda.java**: Entidad que representa una deuda generada por un gasto. Almacena información sobre el monto, si está saldada y la fecha de creación.
+  
+--
 ## Estructura general de la aplicación (MVC + capas)
 
 Split.it sigue una arquitectura en capas típica de aplicaciones web en Spring Boot, combinando el patrón MVC (Modelo-Vista-Controlador) con servicios y repositorios. A continuación se explica cada componente y cómo interactúan entre ellos:
@@ -199,7 +213,8 @@ public class GrupoController {
 
 ### Diagrama de flujo de capas
 
-![Estructura API Split.it](docs/estructura-api-splitit.png)
+![Captura de pantalla 2025-04-19 a las 11 34 39](https://github.com/user-attachments/assets/126c8db1-5b11-4f83-ab1a-cd36d2544002)
+
 
 Este diagrama resume cómo fluye la información desde el cliente hasta la base de datos y viceversa, pasando por cada capa.
 
@@ -225,19 +240,6 @@ Recursos y configuración del backend:
 | `static/`                 | Archivos estáticos: CSS, JS, imágenes |
 
 ---
-
-### 📋 Modelos de datos
-Un modelo es una clase Java que representa una tabla de la base de datos.
-
-- **Usuario.java**: Entidad que representa a los usuarios registrados en el sistema. Almacena información básica como nombre, email y contraseña, y establece la relación con los grupos a través de la entidad Miembro.
-
-- **Grupo.java**: Entidad que representa un grupo de gastos compartidos. Contiene información sobre el nombre, descripción y fecha de creación del grupo, así como las relaciones con miembros y gastos.
-
-- **Miembro.java**: Entidad que establece la relación entre usuarios y grupos. Almacena el saldo actual del miembro en el grupo y su rol (administrador o miembro regular).
-
-- **Gasto.java**: Entidad que representa un gasto registrado en un grupo. Contiene información sobre el monto, fecha, descripción y categoría del gasto, así como el miembro que lo pagó.
-
-- **Deuda.java**: Entidad que representa una deuda generada por un gasto. Almacena información sobre el monto, si está saldada y la fecha de creación.
 
 ## 🔧 Configuración
 
