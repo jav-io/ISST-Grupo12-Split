@@ -97,57 +97,15 @@ ISST-GRUPO12-SPLIT/
 
 ---
 
-## 📄 `.gitignore`
-
-Archivo que le indica a Git qué archivos no deben subirse. Ejemplos típicos:
-
-```
-/target/
-*.class
-.idea/
-.vscode/
-*.log
-.env
-```
-
-Evita subir archivos innecesarios o sensibles.
-
----
-
-## 📄 `README.md`
-
-Este mismo archivo. Contiene toda la información básica del proyecto: descripción, estructura, tecnología, equipo, etc.
-
----
-
-## 📁 `docs/`
-
-Documentación interna del proyecto:
-- Visión (VD)
-- Diseño (SDD)
-- Planificación (SDP)
-- Feedback del profesor
-
----
-
 ## 📁 `backend/`
 
 Contiene todo el backend de la aplicación usando Java y Spring Boot.
 
-### 📄 `pom.xml`
-Archivo de configuración del proyecto para Maven: versiones, dependencias, compilación.
+## 📄 `pom.xml`
+Archivo de configuración del proyecto para Maven: versiones, dependencias, compilación y herramientas. 
 
-### 📄 `SplititApplication.java`
+## 📄 `SplititApplication.java`
 Punto de entrada de la aplicación. Arranca Spring Boot y lanza el servidor web.
-
-```java
-@SpringBootApplication
-public class SplititApplication {
-    public static void main(String[] args) {
-        SpringApplication.run(SplititApplication.class, args);
-    }
-}
-```
 
 ---
 
@@ -161,6 +119,113 @@ Organiza el código Java del backend en capas:
 | `service/`     | Lógica de negocio (validaciones, cálculos) |
 | `model/`       | Entidades (tablas de base de datos) |
 | `repository/`  | Acceso a datos (consultas a la base de datos) |
+
+## 📋 Modelos de datos
+Un modelo es una clase Java que representa una tabla de la base de datos.
+
+- **Usuario.java**: Entidad que representa a los usuarios registrados en el sistema. Almacena información básica como nombre, email y contraseña, y establece la relación con los grupos a través de la entidad Miembro.
+
+- **Grupo.java**: Entidad que representa un grupo de gastos compartidos. Contiene información sobre el nombre, descripción y fecha de creación del grupo, así como las relaciones con miembros y gastos.
+
+- **Miembro.java**: Entidad que establece la relación entre usuarios y grupos. Almacena el saldo actual del miembro en el grupo y su rol (administrador o miembro regular).
+
+- **Gasto.java**: Entidad que representa un gasto registrado en un grupo. Contiene información sobre el monto, fecha, descripción y categoría del gasto, así como el miembro que lo pagó.
+
+- **Deuda.java**: Entidad que representa una deuda generada por un gasto. Almacena información sobre el monto, si está saldada y la fecha de creación.
+  
+---
+## Estructura general de la aplicación (MVC + capas)
+
+Split.it sigue una arquitectura en capas típica de aplicaciones web en Spring Boot, combinando el patrón MVC (Modelo-Vista-Controlador) con servicios y repositorios. A continuación se explica cada componente y cómo interactúan entre ellos:
+
+### 1. Model
+
+El modelo representa las entidades del sistema. Estas clases están anotadas con `@Entity` y se mapean directamente a tablas en la base de datos.
+
+```java
+@Entity
+public class Grupo {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private String nombre;
+    // otros campos, getters y setters
+}
+```
+
+### 2. Repository
+
+El repositorio proporciona acceso a la base de datos. Extiende `JpaRepository` y permite realizar operaciones CRUD sin necesidad de escribir SQL.
+
+```java
+public interface GrupoRepository extends JpaRepository<Grupo, Long> {
+    // Puedes añadir métodos personalizados si lo necesitas
+}
+```
+
+### 3. Service
+
+Los servicios contienen la lógica de negocio. Se encargan de gestionar las operaciones complejas y reutilizables que involucran varias entidades o validaciones.
+
+```java
+@Service
+public class GrupoService {
+    @Autowired
+    private GrupoRepository grupoRepository;
+
+    public Grupo obtenerGrupoPorId(Long id) {
+        return grupoRepository.findById(id).orElse(null);
+    }
+}
+```
+
+### 4. Controller
+
+Los controladores son la "API" del sistema. Reciben las peticiones HTTP desde el navegador o cliente, coordinan el flujo llamando a los servicios, y devuelven una vista HTML o una respuesta JSON.
+
+Se implementaron controladores para exponer la API REST:
+
+- **UsuarioController**: Gestiona el registro, consulta y búsqueda de usuarios.
+- **GrupoController**: Gestiona la creación, consulta y búsqueda por ID de grupos.
+- **GastoController**: Permite registrar y consultar gastos.
+- **MiembroController**: Permite la gestión de la relación entre usuarios y grupos.
+- **DeudaController**: Gestiona el registro y consulta de deudas generadas por gastos.
+
+  Y controladores para exponer una API web para exponer las vistas HTML a traves de Thymeleaf.
+- **VistaController**: Gestiona las vistas HTML de la aplicación.
+
+
+```java
+@Controller
+public class GrupoController {
+
+    @Autowired
+    private GrupoService grupoService;
+
+    @GetMapping("/grupo/{id}")
+    public String verGrupo(@PathVariable Long id, Model model) {
+        Grupo grupo = grupoService.obtenerGrupoPorId(id);
+        model.addAttribute("grupo", grupo);
+        return "ver-grupo";
+    }
+}
+```
+
+### Diagrama de flujo de capas
+
+![Captura de pantalla 2025-04-19 a las 11 34 39](https://github.com/user-attachments/assets/126c8db1-5b11-4f83-ab1a-cd36d2544002)
+
+
+Este diagrama resume cómo fluye la información desde el cliente hasta la base de datos y viceversa, pasando por cada capa.
+
+1. **El cliente** hace una petición a una ruta del sistema (por ejemplo, `/grupo/1`).
+2. El **Controller** recibe la petición y llama al **Service**.
+3. El **Service** realiza la lógica de negocio necesaria y consulta al **Repository**.
+4. El **Repository** accede a la base de datos y devuelve una entidad **Model**.
+5. El resultado se propaga de vuelta al cliente, ya sea en una vista Thymeleaf o en formato JSON si se usa `@RestController`.
+
+Este diseño facilita la separación de responsabilidades, la escalabilidad del código y la facilidad de pruebas unitarias.
+
 
 ---
 
@@ -176,32 +241,7 @@ Recursos y configuración del backend:
 
 ---
 
-### 📋 Modelos de datos
-Un modelo es una clase Java que representa una tabla de la base de datos.
-
-- **Usuario.java**: Entidad que representa a los usuarios registrados en el sistema. Almacena información básica como nombre, email y contraseña, y establece la relación con los grupos a través de la entidad Miembro.
-
-- **Grupo.java**: Entidad que representa un grupo de gastos compartidos. Contiene información sobre el nombre, descripción y fecha de creación del grupo, así como las relaciones con miembros y gastos.
-
-- **Miembro.java**: Entidad que establece la relación entre usuarios y grupos. Almacena el saldo actual del miembro en el grupo y su rol (administrador o miembro regular).
-
-- **Gasto.java**: Entidad que representa un gasto registrado en un grupo. Contiene información sobre el monto, fecha, descripción y categoría del gasto, así como el miembro que lo pagó.
-
-- **Deuda.java**: Entidad que representa una deuda generada por un gasto. Almacena información sobre el monto, si está saldada y la fecha de creación.
-
-
-## Controladores REST
-
-Se implementaron controladores para exponer la API REST:
-
-- **UsuarioController**: Gestiona el registro, consulta y búsqueda de usuarios.
-- **GrupoController**: Gestiona la creación, consulta y búsqueda por ID de grupos.
-- **GastoController**: Permite registrar y consultar gastos.
-- **MiembroController**: Permite la gestión de la relación entre usuarios y grupos.
-- **DeudaController**: Gestiona el registro y consulta de deudas generadas por gastos.
-
-
-### 🔧 Configuración
+## 🔧 Configuración
 
 - **application.properties**: Archivo de configuración que define la conexión a la base de datos PostgreSQL, configuración de JPA/Hibernate, puerto del servidor y configuración de Thymeleaf.
 
@@ -215,7 +255,7 @@ Así separas la lógica (services) del acceso a la base de datos (repositories),
 ![alt text](<Captura de pantalla 2025-04-01 a las 17.31.52.png>)
 
 
-### ⚙️ Configuración de la base de datos
+## ⚙️ Configuración de la base de datos
 
 - Se ha creado y probado una base de datos local en PostgreSQL llamada `splitit`.
 - Se ha creado el rol `postgres` con contraseña `password` y permisos suficientes.
@@ -281,12 +321,3 @@ SELECT * FROM grupo;
 SELECT * FROM miembro;
 SELECT * FROM gasto;
 SELECT * FROM deuda;
-
-
-
-
-
-
-
-
-

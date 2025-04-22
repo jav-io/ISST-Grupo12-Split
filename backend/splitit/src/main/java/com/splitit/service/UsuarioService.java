@@ -48,5 +48,18 @@ public class UsuarioService {
         return usuario;
     }
     
+    public void cambiarPasswordPorEmail(String email, String nuevaPassword) {
+    Optional<Usuario> usuarioOpt = usuarioRepository.findByEmail(email);
+
+        if (usuarioOpt.isEmpty()) {
+        throw new RuntimeException("No se encontró un usuario con el correo: " + email);
+        }
+
+        Usuario usuario = usuarioOpt.get();
+        usuario.setPassword(nuevaPassword);
+        usuarioRepository.save(usuario);
+    }
+
+
 
 }

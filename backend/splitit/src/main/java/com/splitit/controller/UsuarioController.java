@@ -5,6 +5,8 @@ import com.splitit.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.splitit.dto.PasswordResetDTO;
+
 
 import java.util.List;
 
@@ -36,4 +38,11 @@ public class UsuarioController {
     public ResponseEntity<Usuario> buscarPorId(@PathVariable Long id) {
         return ResponseEntity.ok(usuarioService.buscarPorId(id));
     }
+
+    @PostMapping("/recuperar-password")
+    public ResponseEntity<String> cambiarPassword(@RequestBody PasswordResetDTO dto) {
+        usuarioService.cambiarPasswordPorEmail(dto.getEmail(), dto.getNuevaPassword());
+        return ResponseEntity.ok("Contraseña actualizada correctamente.");
+    }
+
 }
