@@ -1,18 +1,17 @@
 package com.splitit.controller;
 
+import com.splitit.dto.PasswordResetDTO;
 import com.splitit.model.Usuario;
 import com.splitit.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import com.splitit.dto.PasswordResetDTO;
+import java.util.Map;
+import org.springframework.http.HttpStatus;
 
 
 import java.util.List;
 
-/**
- * Controlador REST para gestionar usuarios
- */
 @RestController
 @RequestMapping("/api/usuarios")
 public class UsuarioController {
@@ -39,10 +38,25 @@ public class UsuarioController {
         return ResponseEntity.ok(usuarioService.buscarPorId(id));
     }
 
+    // Cambiar contraseña mediante email
     @PostMapping("/recuperar-password")
     public ResponseEntity<String> cambiarPassword(@RequestBody PasswordResetDTO dto) {
-        usuarioService.cambiarPasswordPorEmail(dto.getEmail(), dto.getNuevaPassword());
-        return ResponseEntity.ok("Contraseña actualizada correctamente.");
+        try {
+            usuarioService.cambiarPasswordPorEmail(dto.getEmail(), dto.getNuevaPassword());
+            return ResponseEntity.ok("Contraseña actualizada correctamente.");
+        } catch (RuntimeException ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
     }
+    @PostMapping("/solicitar-recuperacion")
+    public ResponseEntity<String> solicitarRecuperacion(@RequestBody Map<String, String> body) {
+        String email = body.get("email");
 
+        if (!usuarioService.verificarEmailExistente(email)) {
+           return ResponseEntity.status(HttpStatus.NOT_FOUND).body("El correo no está registrado.");
+        }
+
+        // Aquí iría lógica de envío de email, pero por ahora simulamos
+        return ResponseEntity.ok("Correo de recuperación enviado.");
+    }
 }
