@@ -199,5 +199,8 @@ public class VistaController {
         return "saldo-grupo";
     }
 
-
+    @GetMapping("/recuperar-password")
+    public String mostrarFormularioRecuperarPassword() {
+        return "recuperar-password";
+    }
 }

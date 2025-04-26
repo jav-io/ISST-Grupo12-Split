@@ -14,52 +14,61 @@ public class UsuarioService {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
+    // Crear usuario
     public Usuario crearUsuario(Usuario usuario) {
-        Optional<Usuario> existente = usuarioRepository.findByEmail(usuario.getEmail());
-        if (existente.isPresent()) {
-            throw new RuntimeException("El email ya está en uso.");
+        if (usuarioRepository.findByEmail(usuario.getEmail()).isPresent()) {
+            throw new RuntimeException("Ya existe un usuario con ese correo.");
         }
-
-        // SIN ENCRIPTAR LA CONTRASEÑA
         return usuarioRepository.save(usuario);
     }
 
+    // Obtener todos
     public List<Usuario> obtenerTodos() {
         return usuarioRepository.findAll();
     }
 
+    // Buscar por ID
     public Usuario buscarPorId(Long id) {
         return usuarioRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado."));
     }
 
+    // Autenticación
     public Usuario autenticarUsuario(String email, String password) {
-        Usuario usuario = usuarioRepository.findByEmail(email)
-            .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-    
-        System.out.println("[DEBUG] Email: " + email);
-        System.out.println("[DEBUG] Password introducida: [" + password + "]");
-        System.out.println("[DEBUG] Password almacenada: [" + usuario.getPassword() + "]");
-    
-        if (!usuario.getPassword().trim().equals(password.trim())) {
-            throw new RuntimeException("Contraseña incorrecta");
+        Optional<Usuario> optionalUsuario = usuarioRepository.findByEmail(email);
+
+        if (optionalUsuario.isEmpty()) {
+            throw new RuntimeException("No existe un usuario con ese correo.");
         }
-    
+
+        Usuario usuario = optionalUsuario.get();
+        if (!usuario.getPassword().equals(password)) {
+            throw new RuntimeException("Contraseña incorrecta.");
+        }
+
         return usuario;
     }
-    
-    public void cambiarPasswordPorEmail(String email, String nuevaPassword) {
-    Optional<Usuario> usuarioOpt = usuarioRepository.findByEmail(email);
 
-        if (usuarioOpt.isEmpty()) {
-        throw new RuntimeException("No se encontró un usuario con el correo: " + email);
+    // Recuperación de contraseña - cambio directo
+    public void cambiarPasswordPorEmail(String email, String nuevaPassword) {
+        Optional<Usuario> optionalUsuario = usuarioRepository.findByEmail(email);
+
+        if (optionalUsuario.isEmpty()) {
+            throw new RuntimeException("No existe un usuario con ese correo.");
         }
 
-        Usuario usuario = usuarioOpt.get();
+        Usuario usuario = optionalUsuario.get();
         usuario.setPassword(nuevaPassword);
         usuarioRepository.save(usuario);
     }
 
+    // Solo buscar sin lanzar error
+    public Optional<Usuario> buscarPorEmail(String email) {
+        return usuarioRepository.findByEmail(email);
+    }
 
+    public boolean verificarEmailExistente(String email) {
+        return usuarioRepository.findByEmail(email).isPresent();
+    }
 
 }
