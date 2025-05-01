@@ -1,20 +1,28 @@
-// backend/splitit/src/main/java/com/splitit/dto/DetalleSaldoDTO.java
-package com.splitit.dto;
+// backend/splitit/src/main/java/com/splitit/DTO/DetalleSaldoDTO.java
+package com.splitit.DTO;
+
+import java.math.BigDecimal;
 
 public class DetalleSaldoDTO {
-    private String nombreUsuario;
-    private float cantidad;
+    private Long idUsuario;
+    private String nombre;
+    private BigDecimal saldo;
 
-    public DetalleSaldoDTO(String nombreUsuario, float cantidad) {
-        this.nombreUsuario = nombreUsuario;
-        this.cantidad = cantidad;
+    public DetalleSaldoDTO(Long idUsuario, String nombre, BigDecimal saldo) {
+        this.idUsuario = idUsuario;
+        this.nombre = nombre;
+        this.saldo = saldo;
     }
 
-    public String getNombreUsuario() {
-        return nombreUsuario;
+    public Long getIdUsuario() {
+        return idUsuario;
     }
 
-    public float getCantidad() {
-        return cantidad;
+    public String getNombre() {
+        return nombre;
+    }
+
+    public BigDecimal getSaldo() {
+        return saldo;
     }
 }

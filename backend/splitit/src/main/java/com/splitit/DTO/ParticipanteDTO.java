@@ -1,23 +1,31 @@
-package com.splitit.dto;
-import com.splitit.dto.ParticipanteDTO;
+package com.splitit.DTO;
 
+import java.math.BigDecimal;
 
 public class ParticipanteDTO {
-
+    private Long id;
     private String nombre;
     private String email;
+    private BigDecimal montoAdeudado;
 
+    // Constructor vacío
     public ParticipanteDTO() {}
 
-    public ParticipanteDTO(String nombre, String email) {
+    // Constructor con todos los campos
+    public ParticipanteDTO(Long id, String nombre, String email, BigDecimal montoAdeudado) {
+        this.id = id;
         this.nombre = nombre;
         this.email = email;
+        this.montoAdeudado = montoAdeudado;
     }
 
-    // Añade este constructor también:
-    public ParticipanteDTO(Long id, String nombre) {
-        this.nombre = nombre;
-        this.email = ""; // o puedes crear también un campo id si realmente necesitas el ID
+    // Getters y setters
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getNombre() {
@@ -34,6 +42,14 @@ public class ParticipanteDTO {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public BigDecimal getMontoAdeudado() {
+        return montoAdeudado;
+    }
+
+    public void setMontoAdeudado(BigDecimal montoAdeudado) {
+        this.montoAdeudado = montoAdeudado;
     }
 }
 

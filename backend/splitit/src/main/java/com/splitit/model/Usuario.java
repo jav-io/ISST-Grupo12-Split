@@ -3,12 +3,15 @@ package com.splitit.model;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
-import java.util.List;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import java.util.*;
 
 @Entity
 @Table(name = "usuario")
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "idUsuario")
-public class Usuario {
+public class Usuario implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,6 +26,9 @@ public class Usuario {
 
     private boolean isPremium;
 
+    @ElementCollection(fetch = FetchType.EAGER)
+    private Set<String> roles = new HashSet<>();
+
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
     private List<Miembro> miembros;
 
@@ -35,6 +41,40 @@ public class Usuario {
         this.email = email;
         this.password = password;
         this.isPremium = false;
+        this.roles = new HashSet<>(Arrays.asList("ROLE_USER"));
+    }
+
+    // Métodos de UserDetails
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return roles.stream()
+                .map(role -> new SimpleGrantedAuthority(role))
+                .collect(java.util.stream.Collectors.toList());
+    }
+
+    @Override
+    public String getUsername() {
+        return email;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
     }
 
     // Getters y setters
@@ -62,6 +102,7 @@ public class Usuario {
         this.email = email;
     }
 
+    @Override
     public String getPassword() {
         return password;
     }
@@ -84,6 +125,14 @@ public class Usuario {
 
     public void setMiembros(List<Miembro> miembros) {
         this.miembros = miembros;
+    }
+
+    public Set<String> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Set<String> roles) {
+        this.roles = roles;
     }
 
     public Long getId() {

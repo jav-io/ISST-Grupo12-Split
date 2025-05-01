@@ -6,15 +6,16 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import java.util.Date;
 import java.util.List;
+import java.util.ArrayList;
 
 @Entity
 @Table(name = "grupo")
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "idGrupo")
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class Grupo {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long idGrupo;
+    private Long id;
 
     @NotBlank(message = "El nombre del grupo es obligatorio")
     private String nombre;
@@ -36,10 +37,10 @@ public class Grupo {
     private Date fechaCreacion;
 
     @OneToMany(mappedBy = "grupo", cascade = CascadeType.ALL)
-    private List<Miembro> miembros;
+    private List<Miembro> miembros = new ArrayList<>();
 
     @OneToMany(mappedBy = "grupo", cascade = CascadeType.ALL)
-    private List<Gasto> gastos;
+    private List<Gasto> gastos = new ArrayList<>();
 
     public Grupo() {
         this.fechaCreacion = new Date();
@@ -52,12 +53,12 @@ public class Grupo {
     }
 
     // Getters y setters
-    public Long getIdGrupo() {
-        return idGrupo;
+    public Long getId() {
+        return id;
     }
 
-    public void setIdGrupo(Long idGrupo) {
-        this.idGrupo = idGrupo;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getNombre() {

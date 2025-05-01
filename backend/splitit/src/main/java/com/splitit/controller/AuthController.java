@@ -2,11 +2,20 @@ package com.splitit.controller;
 
 import com.splitit.model.Usuario;
 import com.splitit.service.UsuarioService;
-import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import java.util.HashSet;
+import java.util.Set;
 
 @Controller
 public class AuthController {
@@ -14,48 +23,50 @@ public class AuthController {
     @Autowired
     private UsuarioService usuarioService;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @GetMapping("/login")
-    public String mostrarLoginForm() {
+    public String login() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.isAuthenticated() && !auth.getName().equals("anonymousUser")) {
+            return "redirect:/dashboard";
+        }
         return "login";
     }
 
-    @PostMapping("/login")
-    public String procesarLogin(@RequestParam String email,
-                                 @RequestParam String password,
-                                 Model model,
-                                 HttpSession session) {
-        try {
-            Usuario usuario = usuarioService.autenticarUsuario(email, password);
-            session.setAttribute("usuarioLogueado", usuario);
-            return "redirect:/dashboard";
-        } catch (RuntimeException e) {
-            model.addAttribute("error", e.getMessage());
-            return "login";
-        }
-    }
-    
-
     @GetMapping("/logout")
-    public String cerrarSesion(HttpSession session) {
-        session.invalidate();
-        return "redirect:/login";
+    public String logout(HttpServletRequest request, HttpServletResponse response) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null) {
+            new SecurityContextLogoutHandler().logout(request, response, auth);
+        }
+        return "redirect:/login?logout";
     }
 
     @GetMapping("/register")
-    public String mostrarFormularioRegistro(Model model) {
+    public String showRegistrationForm(Model model) {
         model.addAttribute("usuario", new Usuario());
         return "register";
     }
 
     @PostMapping("/register")
-    public String procesarRegistro(@ModelAttribute Usuario usuario, Model model) {
-        try {
-            usuarioService.crearUsuario(usuario);
-            return "redirect:/login";
-        } catch (RuntimeException e) {
-            model.addAttribute("error", e.getMessage());
-            return "register";
+    public String registerUser(@RequestParam String nombre, 
+                             @RequestParam String email, 
+                             @RequestParam String password,
+                             @RequestParam(required = false) boolean isAdmin) {
+        Usuario usuario = new Usuario(nombre, email, passwordEncoder.encode(password));
+        
+        // Si es admin, añadimos el rol ADMIN
+        if (isAdmin) {
+            Set<String> roles = new HashSet<>();
+            roles.add("ROLE_USER");
+            roles.add("ROLE_ADMIN");
+            usuario.setRoles(roles);
         }
+        
+        usuarioService.save(usuario);
+        return "redirect:/login?registered";
     }
 }
 

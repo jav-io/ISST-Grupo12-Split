@@ -141,8 +141,8 @@
       <div id="miembros">
         <label>Miembros del grupo</label>
         <div class="miembro">
-          <input type="text" name="miembros[0].nombre" placeholder="Nombre del miembro" />
-          <input type="email" name="miembros[0].email" placeholder="Email del miembro" />
+          <input type="text" name="miembros[0].nombre" placeholder="Nombre del miembro" required />
+          <input type="email" name="miembros[0].email" placeholder="Email del miembro" required />
         </div>
       </div>
       <button type="button" class="add-miembro-btn" onclick="agregarMiembro()"><i class="fas fa-plus"></i> Añadir otro miembro</button>
@@ -160,8 +160,8 @@
       const div = document.createElement('div');
       div.className = 'miembro';
       div.innerHTML = `
-        <input type="text" name="miembros[${miembroIndex}].nombre" placeholder="Nombre del miembro" />
-        <input type="email" name="miembros[${miembroIndex}].email" placeholder="Email del miembro" />
+        <input type="text" name="miembros[${miembroIndex}].nombre" placeholder="Nombre del miembro" required />
+        <input type="email" name="miembros[${miembroIndex}].email" placeholder="Email del miembro" required />
       `;
       container.appendChild(div);
       miembroIndex++;

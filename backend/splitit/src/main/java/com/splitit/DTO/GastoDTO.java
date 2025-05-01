@@ -1,50 +1,97 @@
-package com.splitit.dto;
+package com.splitit.DTO;
 
-import jakarta.validation.constraints.NotNull;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
-import java.time.LocalDate;
-import org.springframework.format.annotation.DateTimeFormat;
 
 public class GastoDTO {
-
-    @NotNull(message = "El monto es obligatorio")
-    private Float monto;
-
+    private Long id;
     private String descripcion;
-
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate fecha;
-
+    private BigDecimal monto;
+    private LocalDateTime fecha;
+    private Long pagadorId;
+    private Long grupoId;
     private String categoria;
+    private List<Long> participantesIds;
 
-    @NotNull(message = "El id del grupo es obligatorio")
-    private Long idGrupo;
+    // Constructor vacío
+    public GastoDTO() {}
 
-    @NotNull(message = "El id del pagador es obligatorio")
-    private Long idPagador;
+    // Constructor con todos los campos
+    public GastoDTO(Long id, String descripcion, BigDecimal monto, LocalDateTime fecha, 
+                    Long pagadorId, Long grupoId, String categoria, List<Long> participantesIds) {
+        this.id = id;
+        this.descripcion = descripcion;
+        this.monto = monto;
+        this.fecha = fecha;
+        this.pagadorId = pagadorId;
+        this.grupoId = grupoId;
+        this.categoria = categoria;
+        this.participantesIds = participantesIds;
+    }
 
-    @NotNull(message = "La lista de participantes es obligatoria")
-    private List<Long> idParticipantes;
+    // Getters y setters
+    public Long getId() {
+        return id;
+    }
 
-    // Getters y Setters
-    public Float getMonto() { return monto; }
-    public void setMonto(Float monto) { this.monto = monto; }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-    public String getDescripcion() { return descripcion; }
-    public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
+    public String getDescripcion() {
+        return descripcion;
+    }
 
-    public LocalDate getFecha() { return fecha; }
-    public void setFecha(LocalDate fecha) { this.fecha = fecha; }
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
+    }
 
-    public String getCategoria() { return categoria; }
-    public void setCategoria(String categoria) { this.categoria = categoria; }
+    public BigDecimal getMonto() {
+        return monto;
+    }
 
-    public Long getIdGrupo() { return idGrupo; }
-    public void setIdGrupo(Long idGrupo) { this.idGrupo = idGrupo; }
+    public void setMonto(BigDecimal monto) {
+        this.monto = monto;
+    }
 
-    public Long getIdPagador() { return idPagador; }
-    public void setIdPagador(Long idPagador) { this.idPagador = idPagador; }
+    public LocalDateTime getFecha() {
+        return fecha;
+    }
 
-    public List<Long> getIdParticipantes() { return idParticipantes; }
-    public void setIdParticipantes(List<Long> idParticipantes) { this.idParticipantes = idParticipantes; }
+    public void setFecha(LocalDateTime fecha) {
+        this.fecha = fecha;
+    }
+
+    public Long getPagadorId() {
+        return pagadorId;
+    }
+
+    public void setPagadorId(Long pagadorId) {
+        this.pagadorId = pagadorId;
+    }
+
+    public Long getGrupoId() {
+        return grupoId;
+    }
+
+    public void setGrupoId(Long grupoId) {
+        this.grupoId = grupoId;
+    }
+
+    public String getCategoria() {
+        return categoria;
+    }
+
+    public void setCategoria(String categoria) {
+        this.categoria = categoria;
+    }
+
+    public List<Long> getParticipantesIds() {
+        return participantesIds;
+    }
+
+    public void setParticipantesIds(List<Long> participantesIds) {
+        this.participantesIds = participantesIds;
+    }
 }

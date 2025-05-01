@@ -1,44 +1,86 @@
-package com.splitit.dto;
+package com.splitit.DTO;
 
-import java.util.Date;
-import java.util.List;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 public class GastoResponseDTO {
-    private Long idGasto;
-    private float monto;
-    private Date fecha;
+    private Long id;
     private String descripcion;
+    private BigDecimal monto;
+    private LocalDateTime fecha;
+    private String pagadorNombre;
+    private String grupoNombre;
     private String categoria;
-    private Long idGrupo;
-    private String nombreGrupo;
-    private Long idPagador;
-    private String nombrePagador;
-    private List<DeudorSimpleDTO> deudores;
 
-    public GastoResponseDTO(Long idGasto, float monto, Date fecha, String descripcion, String categoria,
-                              Long idGrupo, String nombreGrupo, Long idPagador, String nombrePagador,
-                              List<DeudorSimpleDTO> deudores) {
-        this.idGasto = idGasto;
+    // Constructor vacío
+    public GastoResponseDTO() {}
+
+    // Constructor con todos los campos
+    public GastoResponseDTO(Long id, String descripcion, BigDecimal monto, LocalDateTime fecha,
+                          String pagadorNombre, String grupoNombre, String categoria) {
+        this.id = id;
+        this.descripcion = descripcion;
         this.monto = monto;
         this.fecha = fecha;
-        this.descripcion = descripcion;
+        this.pagadorNombre = pagadorNombre;
+        this.grupoNombre = grupoNombre;
         this.categoria = categoria;
-        this.idGrupo = idGrupo;
-        this.nombreGrupo = nombreGrupo;
-        this.idPagador = idPagador;
-        this.nombrePagador = nombrePagador;
-        this.deudores = deudores;
     }
 
-    // Getters
-    public Long getIdGasto() { return idGasto; }
-    public float getMonto() { return monto; }
-    public Date getFecha() { return fecha; }
-    public String getDescripcion() { return descripcion; }
-    public String getCategoria() { return categoria; }
-    public Long getIdGrupo() { return idGrupo; }
-    public String getNombreGrupo() { return nombreGrupo; }
-    public Long getIdPagador() { return idPagador; }
-    public String getNombrePagador() { return nombrePagador; }
-    public List<DeudorSimpleDTO> getDeudores() { return deudores; }
+    // Getters y setters
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getDescripcion() {
+        return descripcion;
+    }
+
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
+    }
+
+    public BigDecimal getMonto() {
+        return monto;
+    }
+
+    public void setMonto(BigDecimal monto) {
+        this.monto = monto;
+    }
+
+    public LocalDateTime getFecha() {
+        return fecha;
+    }
+
+    public void setFecha(LocalDateTime fecha) {
+        this.fecha = fecha;
+    }
+
+    public String getPagadorNombre() {
+        return pagadorNombre;
+    }
+
+    public void setPagadorNombre(String pagadorNombre) {
+        this.pagadorNombre = pagadorNombre;
+    }
+
+    public String getGrupoNombre() {
+        return grupoNombre;
+    }
+
+    public void setGrupoNombre(String grupoNombre) {
+        this.grupoNombre = grupoNombre;
+    }
+
+    public String getCategoria() {
+        return categoria;
+    }
+
+    public void setCategoria(String categoria) {
+        this.categoria = categoria;
+    }
 }

@@ -3,28 +3,30 @@ package com.splitit.model;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
+import java.math.BigDecimal;
 import java.util.List;
 
 @Entity
 @Table(name = "miembro")
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "idMiembro")
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class Miembro {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long idMiembro;
-
-    private float saldoActual;
-
-    private String rolEnGrupo;
+    private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "idUsuario")
+    @JoinColumn(name = "usuario_id")
     private Usuario usuario;
 
     @ManyToOne
-    @JoinColumn(name = "idGrupo")
+    @JoinColumn(name = "grupo_id")
     private Grupo grupo;
+
+    @Column(name = "saldo_actual", precision = 10, scale = 2)
+    private BigDecimal saldo = BigDecimal.ZERO;
+
+    private String rolEnGrupo;
 
     @OneToMany(mappedBy = "pagador")
     private List<Gasto> gastosPagados;
@@ -33,30 +35,48 @@ public class Miembro {
     private List<Deuda> deudasPendientes;
 
     public Miembro() {
-        this.saldoActual = 0;
+        this.saldo = BigDecimal.ZERO;
     }
 
     public Miembro(Usuario usuario, Grupo grupo, String rolEnGrupo) {
         this.usuario = usuario;
         this.grupo = grupo;
         this.rolEnGrupo = rolEnGrupo;
-        this.saldoActual = 0;
+        this.saldo = BigDecimal.ZERO;
     }
+
     // Getters y setters
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public BigDecimal getSaldo() {
+        return saldo;
+    }
+
+    public void setSaldo(BigDecimal saldo) {
+        this.saldo = saldo;
+    }
+
+    // Métodos de compatibilidad para código existente
     public Long getIdMiembro() {
-        return idMiembro;
+        return id;
     }
 
-    public void setIdMiembro(Long idMiembro) {
-        this.idMiembro = idMiembro;
+    public void setIdMiembro(Long id) {
+        this.id = id;
     }
 
-    public float getSaldoActual() {
-        return saldoActual;
+    public BigDecimal getSaldoActual() {
+        return saldo;
     }
 
-    public void setSaldoActual(float saldoActual) {
-        this.saldoActual = saldoActual;
+    public void setSaldoActual(float saldo) {
+        this.saldo = BigDecimal.valueOf(saldo);
     }
 
     public String getRolEnGrupo() {

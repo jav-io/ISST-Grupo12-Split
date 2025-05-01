@@ -199,34 +199,37 @@
   <div class="form-container">
     <h2>Añadir nuevo gasto</h2>
     <form th:action="@{/añadir-gasto}" th:object="${gasto}" method="post">
-      <input type="hidden" th:field="*{idGrupo}" />
+      <input type="hidden" th:field="*{grupoId}" />
 
       <label for="descripcion">Descripción</label>
-      <input type="text" id="descripcion" name="descripcion" placeholder="Ej. Cena en restaurante" required />
+      <input type="text" id="descripcion" th:field="*{descripcion}" placeholder="Ej. Cena en restaurante" required />
 
       <div class="form-row">
         <div>
           <label for="monto">Monto (€)</label>
-          <input type="number" step="0.01" id="monto" name="monto" placeholder="0.00" required />
+          <input type="number" step="0.01" id="monto" th:field="*{monto}" placeholder="0.00" required />
         </div>
         <div>
-          <label for="fecha">Fecha</label>
-          <input type="date" id="fecha" name="fecha" th:value="${#dates.format(#dates.createNow(), 'yyyy-MM-dd')}" required />
+          <label for="fecha">Fecha y Hora</label>
+          <input type="datetime-local" id="fecha" name="fecha" 
+                 th:value="${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd''T''HH:mm')}"
+                 pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}"
+                 required />
         </div>
       </div>
 
-      <label for="idPagador">¿Quién ha pagado?</label>
-      <select id="idPagador" name="idPagador" required>
+      <label for="pagadorId">¿Quién ha pagado?</label>
+      <select id="pagadorId" th:field="*{pagadorId}" required>
         <option th:each="miembro : ${participantes}"
-                th:value="${miembro.idMiembro}"
+                th:value="${miembro.id}"
                 th:text="${miembro.usuario.nombre}">
         </option>
       </select>
 
-      <label for="participantes">Participantes involucrados</label>
-      <select id="participantes" multiple name="idParticipantes" required>
+      <label for="participantesIds">Participantes involucrados</label>
+      <select id="participantesIds" multiple th:field="*{participantesIds}" required>
         <option th:each="miembro : ${participantes}"
-                th:value="${miembro.idMiembro}"
+                th:value="${miembro.id}"
                 th:text="${miembro.usuario.nombre}">
         </option>
       </select>
@@ -258,9 +261,9 @@
           <div>Otros</div>
         </div>
       </div>
-      <input type="hidden" id="categoria" name="categoria" value="OTROS" />
+      <input type="hidden" id="categoria" th:field="*{categoria}" value="OTROS" />
 
-      <button type="submit"><i class="fas fa-plus-circle"></i> Añadir gasto</button>
+      <button type="submit"><i class="fas fa-plus"></i> Añadir gasto</button>
     </form>
   </div>
 
@@ -269,8 +272,8 @@
   <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      const participantesSelect = document.getElementById('participantes');
-      const pagadorSelect = document.getElementById('idPagador');
+      const participantesSelect = document.getElementById('participantesIds');
+      const pagadorSelect = document.getElementById('pagadorId');
       
       if (participantesSelect) {
         new Choices(participantesSelect, {

@@ -1,4 +1,4 @@
-package com.splitit.dto;
+package com.splitit.DTO;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

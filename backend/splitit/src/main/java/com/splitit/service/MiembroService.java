@@ -1,5 +1,6 @@
 package com.splitit.service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import com.splitit.model.Miembro;
 import com.splitit.model.Grupo;
@@ -23,6 +24,9 @@ public class MiembroService {
     private UsuarioService usuarioService;
 
     public Miembro crearMiembro(Miembro miembro) {
+        if (miembro.getSaldo() == null) {
+            miembro.setSaldo(BigDecimal.ZERO);
+        }
         return miembroRepository.save(miembro);
     }
 
@@ -43,7 +47,7 @@ public class MiembroService {
         Usuario usuario = usuarioService.buscarPorId(idUsuario);
         // Crear el miembro con rol "MEMBER"
         Miembro miembro = new Miembro(usuario, grupo, "MEMBER");
-        miembro.setSaldoActual(0);
+        miembro.setSaldo(BigDecimal.ZERO);
         return miembroRepository.save(miembro);
     }
 

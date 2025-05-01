@@ -1,11 +1,13 @@
-package com.splitit.dto;
+package com.splitit.DTO;
+
+import java.math.BigDecimal;
 
 public class SaldoGrupoDTO {
     private Long idUsuario;
     private String nombre;
-    private float saldoActual;
+    private BigDecimal saldoActual;
 
-    public SaldoGrupoDTO(Long idUsuario, String nombre, float saldoActual) {
+    public SaldoGrupoDTO(Long idUsuario, String nombre, BigDecimal saldoActual) {
         this.idUsuario = idUsuario;
         this.nombre = nombre;
         this.saldoActual = saldoActual;
@@ -19,7 +21,7 @@ public class SaldoGrupoDTO {
         return nombre;
     }
 
-    public float getSaldoActual() {
+    public BigDecimal getSaldoActual() {
         return saldoActual;
     }
 }

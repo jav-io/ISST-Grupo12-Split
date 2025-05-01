@@ -1,15 +1,17 @@
-// backend/splitit/src/main/java/com/splitit/dto/PasswordResetDTO.java
-package com.splitit.dto;
+// backend/splitit/src/main/java/com/splitit/DTO/PasswordResetDTO.java
+package com.splitit.DTO;
 
 public class PasswordResetDTO {
     private String email;
-    private String nuevaPassword;
+    private String token;
+    private String newPassword;
 
     public PasswordResetDTO() {}
 
-    public PasswordResetDTO(String email, String nuevaPassword) {
+    public PasswordResetDTO(String email, String token, String newPassword) {
         this.email = email;
-        this.nuevaPassword = nuevaPassword;
+        this.token = token;
+        this.newPassword = newPassword;
     }
 
     public String getEmail() {
@@ -20,11 +22,19 @@ public class PasswordResetDTO {
         this.email = email;
     }
 
-    public String getNuevaPassword() {
-        return nuevaPassword;
+    public String getToken() {
+        return token;
     }
 
-    public void setNuevaPassword(String nuevaPassword) {
-        this.nuevaPassword = nuevaPassword;
+    public void setToken(String token) {
+        this.token = token;
+    }
+
+    public String getNewPassword() {
+        return newPassword;
+    }
+
+    public void setNewPassword(String newPassword) {
+        this.newPassword = newPassword;
     }
 }

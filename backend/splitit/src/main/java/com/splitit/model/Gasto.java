@@ -1,9 +1,10 @@
 // backend/splitit/src/main/java/com/splitit/model/Gasto.java
 package com.splitit.model;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import jakarta.persistence.*;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -15,12 +16,12 @@ import java.util.List;
 public class Gasto {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long idGasto;
+    private Long id;
 
-    private float monto;
+    @Column(precision = 10, scale = 2)
+    private BigDecimal monto;
 
-    @Temporal(TemporalType.DATE)
-    private Date fecha;
+    private LocalDateTime fecha;
 
     private String descripcion;
 
@@ -30,51 +31,52 @@ public class Gasto {
     private byte[] comprobante;
 
     @ManyToOne
-    @JoinColumn(name = "idGrupo")
+    @JoinColumn(name = "grupo_id")
     private Grupo grupo;
 
     @ManyToOne
-    @JoinColumn(name = "idPagador")
+    @JoinColumn(name = "pagador_id")
     private Miembro pagador;
 
     @OneToMany(mappedBy = "gasto", cascade = CascadeType.ALL)
     private List<Deuda> deudas;
 
     public Gasto() {
-        this.fecha = new Date();
+        this.fecha = LocalDateTime.now();
         this.deudas = new ArrayList<>();
     }
 
-    public Gasto(float monto, String descripcion, String categoria, Grupo grupo, Miembro pagador) {
+    public Gasto(BigDecimal monto, String descripcion, String categoria, Grupo grupo, Miembro pagador) {
         this.monto = monto;
         this.descripcion = descripcion;
         this.categoria = categoria;
         this.grupo = grupo;
         this.pagador = pagador;
-        this.fecha = new Date(); 
+        this.fecha = LocalDateTime.now();
+        this.deudas = new ArrayList<>();
     }
 
-    public Long getIdGasto() {
-        return idGasto;
+    public Long getId() {
+        return id;
     }
 
-    public void setIdGasto(Long idGasto) {
-        this.idGasto = idGasto;
+    public void setId(Long id) {
+        this.id = id;
     }
 
-    public float getMonto() {
+    public BigDecimal getMonto() {
         return monto;
     }
 
-    public void setMonto(float monto) {
+    public void setMonto(BigDecimal monto) {
         this.monto = monto;
     }
 
-    public Date getFecha() {
+    public LocalDateTime getFecha() {
         return fecha;
     }
 
-    public void setFecha(Date fecha) {
+    public void setFecha(LocalDateTime fecha) {
         this.fecha = fecha;
     }
 

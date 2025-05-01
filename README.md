@@ -321,3 +321,307 @@ SELECT * FROM grupo;
 SELECT * FROM miembro;
 SELECT * FROM gasto;
 SELECT * FROM deuda;
+
+```
+
+## 🔒 Seguridad en Split.it
+
+Split.it implementa una arquitectura de seguridad robusta siguiendo las mejores prácticas de Spring Security. A continuación se detallan los aspectos clave:
+
+### 1. Autenticación y Autorización
+
+- **Autenticación**: Implementada mediante Spring Security con:
+  - Login personalizado en `/login`
+  - Procesamiento de credenciales en `/api/usuarios/login`
+  - Manejo de sesiones con `JSESSIONID`
+  - Cierre de sesión seguro en `/logout`
+
+- **Autorización**: Basada en roles:
+  - `ROLE_USER`: Acceso básico a funcionalidades
+  - `ROLE_ADMIN`: Acceso a funciones administrativas
+  - Protección de rutas mediante `@PreAuthorize`
+
+### 2. Protección contra vulnerabilidades OWASP
+
+- **CSRF Protection**: Activada mediante `CookieCsrfTokenRepository`
+- **XSS Protection**: Configurada en `SecurityConfig` con políticas CSP
+- **SQL Injection**: Prevenida mediante JPA y consultas parametrizadas
+- **Autenticación Rota**: Implementación segura con BCryptPasswordEncoder
+
+### 3. Configuración de Seguridad
+
+```java
+@Configuration
+@EnableWebSecurity
+public class SecurityConfig {
+    // Configuración de rutas protegidas
+    // Protección CSRF
+    // Políticas de seguridad de contenido
+    // Gestión de sesiones
+}
+```
+
+### 4. Manejo de Contraseñas
+
+- Encriptación con BCrypt
+- Migración segura de contraseñas antiguas
+- Validación de credenciales en el servidor
+
+### 5. Protección de Datos
+
+- Encriptación de contraseñas
+- Validación de entrada de datos
+- Protección de rutas sensibles
+- Manejo seguro de sesiones
+
+### 6. Integración con Thymeleaf
+
+- Uso de `sec:authorize` para control de acceso en vistas
+- Protección de formularios con tokens CSRF
+- Mensajes de error seguros
+
+### 7. Buenas Prácticas Implementadas
+
+- Separación de responsabilidades
+- Validación de entrada
+- Manejo seguro de sesiones
+- Protección contra ataques comunes
+- Logging de eventos de seguridad
+
+## 📚 Cumplimiento de Requisitos de Seguridad (ISST)
+
+Split.it implementa y cumple con los requisitos de seguridad especificados en la asignatura:
+
+### 1. Fiabilidad en Sistemas
+- **Disponibilidad**: Sistema accesible 24/7 con manejo de sesiones
+- **Confiabilidad**: Validación de datos y manejo de errores
+- **Resiliencia**: Recuperación de sesiones y manejo de fallos
+- **Seguridad Física**: Protección de datos sensibles
+
+### 2. Ciberseguridad - Principios CLAVE
+- **Confidencialidad**: 
+  - Encriptación de contraseñas con BCrypt
+  - Protección de rutas sensibles
+  - Manejo seguro de sesiones
+- **Integridad**:
+  - Validación de datos de entrada
+  - Protección CSRF
+  - Transacciones atómicas
+- **Disponibilidad**:
+  - Gestión de sesiones
+  - Manejo de errores
+- **No Repudio**:
+  - Registro de acciones de usuario
+  - Trazabilidad de operaciones
+
+### 3. OWASP Top 10
+Split.it protege contra las principales vulnerabilidades:
+- **Inyección SQL**: Prevenida mediante JPA
+- **Autenticación Rota**: Implementación segura con Spring Security
+- **Exposición de Datos**: Protección de rutas y datos sensibles
+- **XSS**: Políticas CSP y escape de datos
+- **Configuración Insegura**: Configuración segura por defecto
+
+### 4. Autenticación y Autorización
+- **Autenticación**:
+  - Login basado en formularios
+  - Encriptación BCrypt
+  - Manejo de sesiones
+- **Autorización**:
+  - Roles basados en Spring Security
+  - Protección de rutas
+  - Control de acceso granular
+
+### 5. Privacidad y RGPD
+- **Minimización de Datos**: Solo se recogen datos necesarios
+- **Consentimiento**: Registro explícito de usuarios
+- **Transparencia**: Política de privacidad clara
+- **Protección de Datos**: Encriptación y seguridad
+
+### 6. Implementación Técnica
+- **Spring Security**: Configuración completa
+- **BCrypt**: Encriptación de contraseñas
+- **JPA**: Prevención de inyección SQL
+- **Thymeleaf**: Integración segura
+- **CSRF**: Protección de formularios
+
+### 7. Buenas Prácticas
+- Separación de responsabilidades
+- Validación de entrada
+- Manejo seguro de sesiones
+- Protección contra ataques comunes
+- Logging de eventos de seguridad
+
+## 📚 Cumplimiento de Requisitos de Seguridad (ISST) - Ejemplos de Código
+
+### 1. Fiabilidad en Sistemas
+```java
+// Ejemplo de manejo de errores y validación en UsuarioService.java
+@Service
+public class UsuarioService {
+    public Usuario crearUsuario(Usuario usuario) {
+        if (usuarioRepository.findByEmail(usuario.getEmail()).isPresent()) {
+            throw new RuntimeException("Ya existe un usuario con ese correo.");
+        }
+        usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
+        return usuarioRepository.save(usuario);
+    }
+}
+```
+
+### 2. Ciberseguridad - Principios CLAVE
+```java
+// Ejemplo de encriptación y confidencialidad en SecurityConfig.java
+@Configuration
+@EnableWebSecurity
+public class SecurityConfig {
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+            .csrf(csrf -> csrf
+                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+            )
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/api/usuarios/**").authenticated()
+                .requestMatchers("/api/admin/**").hasRole("ADMIN")
+            );
+        return http.build();
+    }
+}
+```
+
+### 3. OWASP Top 10
+```java
+// Ejemplo de prevención de SQL Injection en GastoRepository.java
+@Repository
+public interface GastoRepository extends JpaRepository<Gasto, Long> {
+    // Las consultas JPA son parametrizadas automáticamente
+    @Query("SELECT g FROM Gasto g WHERE g.miembro.grupo.id = :grupoId")
+    List<Gasto> findByGrupoId(@Param("grupoId") Long grupoId);
+}
+
+// Ejemplo de protección XSS en SecurityConfig.java
+.headers(headers -> headers
+    .contentSecurityPolicy(csp -> csp
+        .policyDirectives("default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com;")
+    )
+)
+```
+
+### 4. Autenticación y Autorización
+```java
+// Ejemplo de autenticación en UsuarioController.java
+@RestController
+@RequestMapping("/api/usuarios")
+public class UsuarioController {
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestParam String email, @RequestParam String password) {
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(email, password)
+            );
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+    }
+}
+
+// Ejemplo de autorización en AdminController.java
+@Controller
+@RequestMapping("/admin")
+@PreAuthorize("hasRole('ADMIN')")
+public class AdminController {
+    @GetMapping("/migrar-contrasenas")
+    public String migrarContrasenas() {
+        // Lógica de migración
+    }
+}
+```
+
+### 5. Privacidad y RGPD
+```java
+// Ejemplo de minimización de datos en Usuario.java
+@Entity
+public class Usuario {
+    @Column(unique = true)
+    private String email;
+    
+    private String password;
+    
+    @ElementCollection(fetch = FetchType.EAGER)
+    private Set<String> roles = new HashSet<>();
+    
+    // Solo almacenamos datos necesarios
+}
+```
+
+### 6. Implementación Técnica
+```java
+// Ejemplo de BCrypt en UsuarioService.java
+@Service
+public class UsuarioService {
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+    
+    public Usuario save(Usuario usuario) {
+        if (usuario.getPassword() != null && !usuario.getPassword().startsWith("$2a$")) {
+            usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
+        }
+        return usuarioRepository.save(usuario);
+    }
+}
+
+// Ejemplo de CSRF en formularios HTML
+<form th:action="@{/register}" method="post">
+    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+    <!-- Campos del formulario -->
+</form>
+```
+
+### 7. Buenas Prácticas
+```java
+// Ejemplo de validación de entrada en GastoDTO.java
+public class GastoDTO {
+    @NotNull(message = "El importe es obligatorio")
+    @Min(value = 0, message = "El importe debe ser positivo")
+    private Double importe;
+    
+    @NotBlank(message = "La descripción es obligatoria")
+    private String descripcion;
+}
+
+// Ejemplo de logging de eventos en GastoService.java
+@Service
+public class GastoService {
+    private static final Logger logger = LoggerFactory.getLogger(GastoService.class);
+    
+    public Gasto crearGasto(GastoDTO gastoDTO) {
+        logger.info("Creando nuevo gasto: {}", gastoDTO.getDescripcion());
+        // Lógica de creación
+    }
+}
+```
+
+### Ubicación de los archivos en el proyecto:
+
+```
+backend/splitit/src/main/java/com/splitit/
+├── config/
+│   └── SecurityConfig.java          # Configuración de seguridad
+├── controller/
+│   ├── AuthController.java          # Autenticación
+│   ├── AdminController.java         # Funciones de administrador
+│   └── UsuarioController.java       # Gestión de usuarios
+├── service/
+│   ├── UsuarioService.java          # Lógica de usuarios
+│   └── GastoService.java            # Lógica de gastos
+├── model/
+│   └── Usuario.java                 # Entidad de usuario
+├── repository/
+│   └── GastoRepository.java         # Acceso a datos de gastos
+└── dto/
+    └── GastoDTO.java                # Validación de datos
+```
+

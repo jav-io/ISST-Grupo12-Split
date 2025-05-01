@@ -1,8 +1,8 @@
 package com.splitit.service;
 
-import com.splitit.dto.GrupoDTO;
-import com.splitit.dto.ParticipanteDTO;
-import com.splitit.dto.SaldoGrupoDTO;
+import com.splitit.DTO.GrupoDTO;
+import com.splitit.DTO.ParticipanteDTO;
+import com.splitit.DTO.SaldoGrupoDTO;
 import com.splitit.model.Grupo;
 import com.splitit.model.Miembro;
 import com.splitit.model.Usuario;
@@ -12,23 +12,17 @@ import com.splitit.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-
 
 @Service
 public class GrupoService {
 
     @Autowired
     private GrupoRepository grupoRepository;
-
-    @Autowired
-    private MiembroService miembroService;
-
-    @Autowired
-    private UsuarioService usuarioService;
 
     @Autowired
     private MiembroRepository miembroRepository;
@@ -45,12 +39,15 @@ public class GrupoService {
         grupo.setNombre(grupoDTO.getNombre());
         grupo.setDescripcion(grupoDTO.getDescripcion());
         grupo.setFechaCreacion(new Date());
+        grupo.setIdCreador(grupoDTO.getIdCreador());
         Grupo grupoGuardado = grupoRepository.save(grupo);
 
-        Usuario usuarioCreador = usuarioService.buscarPorId(grupoDTO.getIdCreador());
+        Usuario usuarioCreador = usuarioRepository.findById(grupoDTO.getIdCreador())
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        
         Miembro miembroAdmin = new Miembro(usuarioCreador, grupoGuardado, "ADMIN");
-        miembroAdmin.setSaldoActual(0);
-        miembroService.crearMiembro(miembroAdmin);
+        miembroAdmin.setSaldo(BigDecimal.ZERO);
+        miembroRepository.save(miembroAdmin);
 
         return grupoGuardado;
     }
@@ -74,9 +71,9 @@ public class GrupoService {
             if (usuario == null) continue;
 
             saldos.add(new SaldoGrupoDTO(
-                    usuario.getIdUsuario(),
+                    usuario.getId(),
                     usuario.getNombre(),
-                    miembro.getSaldoActual()
+                    miembro.getSaldo()
             ));
         }
         return saldos;
@@ -87,57 +84,52 @@ public class GrupoService {
     }
 
     public Grupo crearGrupoDesdeDTO(GrupoDTO grupoDTO) {
-        // Crear grupo
+        if (grupoDTO.getNombre() == null || grupoDTO.getNombre().trim().isEmpty()) {
+            throw new RuntimeException("El nombre del grupo es obligatorio.");
+        }
+
         Grupo grupo = new Grupo();
         grupo.setNombre(grupoDTO.getNombre());
         grupo.setDescripcion(grupoDTO.getDescripcion());
         grupo.setFechaCreacion(new Date());
+        grupo.setIdCreador(grupoDTO.getIdCreador());
 
         Grupo grupoGuardado = grupoRepository.save(grupo);
 
-        // Crear miembro ADMIN (creador del grupo)
         Usuario usuarioCreador = usuarioRepository.findById(grupoDTO.getIdCreador())
-            .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
         Miembro miembroAdmin = new Miembro(usuarioCreador, grupoGuardado, "ADMIN");
-        miembroAdmin.setSaldoActual(0);
+        miembroAdmin.setSaldo(BigDecimal.ZERO);
         miembroRepository.save(miembroAdmin);
 
-        // Crear los demás miembros desde DTO
         if (grupoDTO.getMiembros() != null) {
             for (ParticipanteDTO participante : grupoDTO.getMiembros()) {
-                if (participante.getEmail() == null || participante.getEmail().equals(usuarioCreador.getEmail())) {
-                    continue; // No añadir al creador de nuevo
+                if (participante.getEmail() == null || participante.getEmail().trim().isEmpty() || 
+                    participante.getEmail().equals(usuarioCreador.getEmail())) {
+                    continue;
                 }
 
-                // Buscar si ya existe el usuario
                 Optional<Usuario> optionalUsuario = usuarioRepository.findByEmail(participante.getEmail());
                 Usuario usuario;
-                
+
                 if (optionalUsuario.isPresent()) {
                     usuario = optionalUsuario.get();
                 } else {
-                    // Crear nuevo usuario si no existe
                     usuario = new Usuario();
                     usuario.setNombre(participante.getNombre());
                     usuario.setEmail(participante.getEmail());
                     usuario = usuarioRepository.save(usuario);
                 }
-                
 
-                // Crear miembro
                 Miembro nuevoMiembro = new Miembro(usuario, grupoGuardado, "MIEMBRO");
-                nuevoMiembro.setSaldoActual(0);
+                nuevoMiembro.setSaldo(BigDecimal.ZERO);
                 miembroRepository.save(nuevoMiembro);
             }
         }
 
         return grupoGuardado;
     }
-
-    
-    
-    
 
     public Grupo obtenerGrupoPorId(Long id) {
         return buscarPorId(id);

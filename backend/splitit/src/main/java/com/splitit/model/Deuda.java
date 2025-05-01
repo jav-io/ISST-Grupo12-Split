@@ -3,8 +3,8 @@ package com.splitit.model;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
-
-import java.util.Date;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "deuda")
@@ -15,12 +15,12 @@ public class Deuda {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idDeuda;
 
-    private float monto;
+    @Column(precision = 10, scale = 2)
+    private BigDecimal monto;
 
     private boolean saldada = false;
 
-    @Temporal(TemporalType.DATE)
-    private Date fecha = new Date();
+    private LocalDateTime fecha = LocalDateTime.now();
 
     @ManyToOne
     @JoinColumn(name = "idMiembro")
@@ -29,6 +29,19 @@ public class Deuda {
     @ManyToOne
     @JoinColumn(name = "idGasto")
     private Gasto gasto;
+
+    // Constructor vacío
+    public Deuda() {
+        this.saldada = false;
+    }
+
+    // Constructor con campos
+    public Deuda(BigDecimal monto, Gasto gasto, Miembro deudor) {
+        this.monto = monto;
+        this.gasto = gasto;
+        this.deudor = deudor;
+        this.saldada = false;
+    }
 
     // Getters y setters
     public Long getIdDeuda() {
@@ -39,11 +52,11 @@ public class Deuda {
         this.idDeuda = idDeuda;
     }
 
-    public float getMonto() {
+    public BigDecimal getMonto() {
         return monto;
     }
 
-    public void setMonto(float monto) {
+    public void setMonto(BigDecimal monto) {
         this.monto = monto;
     }
 
@@ -55,11 +68,11 @@ public class Deuda {
         this.saldada = saldada;
     }
 
-    public Date getFecha() {
+    public LocalDateTime getFecha() {
         return fecha;
     }
 
-    public void setFecha(Date fecha) {
+    public void setFecha(LocalDateTime fecha) {
         this.fecha = fecha;
     }
 

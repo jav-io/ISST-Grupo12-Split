@@ -1,28 +1,29 @@
 package com.splitit.controller;
 
-import com.splitit.dto.GrupoDTO;
-import com.splitit.dto.SaldoGrupoDTO;
-import com.splitit.dto.GastoConParticipantesDTO;
-import com.splitit.dto.GastoDTO;
-import com.splitit.model.Gasto;
+import com.splitit.DTO.GrupoDTO;
+import com.splitit.DTO.SaldoGrupoDTO;
+import com.splitit.DTO.GastoConParticipantesDTO;
+import com.splitit.DTO.GastoDTO;
 import com.splitit.model.Grupo;
-import com.splitit.model.Miembro;
 import com.splitit.model.Usuario;
+import com.splitit.model.Gasto;
 import com.splitit.service.GrupoService;
+import com.splitit.service.GastoService;
+import com.splitit.service.UsuarioService;
 
 import jakarta.servlet.http.HttpSession;
 
-import com.splitit.service.GastoService;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Date;
-
+import java.util.stream.Collectors;
+import java.util.Arrays;
 
 @Controller
 public class VistaController {
@@ -33,26 +34,34 @@ public class VistaController {
     @Autowired
     private GastoService gastoService;
 
+    @Autowired
+    private UsuarioService usuarioService;
+
     // Página de inicio
     @GetMapping("/")
-    public String inicio(HttpSession session) {
-        if (session.getAttribute("usuarioLogueado") != null) {
+    public String inicio() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.isAuthenticated() && !auth.getName().equals("anonymousUser")) {
             return "redirect:/dashboard";
         }
         return "index";
     }
-    
 
-  @GetMapping("/dashboard")
-    public String dashboard(Model model, HttpSession session) {
-        Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
-        if (usuario == null) return "redirect:/login";
+    @GetMapping("/dashboard")
+    public String dashboard(Model model) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !auth.isAuthenticated() || auth.getName().equals("anonymousUser")) {
+            return "redirect:/login";
+        }
 
-        List<Grupo> grupos = grupoService.obtenerGruposPorUsuario(usuario.getIdUsuario());
+        Usuario usuario = usuarioService.buscarPorEmail(auth.getName())
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        List<Grupo> grupos = grupoService.obtenerGruposPorUsuario(usuario.getId());
         model.addAttribute("grupos", grupos);
+        model.addAttribute("usuario", usuario);
         return "dashboard";
     }
-
 
     // Formulario para crear grupo
     @GetMapping("/crear-grupo")
@@ -63,53 +72,56 @@ public class VistaController {
 
     // Procesamiento del formulario para crear grupo
     @PostMapping("/crear-grupo")
-    public String crearGrupo(@ModelAttribute GrupoDTO grupoDTO, HttpSession session) {
-        Usuario creador = (Usuario) session.getAttribute("usuarioLogueado");
-        if (creador == null) return "redirect:/login";
+    public String crearGrupo(@ModelAttribute GrupoDTO grupoDTO) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !auth.isAuthenticated()) {
+            return "redirect:/login";
+        }
 
-        grupoDTO.setIdCreador(creador.getIdUsuario());
-        grupoService.crearGrupoDesdeDTO(grupoDTO); // solo pasamos grupoDTO
+        Usuario creador = usuarioService.buscarPorEmail(auth.getName())
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        grupoDTO.setIdCreador(creador.getId());
+        grupoService.crearGrupoDesdeDTO(grupoDTO);
 
         return "redirect:/dashboard";
     }
 
-    
-
-
     // Vista de detalle de grupo con gastos asociados
     @GetMapping("/detalle-grupo/{id}")
-    public String mostrarDetalleGrupo(@PathVariable Long id, Model model, HttpSession session) {
-        Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
-        if (usuario == null) return "redirect:/login";
+    public String mostrarDetalleGrupo(@PathVariable Long id, Model model) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !auth.isAuthenticated()) {
+            return "redirect:/login";
+        }
+
+        Usuario usuario = usuarioService.buscarPorEmail(auth.getName())
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
         Grupo grupo = grupoService.obtenerGrupoPorId(id);
 
         boolean esMiembro = grupo.getMiembros()
-            .stream()
-            .anyMatch(m -> m.getUsuario().getIdUsuario().equals(usuario.getIdUsuario()));
+                .stream()
+                .anyMatch(m -> m.getUsuario().getId().equals(usuario.getId()));
 
         if (!esMiembro) {
-            return "redirect:/dashboard"; // o mostrar error
+            return "redirect:/dashboard";
         }
 
-        // Obtenemos los gastos con sus participantes correctamente mapeados
         List<GastoConParticipantesDTO> gastos = gastoService.obtenerGastosConParticipantes()
-            .stream()
-            .filter(g -> g.getIdGrupo().equals(id)) // Solo los del grupo actual
-            .toList();
+                .stream()
+                .filter(g -> g.getGrupoId().equals(id))
+                .toList();
 
         model.addAttribute("grupo", grupo);
         model.addAttribute("gastos", gastos);
         return "detalle-grupo";
     }
-        
-
 
     // Vista para formulario de añadir gasto
     @GetMapping("/añadir-gasto/{idGrupo}")
     public String mostrarFormularioAñadirGasto(@PathVariable Long idGrupo, Model model) {
         GastoDTO gastoDTO = new GastoDTO();
-        gastoDTO.setIdGrupo(idGrupo);
+        gastoDTO.setGrupoId(idGrupo);
         model.addAttribute("gasto", gastoDTO);
 
         Grupo grupo = grupoService.obtenerGrupoPorId(idGrupo);
@@ -118,77 +130,36 @@ public class VistaController {
         return "añadir-gasto";
     }
 
-    
-    
-    
-
-    // Procesamiento del formulario para añadir gasto
     @PostMapping("/añadir-gasto")
-    public String añadirGasto(@ModelAttribute GastoDTO gastoDTO,
-                              @RequestParam List<Long> idParticipantes,
-                              HttpSession session) {
-        Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
-        if (usuario == null) return "redirect:/login";
-    
-        Long idMiembro = grupoService
-            .buscarPorId(gastoDTO.getIdGrupo())
-            .getMiembros()
-            .stream()
-            .filter(m -> m.getUsuario().getIdUsuario().equals(usuario.getIdUsuario()))
-            .findFirst()
-            .orElseThrow(() -> new RuntimeException("No eres miembro de este grupo"))
-            .getIdMiembro();
-    
-        gastoDTO.setIdPagador(idMiembro);
-        gastoDTO.setIdParticipantes(idParticipantes); // importante
-        gastoService.crearGasto(gastoDTO);
-        return "redirect:/detalle-grupo/" + gastoDTO.getIdGrupo();
-    }
-    
-    
+    public String procesarAñadirGasto(@ModelAttribute GastoDTO gastoDTO) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !auth.isAuthenticated()) {
+            return "redirect:/login";
+        }
 
-    // Vista para formulario de editar gasto
-    @GetMapping("/editar-gasto/{id}")
-    public String mostrarFormularioEditarGasto(@PathVariable Long id, Model model) {
-        Gasto gasto = gastoService.buscarPorId(id);
-        Grupo grupo = gasto.getGrupo();
-        List<Miembro> miembros = grupo.getMiembros();
-
-        List<Long> gastoParticipantesIds = gasto.getDeudas().stream()
-            .map(deuda -> deuda.getDeudor().getIdMiembro())
-            .toList();
-
-        model.addAttribute("gasto", gasto);
-        model.addAttribute("participantes", miembros); // necesario para el formulario
-        model.addAttribute("miembros", miembros); // opcional, si lo usas en otra parte
-        model.addAttribute("gastoParticipantesIds", gastoParticipantesIds);
-
-        return "editar-gasto";
+        try {
+            // Si no hay fecha establecida, usar la fecha actual
+            if (gastoDTO.getFecha() == null) {
+                gastoDTO.setFecha(LocalDateTime.now());
+            }
+            
+            gastoService.crearGasto(gastoDTO);
+            return "redirect:/detalle-grupo/" + gastoDTO.getGrupoId();
+        } catch (Exception e) {
+            e.printStackTrace(); // Para ver el error en los logs
+            return "redirect:/error";
+        }
     }
 
-
-    // Procesamiento del formulario para editar gasto
-    @PostMapping("/editar-gasto")
-    public String actualizarGasto(
-            @RequestParam Long id,
-            @RequestParam String descripcion,
-            @RequestParam Float monto,
-            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date fecha,
-            @RequestParam Long idGrupo,
-            @RequestParam Long idPagador,
-            @RequestParam List<Long> idParticipantes
-    ) {
-        gastoService.editarGastoConParticipantes(id, descripcion, monto, fecha, idGrupo, idPagador, idParticipantes);
-        return "redirect:/detalle-grupo/" + idGrupo;
-    }
-
-
-    //redirige a saldos del grupo
     @GetMapping("/saldo-grupo/{id}")
-    public String mostrarSaldoGrupo(@PathVariable Long id, Model model, HttpSession session) {
+    public String mostrarSaldoGrupo(@PathVariable Long id, Model model) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !auth.isAuthenticated()) {
+            return "redirect:/login";
+        }
 
-        Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
-        if (usuario == null) return "redirect:/login";
+        Usuario usuario = usuarioService.buscarPorEmail(auth.getName())
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
         Grupo grupo = grupoService.obtenerGrupoPorId(id);
         List<SaldoGrupoDTO> saldos = grupoService.consultarSaldosGrupo(id);
@@ -202,5 +173,64 @@ public class VistaController {
     @GetMapping("/recuperar-password")
     public String mostrarFormularioRecuperarPassword() {
         return "recuperar-password";
+    }
+
+    @GetMapping("/editar-gasto/{id}")
+    public String mostrarFormularioEditarGasto(@PathVariable Long id, Model model) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !auth.isAuthenticated()) {
+            return "redirect:/login";
+        }
+
+        Gasto gasto = gastoService.buscarPorId(id);
+        GastoDTO gastoDTO = new GastoDTO();
+        gastoDTO.setId(gasto.getId());
+        gastoDTO.setDescripcion(gasto.getDescripcion());
+        gastoDTO.setMonto(gasto.getMonto());
+        gastoDTO.setFecha(gasto.getFecha());
+        gastoDTO.setPagadorId(gasto.getPagador().getId());
+        gastoDTO.setGrupoId(gasto.getGrupo().getId());
+        gastoDTO.setCategoria(gasto.getCategoria());
+        gastoDTO.setParticipantesIds(gasto.getDeudas().stream()
+                .map(deuda -> deuda.getDeudor().getId())
+                .collect(Collectors.toList()));
+
+        List<String> categorias = Arrays.asList("COMIDA", "TRANSPORTE", "ALOJAMIENTO", "ENTRETENIMIENTO", "COMPRAS", "OTROS");
+        
+        model.addAttribute("gasto", gastoDTO);
+        model.addAttribute("participantes", gasto.getGrupo().getMiembros());
+        model.addAttribute("grupoId", gasto.getGrupo().getId());
+        model.addAttribute("categorias", categorias);
+
+        return "editar-gasto";
+    }
+
+    @PostMapping("/editar-gasto/{id}")
+    public String procesarEditarGasto(@PathVariable Long id, @ModelAttribute GastoDTO gastoDTO) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !auth.isAuthenticated()) {
+            return "redirect:/login";
+        }
+
+        try {
+            if (gastoDTO.getFecha() == null) {
+                gastoDTO.setFecha(LocalDateTime.now());
+            }
+            
+            gastoService.editarGastoConParticipantes(
+                id,
+                gastoDTO.getDescripcion(),
+                gastoDTO.getMonto(),
+                gastoDTO.getFecha(),
+                gastoDTO.getGrupoId(),
+                gastoDTO.getPagadorId(),
+                gastoDTO.getParticipantesIds()
+            );
+            
+            return "redirect:/detalle-grupo/" + gastoDTO.getGrupoId();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "redirect:/error";
+        }
     }
 }

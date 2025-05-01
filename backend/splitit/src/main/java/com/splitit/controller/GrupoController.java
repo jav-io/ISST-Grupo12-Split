@@ -1,7 +1,7 @@
 package com.splitit.controller;
 
-import com.splitit.dto.GrupoDTO;
-import com.splitit.dto.SaldoGrupoDTO;
+import com.splitit.DTO.GrupoDTO;
+import com.splitit.DTO.SaldoGrupoDTO;
 import com.splitit.model.Grupo;
 import com.splitit.service.GrupoService;
 import org.springframework.beans.factory.annotation.Autowired;

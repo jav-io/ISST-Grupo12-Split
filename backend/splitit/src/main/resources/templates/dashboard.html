@@ -234,7 +234,7 @@
     <nav>
       <a th:href="@{/}"><i class="fas fa-home"></i> Inicio</a>
       <a th:href="@{/crear-grupo}"><i class="fas fa-plus-circle"></i> Crear grupo</a>
-      <a href="/logout" class="btn-logout"><i class="fas fa-sign-out-alt"></i> Cerrar sesión</a>
+      <a th:href="@{/logout}" class="btn-logout"><i class="fas fa-sign-out-alt"></i> Cerrar sesión</a>
     </nav>
   </header>
 
@@ -256,7 +256,7 @@
           <div class="grupo-descripcion" th:text="${grupo.descripcion}">Descripción</div>
         </div>
         <div class="grupo-accion">
-          <a th:href="@{'/detalle-grupo/' + ${grupo.idGrupo}}">Ver detalles <i class="fas fa-chevron-right"></i></a>
+          <a th:href="@{'/detalle-grupo/' + ${grupo.id}}">Ver detalles <i class="fas fa-chevron-right"></i></a>
         </div>
       </div>
     </div>

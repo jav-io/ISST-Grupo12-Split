@@ -184,14 +184,14 @@
     <nav>
       <a th:href="@{/}"><i class="fas fa-home"></i> Inicio</a>
       <a th:href="@{/dashboard}"><i class="fas fa-tachometer-alt"></i> Panel</a>
-      <a th:href="@{'/detalle-grupo/' + ${grupo.idGrupo}}"><i class="fas fa-users"></i> Volver al grupo</a>
+      <a th:href="@{'/detalle-grupo/' + ${grupo.id}}"><i class="fas fa-users"></i> Volver al grupo</a>
     </nav>
   </header>
 
   <main>
     <div class="saldo-header">
       <h2 th:text="'Saldo del grupo: ' + ${grupo.nombre}">Saldo del grupo</h2>
-      <a class="btn-volver" th:href="@{/detalle-grupo/{id}(id=${grupo.idGrupo})}"><i class="fas fa-arrow-left"></i> Volver al grupo</a>
+      <a class="btn-volver" th:href="@{/detalle-grupo/{id}(id=${grupo.id})}"><i class="fas fa-arrow-left"></i> Volver al grupo</a>
     </div>
 
     <div class="saldos-container">

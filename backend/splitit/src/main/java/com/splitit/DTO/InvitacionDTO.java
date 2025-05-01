@@ -1,4 +1,4 @@
-package com.splitit.dto;
+package com.splitit.DTO;
 
 import jakarta.validation.constraints.NotNull;
 
@@ -9,6 +9,9 @@ public class InvitacionDTO {
     
     @NotNull(message = "El id del usuario es obligatorio")
     private Long idUsuario;
+
+    public InvitacionDTO() {
+    }
 
     // Getters y setters
     public Long getIdGrupo() {

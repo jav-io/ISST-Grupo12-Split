@@ -1,8 +1,8 @@
 package com.splitit.controller;
 
-import com.splitit.dto.GastoDTO;
-import com.splitit.dto.GastoResponseDTO;
-import com.splitit.dto.GastoConParticipantesDTO;
+import com.splitit.DTO.GastoDTO;
+import com.splitit.DTO.GastoResponseDTO;
+import com.splitit.DTO.GastoConParticipantesDTO;
 import com.splitit.model.Gasto;
 import com.splitit.service.GastoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,12 +26,10 @@ public class GastoController {
         return ResponseEntity.ok(nuevoGasto);
     }
 
-
     @GetMapping("/response")
     public ResponseEntity<List<GastoResponseDTO>> obtenerGastosResponse() {
         return ResponseEntity.ok(gastoService.obtenerGastosResponse());
     }
-
     
     // Endpoint para obtener todos los gastos con participantes (incluye pagador con nombre)
     @GetMapping

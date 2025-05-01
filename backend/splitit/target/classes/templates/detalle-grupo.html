@@ -130,7 +130,7 @@
     <p><span>Nombre:</span> <span th:text="${grupo.nombre}">Nombre grupo</span></p>
     <p><span>Descripción:</span> <span th:text="${grupo.descripcion}">Descripción grupo</span></p>
     <p><span>Fecha de creación:</span> <span th:text="${#dates.format(grupo.fechaCreacion, 'dd/MM/yyyy')}">01/01/2025</span></p>
-    <form th:action="@{/saldo-grupo/{id}(id=${grupo.idGrupo})}" method="get">
+    <form th:action="@{/saldo-grupo/{id}(id=${grupo.id})}" method="get">
       <button type="submit" class="btn"><i class="fas fa-balance-scale"></i> Consultar saldo del grupo</button>
     </form>
     <div class="section">
@@ -155,7 +155,7 @@
             <strong th:text="${gasto.descripcion}">Descripción</strong> - 
             <span th:text="${gasto.monto} + ' €'">100 €</span>
           </div>
-          <a th:href="@{'/editar-gasto/' + ${gasto.idGasto}}"><i class="fas fa-edit"></i> Editar</a>
+          <a th:href="@{'/editar-gasto/' + ${gasto.id}}"><i class="fas fa-edit"></i> Editar</a>
         </div>
         <div style="margin-top: 10px;">
           <span style="font-weight: 600;">Participantes:</span>
@@ -165,7 +165,7 @@
           <span th:if="${gasto.participantes.size() == 0}" style="font-weight: bold;">Ninguno</span>
         </div>
       </div>
-      <a th:href="@{'/añadir-gasto/' + ${grupo.idGrupo}}" class="btn"><i class="fas fa-plus"></i> Añadir gasto</a>
+      <a th:href="@{'/añadir-gasto/' + ${grupo.id}}" class="btn"><i class="fas fa-plus"></i> Añadir gasto</a>
     </div>
   
     <a class="btn" th:href="@{/dashboard}"><i class="fas fa-arrow-left"></i> Volver al panel</a>
