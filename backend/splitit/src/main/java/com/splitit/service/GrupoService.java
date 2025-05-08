@@ -1,5 +1,14 @@
 package com.splitit.service;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.splitit.DTO.GrupoDTO;
 import com.splitit.DTO.ParticipanteDTO;
 import com.splitit.DTO.SaldoGrupoDTO;
@@ -9,14 +18,6 @@ import com.splitit.model.Usuario;
 import com.splitit.repository.GrupoRepository;
 import com.splitit.repository.MiembroRepository;
 import com.splitit.repository.UsuarioRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
 
 @Service
 public class GrupoService {
@@ -146,4 +147,25 @@ public class GrupoService {
         dto.setFechaCreacion(grupo.getFechaCreacion());
         return dto;
     }
+
+    public void cerrarGrupo(Long grupoId, Long usuarioId) {
+        Grupo grupo = grupoRepository.findById(grupoId)
+            .orElseThrow(() -> new RuntimeException("Grupo no encontrado"));
+    
+        boolean esAdmin = grupo.getMiembros().stream()
+            .anyMatch(m -> m.getUsuario().getId().equals(usuarioId) && "ADMIN".equals(m.getRolEnGrupo()));
+    
+        if (!esAdmin) {
+            throw new RuntimeException("Solo el administrador puede cerrar el grupo");
+        }
+    
+        if (grupo.isCerrado()) {
+            throw new RuntimeException("El grupo ya está cerrado");
+        }
+    
+        grupo.setCerrado(true);
+        grupoRepository.save(grupo);
+    }
+    
+    
 }

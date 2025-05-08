@@ -1,15 +1,22 @@
 package com.splitit.controller;
 
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.splitit.DTO.GrupoDTO;
 import com.splitit.DTO.SaldoGrupoDTO;
 import com.splitit.model.Grupo;
 import com.splitit.service.GrupoService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/grupos")
@@ -34,7 +41,6 @@ public class GrupoController {
         return ResponseEntity.ok(grupoService.buscarPorId(idGrupo));
     }
 
-    // ✅ Endpoint para consultar saldos por grupo
     @GetMapping("/{idGrupo}/saldos")
     public ResponseEntity<List<SaldoGrupoDTO>> consultarSaldos(@PathVariable Long idGrupo) {
         List<SaldoGrupoDTO> saldos = grupoService.consultarSaldosGrupo(idGrupo);

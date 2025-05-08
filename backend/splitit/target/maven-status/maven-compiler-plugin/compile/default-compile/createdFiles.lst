@@ -18,6 +18,7 @@ com/splitit/model/Deuda.class
 com/splitit/controller/MiembroController.class
 com/splitit/service/UsuarioService.class
 com/splitit/config/SecurityConfig.class
+com/splitit/config/WebConfig.class
 com/splitit/repository/UsuarioRepository.class
 com/splitit/DTO/GastoDTO.class
 com/splitit/DTO/PasswordResetDTO.class
@@ -27,6 +28,7 @@ com/splitit/repository/MiembroRepository.class
 com/splitit/controller/GrupoController.class
 com/splitit/SplititApplication.class
 com/splitit/controller/DeudaController.class
+com/splitit/controller/AdminController.class
 com/splitit/service/GastoService.class
 com/splitit/DTO/GastoResponseDTO.class
 com/splitit/repository/DeudaRepository.class

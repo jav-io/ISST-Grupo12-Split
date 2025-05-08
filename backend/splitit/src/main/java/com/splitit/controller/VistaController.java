@@ -1,29 +1,30 @@
 package com.splitit.controller;
 
-import com.splitit.DTO.GrupoDTO;
-import com.splitit.DTO.SaldoGrupoDTO;
-import com.splitit.DTO.GastoConParticipantesDTO;
-import com.splitit.DTO.GastoDTO;
-import com.splitit.model.Grupo;
-import com.splitit.model.Usuario;
-import com.splitit.model.Gasto;
-import com.splitit.service.GrupoService;
-import com.splitit.service.GastoService;
-import com.splitit.service.UsuarioService;
-
-import jakarta.servlet.http.HttpSession;
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.Arrays;
+import com.splitit.DTO.GastoConParticipantesDTO;
+import com.splitit.DTO.GastoDTO;
+import com.splitit.DTO.GrupoDTO;
+import com.splitit.DTO.SaldoGrupoDTO;
+import com.splitit.model.Gasto;
+import com.splitit.model.Grupo;
+import com.splitit.model.Usuario;
+import com.splitit.service.GastoService;
+import com.splitit.service.GrupoService;
+import com.splitit.service.UsuarioService;
 
 @Controller
 public class VistaController {
@@ -37,7 +38,6 @@ public class VistaController {
     @Autowired
     private UsuarioService usuarioService;
 
-    // Página de inicio
     @GetMapping("/")
     public String inicio() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -63,14 +63,12 @@ public class VistaController {
         return "dashboard";
     }
 
-    // Formulario para crear grupo
     @GetMapping("/crear-grupo")
     public String mostrarFormularioCrearGrupo(Model model) {
         model.addAttribute("grupoDTO", new GrupoDTO());
         return "crear-grupo";
     }
 
-    // Procesamiento del formulario para crear grupo
     @PostMapping("/crear-grupo")
     public String crearGrupo(@ModelAttribute GrupoDTO grupoDTO) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -86,7 +84,6 @@ public class VistaController {
         return "redirect:/dashboard";
     }
 
-    // Vista de detalle de grupo con gastos asociados
     @GetMapping("/detalle-grupo/{id}")
     public String mostrarDetalleGrupo(@PathVariable Long id, Model model) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -107,6 +104,10 @@ public class VistaController {
             return "redirect:/dashboard";
         }
 
+        boolean esAdmin = grupo.getMiembros().stream()
+                .anyMatch(m -> m.getUsuario().getId().equals(usuario.getId()) && "ADMIN".equals(m.getRolEnGrupo()));
+        model.addAttribute("esAdmin", esAdmin);
+
         List<GastoConParticipantesDTO> gastos = gastoService.obtenerGastosConParticipantes()
                 .stream()
                 .filter(g -> g.getGrupoId().equals(id))
@@ -117,16 +118,31 @@ public class VistaController {
         return "detalle-grupo";
     }
 
-    // Vista para formulario de añadir gasto
+    @PostMapping("/grupo/{id}/cerrar")
+    public String cerrarGrupoDesdeVista(@PathVariable Long id) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !auth.isAuthenticated()) {
+            return "redirect:/login";
+        }
+
+        Usuario usuario = usuarioService.buscarPorEmail(auth.getName())
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        grupoService.cerrarGrupo(id, usuario.getId());
+        return "redirect:/detalle-grupo/" + id;
+    }
+
     @GetMapping("/añadir-gasto/{idGrupo}")
     public String mostrarFormularioAñadirGasto(@PathVariable Long idGrupo, Model model) {
+        Grupo grupo = grupoService.obtenerGrupoPorId(idGrupo);
+        if (grupo.isCerrado()) {
+            return "redirect:/detalle-grupo/" + idGrupo;
+        }
+
         GastoDTO gastoDTO = new GastoDTO();
         gastoDTO.setGrupoId(idGrupo);
         model.addAttribute("gasto", gastoDTO);
-
-        Grupo grupo = grupoService.obtenerGrupoPorId(idGrupo);
         model.addAttribute("participantes", grupo.getMiembros());
-
         return "añadir-gasto";
     }
 
@@ -138,15 +154,18 @@ public class VistaController {
         }
 
         try {
-            // Si no hay fecha establecida, usar la fecha actual
+            Grupo grupo = grupoService.obtenerGrupoPorId(gastoDTO.getGrupoId());
+            if (grupo.isCerrado()) {
+                return "redirect:/detalle-grupo/" + gastoDTO.getGrupoId();
+            }
+
             if (gastoDTO.getFecha() == null) {
                 gastoDTO.setFecha(LocalDateTime.now());
             }
-            
             gastoService.crearGasto(gastoDTO);
             return "redirect:/detalle-grupo/" + gastoDTO.getGrupoId();
         } catch (Exception e) {
-            e.printStackTrace(); // Para ver el error en los logs
+            e.printStackTrace();
             return "redirect:/error";
         }
     }
@@ -183,6 +202,10 @@ public class VistaController {
         }
 
         Gasto gasto = gastoService.buscarPorId(id);
+        if (gasto.getGrupo().isCerrado()) {
+            return "redirect:/detalle-grupo/" + gasto.getGrupo().getId();
+        }
+
         GastoDTO gastoDTO = new GastoDTO();
         gastoDTO.setId(gasto.getId());
         gastoDTO.setDescripcion(gasto.getDescripcion());
@@ -196,7 +219,7 @@ public class VistaController {
                 .collect(Collectors.toList()));
 
         List<String> categorias = Arrays.asList("COMIDA", "TRANSPORTE", "ALOJAMIENTO", "ENTRETENIMIENTO", "COMPRAS", "OTROS");
-        
+
         model.addAttribute("gasto", gastoDTO);
         model.addAttribute("participantes", gasto.getGrupo().getMiembros());
         model.addAttribute("grupoId", gasto.getGrupo().getId());
@@ -213,20 +236,25 @@ public class VistaController {
         }
 
         try {
+            Grupo grupo = grupoService.obtenerGrupoPorId(gastoDTO.getGrupoId());
+            if (grupo.isCerrado()) {
+                return "redirect:/detalle-grupo/" + gastoDTO.getGrupoId();
+            }
+
             if (gastoDTO.getFecha() == null) {
                 gastoDTO.setFecha(LocalDateTime.now());
             }
-            
+
             gastoService.editarGastoConParticipantes(
-                id,
-                gastoDTO.getDescripcion(),
-                gastoDTO.getMonto(),
-                gastoDTO.getFecha(),
-                gastoDTO.getGrupoId(),
-                gastoDTO.getPagadorId(),
-                gastoDTO.getParticipantesIds()
+                    id,
+                    gastoDTO.getDescripcion(),
+                    gastoDTO.getMonto(),
+                    gastoDTO.getFecha(),
+                    gastoDTO.getGrupoId(),
+                    gastoDTO.getPagadorId(),
+                    gastoDTO.getParticipantesIds()
             );
-            
+
             return "redirect:/detalle-grupo/" + gastoDTO.getGrupoId();
         } catch (Exception e) {
             e.printStackTrace();
