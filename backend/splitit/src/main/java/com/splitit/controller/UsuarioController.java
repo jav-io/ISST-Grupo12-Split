@@ -14,6 +14,9 @@ import java.util.Map;
 import org.springframework.http.HttpStatus;
 
 import java.util.List;
+import java.util.UUID;
+import org.springframework.web.server.ResponseStatusException;
+import com.splitit.service.CorreoService;
 
 @RestController
 @RequestMapping("/api/usuarios")
@@ -69,15 +72,24 @@ public class UsuarioController {
         }
     }
 
-    @PostMapping("/solicitar-recuperacion")
-    public ResponseEntity<String> solicitarRecuperacion(@RequestBody Map<String, String> body) {
-        String email = body.get("email");
+@PostMapping("/solicitar-recuperacion")
+public ResponseEntity<String> solicitarRecuperacion(@RequestBody Map<String, String> body) {
+    String email = body.get("email");
 
-        if (!usuarioService.verificarEmailExistente(email)) {
-           return ResponseEntity.status(HttpStatus.NOT_FOUND).body("El correo no está registrado.");
-        }
+    Usuario usuario = usuarioService.buscarPorEmail(email)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Correo no encontrado"));
 
-        // Aquí iría lógica de envío de email, pero por ahora simulamos
-        return ResponseEntity.ok("Correo de recuperación enviado.");
-    }
+    String token = UUID.randomUUID().toString();
+    usuario.setTokenRecuperacion(token);
+    usuarioService.actualizarUsuario(usuario);
+
+    String enlace = "http://localhost:8080/resetear-password?token=" + token;
+    correoService.enviarCorreoRecuperacion(email, enlace);
+
+    return ResponseEntity.ok("Correo enviado");
+}
+@Autowired
+private CorreoService correoService;
+
+
 }

@@ -32,6 +32,15 @@ public class Usuario implements UserDetails {
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
     private List<Miembro> miembros;
 
+    @Column(name = "token_recuperacion")
+    private String tokenRecuperacion;
+
+    public String getTokenRecuperacion() {
+        return tokenRecuperacion;
+    }
+    public void setTokenRecuperacion(String tokenRecuperacion) {
+        this.tokenRecuperacion = tokenRecuperacion;
+    }
     // Constructor vacío requerido por JPA
     public Usuario() {}
 
