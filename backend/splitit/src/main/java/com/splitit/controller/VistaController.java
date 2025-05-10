@@ -93,6 +93,8 @@ public class VistaController {
 
         Usuario usuario = usuarioService.buscarPorEmail(auth.getName())
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+                model.addAttribute("usuarioId", usuario.getId());
+
 
         Grupo grupo = grupoService.obtenerGrupoPorId(id);
 
@@ -202,33 +204,51 @@ public class VistaController {
         if (auth == null || !auth.isAuthenticated()) {
             return "redirect:/login";
         }
-
+    
+        String emailActual = auth.getName();
         Gasto gasto = gastoService.buscarPorId(id);
-        if (gasto.getGrupo().isCerrado()) {
-            return "redirect:/detalle-grupo/" + gasto.getGrupo().getId();
+        Grupo grupo = gasto.getGrupo();
+    
+        // Redirigir si el grupo está cerrado
+        if (grupo.isCerrado()) {
+            return "redirect:/detalle-grupo/" + grupo.getId();
         }
-
+    
+        // Verificar permisos: solo admin o pagador puede editar
+        boolean esAdmin = grupo.getMiembros().stream()
+            .anyMatch(m -> m.getUsuario().getEmail().equals(emailActual) && "ADMIN".equals(m.getRolEnGrupo()));
+    
+        boolean esPagador = gasto.getPagador().getUsuario().getEmail().equals(emailActual);
+    
+        if (!esAdmin && !esPagador) {
+            return "redirect:/detalle-grupo/" + grupo.getId();
+        }
+    
+        // Preparar el DTO
         GastoDTO gastoDTO = new GastoDTO();
         gastoDTO.setId(gasto.getId());
         gastoDTO.setDescripcion(gasto.getDescripcion());
         gastoDTO.setMonto(gasto.getMonto());
         gastoDTO.setFecha(gasto.getFecha());
         gastoDTO.setPagadorId(gasto.getPagador().getId());
-        gastoDTO.setGrupoId(gasto.getGrupo().getId());
+        gastoDTO.setGrupoId(grupo.getId());
         gastoDTO.setCategoria(gasto.getCategoria());
-        gastoDTO.setParticipantesIds(gasto.getDeudas().stream()
+        gastoDTO.setParticipantesIds(
+            gasto.getDeudas().stream()
                 .map(deuda -> deuda.getDeudor().getId())
-                .collect(Collectors.toList()));
-
+                .collect(Collectors.toList())
+        );
+    
         List<String> categorias = Arrays.asList("COMIDA", "TRANSPORTE", "ALOJAMIENTO", "ENTRETENIMIENTO", "COMPRAS", "OTROS");
-
+    
         model.addAttribute("gasto", gastoDTO);
-        model.addAttribute("participantes", gasto.getGrupo().getMiembros());
-        model.addAttribute("grupoId", gasto.getGrupo().getId());
+        model.addAttribute("participantes", grupo.getMiembros());
+        model.addAttribute("grupoId", grupo.getId());
         model.addAttribute("categorias", categorias);
-
+    
         return "editar-gasto";
     }
+    
 
     @PostMapping("/editar-gasto/{id}")
     public String procesarEditarGasto(@PathVariable Long id, @ModelAttribute GastoDTO gastoDTO) {

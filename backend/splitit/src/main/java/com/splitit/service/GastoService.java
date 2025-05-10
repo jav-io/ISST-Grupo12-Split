@@ -1,8 +1,17 @@
 package com.splitit.service;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.splitit.DTO.GastoConParticipantesDTO;
 import com.splitit.DTO.GastoDTO;
 import com.splitit.DTO.GastoResponseDTO;
-import com.splitit.DTO.GastoConParticipantesDTO;
 import com.splitit.DTO.ParticipanteDTO;
 import com.splitit.model.Deuda;
 import com.splitit.model.Gasto;
@@ -10,17 +19,8 @@ import com.splitit.model.Grupo;
 import com.splitit.model.Miembro;
 import com.splitit.repository.DeudaRepository;
 import com.splitit.repository.GastoRepository;
-import com.splitit.repository.MiembroRepository;
 import com.splitit.repository.GrupoRepository;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
+import com.splitit.repository.MiembroRepository;
 
 @Service
 public class GastoService {
@@ -182,62 +182,6 @@ public Gasto crearGasto(GastoDTO gastoDTO) {
         return gastoRepository.findByGrupoId(grupoId);
     }
 
-    // @Transactional
-    // public void editarGastoConParticipantes(Long id, String descripcion, BigDecimal monto, LocalDateTime fecha,
-    //                                     Long idGrupo, Long idPagador, List<Long> nuevosParticipantes) {
-    //     Gasto gasto = buscarPorId(id);
-    //     Grupo grupo = grupoRepository.findById(idGrupo)
-    //             .orElseThrow(() -> new RuntimeException("Grupo no encontrado"));
-    //     Miembro pagador = miembroRepository.findById(idPagador)
-    //             .orElseThrow(() -> new RuntimeException("Pagador no encontrado"));
-
-    //     // Revertir saldos actuales antes de editar
-    //     for (Deuda deuda : gasto.getDeudas()) {
-    //         Miembro deudor = deuda.getDeudor();
-    //         deudor.setSaldo(deudor.getSaldo().add(deuda.getMonto()));
-    //         miembroRepository.save(deudor);
-    //     }
-
-    //     // Eliminar deudas previas
-    //     deudaRepository.deleteAll(gasto.getDeudas());
-    //     gasto.getDeudas().clear();
-
-    //     // Actualizar info
-    //     gasto.setDescripcion(descripcion);
-    //     gasto.setMonto(monto);
-    //     gasto.setFecha(fecha);
-    //     gasto.setGrupo(grupo);
-    //     gasto.setPagador(pagador);
-
-    //     // Nueva lógica de reparto
-    //     BigDecimal montoPorPersona = monto.divide(
-    //         BigDecimal.valueOf(nuevosParticipantes.size()),
-    //         2, // escala de 2 decimales
-    //         BigDecimal.ROUND_HALF_UP // redondeo hacia arriba
-    //     );
-
-    //     for (Long idMiembro : nuevosParticipantes) {
-    //         Miembro participante = miembroRepository.findById(idMiembro)
-    //                 .orElseThrow(() -> new RuntimeException("Participante no encontrado"));
-
-    //         if (!participante.getId().equals(idPagador)) {
-    //             Deuda deuda = new Deuda();
-    //             deuda.setGasto(gasto);
-    //             deuda.setDeudor(participante);
-    //             deuda.setMonto(montoPorPersona);
-    //             deudaRepository.save(deuda);
-
-    //             participante.setSaldo(participante.getSaldo().subtract(montoPorPersona));
-    //             miembroRepository.save(participante);
-    //         }
-    //     }
-
-    //     BigDecimal totalRecuperado = montoPorPersona.multiply(BigDecimal.valueOf(nuevosParticipantes.size() - 1));
-    //     pagador.setSaldo(pagador.getSaldo().add(totalRecuperado));
-    //     miembroRepository.save(pagador);
-
-    //     gastoRepository.save(gasto);
-    // }
 @Transactional
 public void editarGastoConParticipantes(Long id, String descripcion, BigDecimal monto, LocalDateTime fecha,
                                         Long idGrupo, Long idPagador, List<Long> nuevosParticipantes) {
@@ -306,15 +250,25 @@ public void editarGastoConParticipantes(Long id, String descripcion, BigDecimal 
 
     gastoRepository.save(gasto);
 }
-    // @Transactional
-    // public void eliminarGasto(Long id) {
-    //     Gasto gasto = buscarPorId(id);
-    //     for (Deuda deuda : gasto.getDeudas()) {
-    //         Miembro deudor = deuda.getDeudor();
-    //         deudor.setSaldo(deudor.getSaldo().add(deuda.getMonto()));
-    //         miembroRepository.save(deudor);
-    //     }
-    //     deudaRepository.deleteAll(gasto.getDeudas());
-    //     gastoRepository.delete(gasto);
-    // }
+@Transactional
+public void eliminarGasto(Long id) {
+    Gasto gasto = buscarPorId(id);
+    for (Deuda deuda : gasto.getDeudas()) {
+        Miembro deudor = deuda.getDeudor();
+        deudor.setSaldo(deudor.getSaldo().add(deuda.getMonto()));
+        miembroRepository.save(deudor);
+    }
+
+    BigDecimal totalDeuda = gasto.getDeudas().stream()
+        .map(Deuda::getMonto)
+        .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+    Miembro pagador = gasto.getPagador();
+    pagador.setSaldo(pagador.getSaldo().subtract(totalDeuda));
+    miembroRepository.save(pagador);
+
+    deudaRepository.deleteAll(gasto.getDeudas());
+    gastoRepository.delete(gasto);
+}
+
 }
