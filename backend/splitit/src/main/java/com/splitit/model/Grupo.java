@@ -1,12 +1,23 @@
 package com.splitit.model;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.ArrayList;
+
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
+import jakarta.validation.constraints.NotBlank;
 
 @Entity
 @Table(name = "grupo")
@@ -41,6 +52,12 @@ public class Grupo {
 
     @OneToMany(mappedBy = "grupo", cascade = CascadeType.ALL)
     private List<Gasto> gastos = new ArrayList<>();
+
+    @Column(nullable = false)
+    private boolean cerrado = false;
+
+
+
 
     public Grupo() {
         this.fechaCreacion = new Date();
@@ -100,4 +117,13 @@ public class Grupo {
     public void setGastos(List<Gasto> gastos) {
         this.gastos = gastos;
     }
+
+    public boolean isCerrado() {
+        return cerrado;
+    }
+
+    public void setCerrado(boolean cerrado) {
+        this.cerrado = cerrado;
+    }
+
 }

@@ -130,9 +130,17 @@
     <p><span>Nombre:</span> <span th:text="${grupo.nombre}">Nombre grupo</span></p>
     <p><span>Descripción:</span> <span th:text="${grupo.descripcion}">Descripción grupo</span></p>
     <p><span>Fecha de creación:</span> <span th:text="${#dates.format(grupo.fechaCreacion, 'dd/MM/yyyy')}">01/01/2025</span></p>
+  
+    <!-- ✅ Mostrar mensaje si el grupo está cerrado -->
+    <div th:if="${grupo.cerrado}" style="margin-top: 10px; padding: 12px; background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; border-radius: 6px;">
+      <i class="fas fa-lock"></i> Este grupo está cerrado. No se pueden realizar más modificaciones.
+    </div>
+  
     <form th:action="@{/saldo-grupo/{id}(id=${grupo.id})}" method="get">
       <button type="submit" class="btn"><i class="fas fa-balance-scale"></i> Consultar saldo del grupo</button>
     </form>
+  
+    <!-- Miembros -->
     <div class="section">
       <h3>Miembros del grupo</h3>
       <ul>
@@ -143,7 +151,8 @@
         </li>
       </ul>
     </div>
-    
+  
+    <!-- Gastos -->
     <div class="section">
       <h3>Gastos del grupo</h3>
       <div th:if="${gastos.empty}">
@@ -155,7 +164,10 @@
             <strong th:text="${gasto.descripcion}">Descripción</strong> - 
             <span th:text="${gasto.monto} + ' €'">100 €</span>
           </div>
-          <a th:href="@{'/editar-gasto/' + ${gasto.id}}"><i class="fas fa-edit"></i> Editar</a>
+          <!-- ✅ Ocultar "Editar" si el grupo está cerrado -->
+          <a th:if="${!grupo.cerrado}" th:href="@{'/editar-gasto/' + ${gasto.id}}">
+            <i class="fas fa-edit"></i> Editar
+          </a>
         </div>
         <div style="margin-top: 10px;">
           <span style="font-weight: 600;">Participantes:</span>
@@ -165,8 +177,20 @@
           <span th:if="${gasto.participantes.size() == 0}" style="font-weight: bold;">Ninguno</span>
         </div>
       </div>
-      <a th:href="@{'/añadir-gasto/' + ${grupo.id}}" class="btn"><i class="fas fa-plus"></i> Añadir gasto</a>
+  
+      <!-- ✅ Ocultar "Añadir gasto" si el grupo está cerrado -->
+      <a th:if="${!grupo.cerrado}" th:href="@{'/añadir-gasto/' + ${grupo.id}}" class="btn">
+        <i class="fas fa-plus"></i> Añadir gasto
+      </a>
     </div>
+  
+    <!-- ✅ Botón cerrar grupo si es admin y no está cerrado -->
+    <form method="post" th:action="@{'/grupo/' + ${grupo.id} + '/cerrar'}"
+      th:if="${esAdmin} and !${grupo.cerrado}">
+      <button type="submit" class="btn" style="background: #dc3545; margin-left: 10px;">
+        <i class="fas fa-lock"></i> Cerrar grupo
+      </button>
+    </form>
   
     <a class="btn" th:href="@{/dashboard}"><i class="fas fa-arrow-left"></i> Volver al panel</a>
   </main>

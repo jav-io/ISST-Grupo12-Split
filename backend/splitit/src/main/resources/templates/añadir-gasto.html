@@ -192,7 +192,7 @@
     <nav>
       <a th:href="@{/}"><i class="fas fa-home"></i> Inicio</a>
       <a th:href="@{/dashboard}"><i class="fas fa-tachometer-alt"></i> Panel</a>
-      <a th:href="@{'/detalle-grupo/' + ${grupoId}}"><i class="fas fa-users"></i> Volver al grupo</a>
+      <a th:href="@{/detalle-grupo/{id}(id=${idGrupo})}" class="btn btn-link">Volver al grupo</a>
     </nav>
   </header>
 
