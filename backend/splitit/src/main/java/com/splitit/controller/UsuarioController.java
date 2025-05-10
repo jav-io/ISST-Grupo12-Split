@@ -1,6 +1,7 @@
 package com.splitit.controller;
 
 import com.splitit.model.Usuario;
+import com.splitit.repository.UsuarioRepository;
 import com.splitit.service.UsuarioService;
 import com.splitit.DTO.PasswordResetDTO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -90,6 +91,13 @@ public ResponseEntity<String> solicitarRecuperacion(@RequestBody Map<String, Str
 }
 @Autowired
 private CorreoService correoService;
+
+@Autowired
+private UsuarioRepository usuarioRepository;
+
+public Usuario actualizarUsuario(Usuario usuario) {
+    return usuarioRepository.save(usuario);
+}
 
 
 }

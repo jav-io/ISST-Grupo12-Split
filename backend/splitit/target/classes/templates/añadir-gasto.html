@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Split.it - Añadir Gasto</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+    body { 
+      background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+      color: #343a40;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    header {
+      background-color: #ffffff;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      padding: 20px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    header h1 { 
+      font-size: 1.8rem; 
+      color: #2c3e50; 
+      font-weight: 800;
+    }
+    
+    nav {
+      display: flex;
+      align-items: center;
+    }
+    
+    nav a {
+      margin-left: 20px;
+      color: #2c3e50;
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.3s;
+      padding: 8px 12px;
+      border-radius: 6px;
+    }
+    
+    nav a:hover { 
+      color: #0d6efd; 
+      background-color: #f8f9fa;
+    }
+    
+    .form-container {
+      max-width: 700px;
+      margin: 60px auto;
+      background: white;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+    
+    h2 { 
+      font-size: 2.2rem;
+      margin-bottom: 40px;
+      color: #2c3e50;
+      font-weight: 800;
+      text-align: center;
+    }
+    
+    label { 
+      display: block; 
+      margin: 20px 0 5px; 
+      font-weight: 600;
+      color: #2c3e50;
+    }
+    
+    input, textarea, select {
+      width: 100%;
+      padding: 12px;
+      border-radius: 6px;
+      border: 1px solid #ced4da;
+      font-size: 1rem;
+    }
+    
+    select[multiple] {
+      height: 150px;
+    }
+    
+    .choices__inner {
+      background-color: #fff;
+      border: 1px solid #ced4da;
+      border-radius: 6px;
+      min-height: 44px;
+      padding: 7.5px 7.5px 3.75px;
+    }
+    
+    .choices__list--multiple .choices__item {
+      background-color: #0d6efd;
+      border: 1px solid #0d6efd;
+    }
+    
+    .form-row {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+    
+    .categoria-options {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+      margin-top: 10px;
+    }
+    
+    .categoria-option {
+      background: #f8f9fa;
+      border: 1px solid #ced4da;
+      border-radius: 6px;
+      padding: 15px 10px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .categoria-option:hover {
+      background: #e9ecef;
+    }
+    
+    .categoria-option.selected {
+      background: #e6f2ff;
+      border-color: #0d6efd;
+      color: #0d6efd;
+    }
+    
+    .categoria-icon {
+      font-size: 1.5rem;
+      margin-bottom: 8px;
+    }
+    
+    button {
+      margin-top: 30px;
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(to right, #0d6efd, #6610f2);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    button:hover { 
+      background: linear-gradient(to right, #084298, #520dc2);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    footer {
+      margin-top: auto;
+      text-align: center;
+      padding: 30px;
+      font-size: 0.9rem;
+      background-color: #dee2e6;
+    }
+    
+    @media (max-width: 768px) {
+      .form-row, .categoria-options {
+        grid-template-columns: 1fr;
+      }
+      
+      .form-container {
+        padding: 30px 20px;
+      }
+      
+      header {
+        padding: 15px 20px;
+      }
+      
+      nav a {
+        margin-left: 10px;
+        padding: 6px 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Split.it</h1>
+    <nav>
+      <a th:href="@{/}"><i class="fas fa-home"></i> Inicio</a>
+      <a th:href="@{/dashboard}"><i class="fas fa-tachometer-alt"></i> Panel</a>
+      <a th:href="@{/detalle-grupo/{id}(id=${idGrupo})}" class="btn btn-link">Volver al grupo</a>
+    </nav>
+  </header>
+
+  <div class="form-container">
+    <h2>Añadir nuevo gasto</h2>
+    <form th:action="@{/añadir-gasto}" th:object="${gasto}" method="post">
+      <input type="hidden" th:field="*{grupoId}" />
+
+      <label for="descripcion">Descripción</label>
+      <input type="text" id="descripcion" th:field="*{descripcion}" placeholder="Ej. Cena en restaurante" required />
+
+      <div class="form-row">
+        <div>
+          <label for="monto">Monto (€)</label>
+          <input type="number" step="0.01" id="monto" th:field="*{monto}" placeholder="0.00" required />
+        </div>
+        <div>
+          <label for="fecha">Fecha y Hora</label>
+          <input type="datetime-local" id="fecha" name="fecha" 
+                 th:value="${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd''T''HH:mm')}"
+                 pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}"
+                 required />
+        </div>
+      </div>
+
+      <label for="pagadorId">¿Quién ha pagado?</label>
+      <select id="pagadorId" th:field="*{pagadorId}" required>
+        <option th:each="miembro : ${participantes}"
+                th:value="${miembro.id}"
+                th:text="${miembro.usuario.nombre}">
+        </option>
+      </select>
+
+      <label for="participantesIds">Participantes involucrados</label>
+      <select id="participantesIds" multiple th:field="*{participantesIds}" required>
+        <option th:each="miembro : ${participantes}"
+                th:value="${miembro.id}"
+                th:text="${miembro.usuario.nombre}">
+        </option>
+      </select>
+
+      <label>Categoría</label>
+      <div class="categoria-options">
+        <div class="categoria-option" onclick="selectCategoria(this, 'COMIDA')">
+          <div class="categoria-icon"><i class="fas fa-utensils"></i></div>
+          <div>Comida</div>
+        </div>
+        <div class="categoria-option" onclick="selectCategoria(this, 'TRANSPORTE')">
+          <div class="categoria-icon"><i class="fas fa-car"></i></div>
+          <div>Transporte</div>
+        </div>
+        <div class="categoria-option" onclick="selectCategoria(this, 'ALOJAMIENTO')">
+          <div class="categoria-icon"><i class="fas fa-home"></i></div>
+          <div>Alojamiento</div>
+        </div>
+        <div class="categoria-option" onclick="selectCategoria(this, 'ENTRETENIMIENTO')">
+          <div class="categoria-icon"><i class="fas fa-film"></i></div>
+          <div>Entretenimiento</div>
+        </div>
+        <div class="categoria-option" onclick="selectCategoria(this, 'COMPRAS')">
+          <div class="categoria-icon"><i class="fas fa-shopping-cart"></i></div>
+          <div>Compras</div>
+        </div>
+        <div class="categoria-option" onclick="selectCategoria(this, 'OTROS')">
+          <div class="categoria-icon"><i class="fas fa-ellipsis-h"></i></div>
+          <div>Otros</div>
+        </div>
+      </div>
+      <input type="hidden" id="categoria" th:field="*{categoria}" value="OTROS" />
+
+      <button type="submit"><i class="fas fa-plus"></i> Añadir gasto</button>
+    </form>
+  </div>
+
+  <footer>&copy; 2025 Split.it – Todos los derechos reservados.</footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const participantesSelect = document.getElementById('participantesIds');
+      const pagadorSelect = document.getElementById('pagadorId');
+      
+      if (participantesSelect) {
+        new Choices(participantesSelect, {
+          removeItemButton: true,
+          placeholderValue: 'Selecciona participantes...',
+          searchEnabled: true,
+          shouldSort: false
+        });
+      }
+      
+      if (pagadorSelect) {
+        new Choices(pagadorSelect, {
+          searchEnabled: true,
+          shouldSort: false,
+          itemSelectText: ''
+        });
+      }
+    });
+    
+    function selectCategoria(element, value) {
+      // Quitar la clase selected de todas las opciones
+      document.querySelectorAll('.categoria-option').forEach(option => {
+        option.classList.remove('selected');
+      });
+      
+      // Añadir la clase selected al elemento clickeado
+      element.classList.add('selected');
+      
+      // Actualizar el valor del input hidden
+      document.getElementById('categoria').value = value;
+    }
+  </script>
+</body>
+</html>
