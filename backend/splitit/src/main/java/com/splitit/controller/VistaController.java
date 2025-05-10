@@ -136,15 +136,17 @@ public class VistaController {
     public String mostrarFormularioAñadirGasto(@PathVariable Long idGrupo, Model model) {
         Grupo grupo = grupoService.obtenerGrupoPorId(idGrupo);
         if (grupo.isCerrado()) {
-            return "redirect:/detalle-grupo/" + idGrupo;
+         return "redirect:/detalle-grupo/" + idGrupo;
         }
 
         GastoDTO gastoDTO = new GastoDTO();
         gastoDTO.setGrupoId(idGrupo);
         model.addAttribute("gasto", gastoDTO);
         model.addAttribute("participantes", grupo.getMiembros());
-        return "añadir-gasto";
+        model.addAttribute("idGrupo", idGrupo);
+         return "añadir-gasto";
     }
+
 
     @PostMapping("/añadir-gasto")
     public String procesarAñadirGasto(@ModelAttribute GastoDTO gastoDTO) {
