@@ -1,19 +1,30 @@
 package com.splitit.controller;
 
-import com.splitit.model.Usuario;
-import com.splitit.service.UsuarioService;
-import com.splitit.DTO.PasswordResetDTO;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import java.util.Map;
-import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
-import java.util.List;
+import com.splitit.dto.PasswordResetDTO;
+import com.splitit.model.Usuario;
+import com.splitit.repository.UsuarioRepository;
+import com.splitit.service.CorreoService;
+import com.splitit.service.UsuarioService;
 
 @RestController
 @RequestMapping("/api/usuarios")
@@ -24,6 +35,10 @@ public class UsuarioController {
 
     @Autowired
     private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private CorreoService correoService;
+
 
     // Endpoint de login
     @PostMapping("/login")
@@ -69,15 +84,30 @@ public class UsuarioController {
         }
     }
 
-    @PostMapping("/solicitar-recuperacion")
-    public ResponseEntity<String> solicitarRecuperacion(@RequestBody Map<String, String> body) {
-        String email = body.get("email");
+@PostMapping("/solicitar-recuperacion")
+public ResponseEntity<String> solicitarRecuperacion(@RequestBody Map<String, String> body) {
+    String email = body.get("email");
 
-        if (!usuarioService.verificarEmailExistente(email)) {
-           return ResponseEntity.status(HttpStatus.NOT_FOUND).body("El correo no está registrado.");
-        }
+    Usuario usuario = usuarioService.buscarPorEmail(email)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Correo no encontrado"));
 
-        // Aquí iría lógica de envío de email, pero por ahora simulamos
-        return ResponseEntity.ok("Correo de recuperación enviado.");
-    }
+    String token = UUID.randomUUID().toString();
+    usuario.setTokenRecuperacion(token);
+    usuarioService.save(usuario);
+
+    String enlace = "http://localhost:8080/resetear-password?token=" + token;
+    correoService.enviarCorreoRecuperacion(email, enlace);
+
+    return ResponseEntity.ok("Correo enviado");
+}
+
+
+@Autowired
+private UsuarioRepository usuarioRepository;
+
+public Usuario actualizarUsuario(Usuario usuario) {
+    return usuarioRepository.save(usuario);
+}
+
+
 }

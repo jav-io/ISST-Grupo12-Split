@@ -1,15 +1,25 @@
-// backend/splitit/src/main/java/com/splitit/model/Gasto.java
 package com.splitit.model;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import jakarta.persistence.*;
 import java.util.List;
 
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Lob;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+
 /**
- * Entidad que representa un gasto registrado en un grupo
- * Un gasto es pagado por un miembro y puede generar deudas para otros miembros
+ * Entidad que representa un gasto registrado en un grupo.
+ * Un gasto es pagado por un miembro y puede generar deudas para otros miembros.
  */
 @Entity
 @Table(name = "gasto")
@@ -38,12 +48,11 @@ public class Gasto {
     @JoinColumn(name = "pagador_id")
     private Miembro pagador;
 
-    @OneToMany(mappedBy = "gasto", cascade = CascadeType.ALL)
-    private List<Deuda> deudas;
+    @OneToMany(mappedBy = "gasto", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Deuda> deudas = new ArrayList<>();
 
     public Gasto() {
         this.fecha = LocalDateTime.now();
-        this.deudas = new ArrayList<>();
     }
 
     public Gasto(BigDecimal monto, String descripcion, String categoria, Grupo grupo, Miembro pagador) {
@@ -53,9 +62,9 @@ public class Gasto {
         this.grupo = grupo;
         this.pagador = pagador;
         this.fecha = LocalDateTime.now();
-        this.deudas = new ArrayList<>();
     }
 
+    // Getters y setters
     public Long getId() {
         return id;
     }

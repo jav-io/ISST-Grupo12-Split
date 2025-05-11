@@ -1,5 +1,6 @@
 package com.splitit.controller;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -14,16 +15,20 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.splitit.DTO.GastoConParticipantesDTO;
-import com.splitit.DTO.GastoDTO;
-import com.splitit.DTO.GrupoDTO;
-import com.splitit.DTO.SaldoGrupoDTO;
+import com.splitit.dto.GastoConParticipantesDTO;
+import com.splitit.dto.GastoDTO;
+import com.splitit.dto.GrupoDTO;
+import com.splitit.dto.SaldoGrupoDTO;
 import com.splitit.model.Gasto;
 import com.splitit.model.Grupo;
+import com.splitit.model.Miembro;
 import com.splitit.model.Usuario;
 import com.splitit.service.GastoService;
 import com.splitit.service.GrupoService;
+import com.splitit.service.MiembroService;
 import com.splitit.service.UsuarioService;
 
 @Controller
@@ -37,6 +42,9 @@ public class VistaController {
 
     @Autowired
     private UsuarioService usuarioService;
+
+    @Autowired
+    private MiembroService miembroService;
 
     @GetMapping("/")
     public String inicio() {
@@ -69,20 +77,26 @@ public class VistaController {
         return "crear-grupo";
     }
 
-    @PostMapping("/crear-grupo")
-    public String crearGrupo(@ModelAttribute GrupoDTO grupoDTO) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null || !auth.isAuthenticated()) {
-            return "redirect:/login";
-        }
+   @PostMapping("/crear-grupo")
+public String crearGrupo(@ModelAttribute GrupoDTO grupoDTO, Model model) {
+    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    if (auth == null || !auth.isAuthenticated()) {
+        return "redirect:/login";
+    }
 
+    try {
         Usuario creador = usuarioService.buscarPorEmail(auth.getName())
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
         grupoDTO.setIdCreador(creador.getId());
         grupoService.crearGrupoDesdeDTO(grupoDTO);
-
         return "redirect:/dashboard";
+    } catch (RuntimeException ex) {
+        model.addAttribute("grupo", grupoDTO);
+        model.addAttribute("error", ex.getMessage());
+        return "crear-grupo"; // Asegúrate de que esta plantilla exista
     }
+}
+
 
     @GetMapping("/detalle-grupo/{id}")
     public String mostrarDetalleGrupo(@PathVariable Long id, Model model) {
@@ -90,33 +104,43 @@ public class VistaController {
         if (auth == null || !auth.isAuthenticated()) {
             return "redirect:/login";
         }
-
+    
         Usuario usuario = usuarioService.buscarPorEmail(auth.getName())
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-
+        model.addAttribute("usuarioId", usuario.getId());
+    
         Grupo grupo = grupoService.obtenerGrupoPorId(id);
-
+    
         boolean esMiembro = grupo.getMiembros()
                 .stream()
                 .anyMatch(m -> m.getUsuario().getId().equals(usuario.getId()));
-
+    
         if (!esMiembro) {
             return "redirect:/dashboard";
         }
-
+    
         boolean esAdmin = grupo.getMiembros().stream()
                 .anyMatch(m -> m.getUsuario().getId().equals(usuario.getId()) && "ADMIN".equals(m.getRolEnGrupo()));
         model.addAttribute("esAdmin", esAdmin);
-
+    
+        // Verifica si el usuario actual es el único admin
+        long totalAdmins = grupo.getMiembros().stream()
+                .filter(m -> "ADMIN".equals(m.getRolEnGrupo()))
+                .count();
+    
+        boolean esUnicoAdmin = esAdmin && totalAdmins == 1;
+        model.addAttribute("esUnicoAdmin", esUnicoAdmin);
+    
         List<GastoConParticipantesDTO> gastos = gastoService.obtenerGastosConParticipantes()
                 .stream()
                 .filter(g -> g.getGrupoId().equals(id))
                 .toList();
-
+    
         model.addAttribute("grupo", grupo);
         model.addAttribute("gastos", gastos);
         return "detalle-grupo";
     }
+    
 
     @PostMapping("/grupo/{id}/cerrar")
     public String cerrarGrupoDesdeVista(@PathVariable Long id) {
@@ -202,33 +226,51 @@ public class VistaController {
         if (auth == null || !auth.isAuthenticated()) {
             return "redirect:/login";
         }
-
+    
+        String emailActual = auth.getName();
         Gasto gasto = gastoService.buscarPorId(id);
-        if (gasto.getGrupo().isCerrado()) {
-            return "redirect:/detalle-grupo/" + gasto.getGrupo().getId();
+        Grupo grupo = gasto.getGrupo();
+    
+        // Redirigir si el grupo está cerrado
+        if (grupo.isCerrado()) {
+            return "redirect:/detalle-grupo/" + grupo.getId();
         }
-
+    
+        // Verificar permisos: solo admin o pagador puede editar
+        boolean esAdmin = grupo.getMiembros().stream()
+            .anyMatch(m -> m.getUsuario().getEmail().equals(emailActual) && "ADMIN".equals(m.getRolEnGrupo()));
+    
+        boolean esPagador = gasto.getPagador().getUsuario().getEmail().equals(emailActual);
+    
+        if (!esAdmin && !esPagador) {
+            return "redirect:/detalle-grupo/" + grupo.getId();
+        }
+    
+        // Preparar el DTO
         GastoDTO gastoDTO = new GastoDTO();
         gastoDTO.setId(gasto.getId());
         gastoDTO.setDescripcion(gasto.getDescripcion());
         gastoDTO.setMonto(gasto.getMonto());
         gastoDTO.setFecha(gasto.getFecha());
         gastoDTO.setPagadorId(gasto.getPagador().getId());
-        gastoDTO.setGrupoId(gasto.getGrupo().getId());
+        gastoDTO.setGrupoId(grupo.getId());
         gastoDTO.setCategoria(gasto.getCategoria());
-        gastoDTO.setParticipantesIds(gasto.getDeudas().stream()
+        gastoDTO.setParticipantesIds(
+            gasto.getDeudas().stream()
                 .map(deuda -> deuda.getDeudor().getId())
-                .collect(Collectors.toList()));
-
+                .collect(Collectors.toList())
+        );
+    
         List<String> categorias = Arrays.asList("COMIDA", "TRANSPORTE", "ALOJAMIENTO", "ENTRETENIMIENTO", "COMPRAS", "OTROS");
-
+    
         model.addAttribute("gasto", gastoDTO);
-        model.addAttribute("participantes", gasto.getGrupo().getMiembros());
-        model.addAttribute("grupoId", gasto.getGrupo().getId());
+        model.addAttribute("participantes", grupo.getMiembros());
+        model.addAttribute("grupoId", grupo.getId());
         model.addAttribute("categorias", categorias);
-
+    
         return "editar-gasto";
     }
+    
 
     @PostMapping("/editar-gasto/{id}")
     public String procesarEditarGasto(@PathVariable Long id, @ModelAttribute GastoDTO gastoDTO) {
@@ -263,4 +305,189 @@ public class VistaController {
             return "redirect:/error";
         }
     }
+
+    @PostMapping("/grupo/{id}/añadir-miembro")
+public String añadirMiembroAlGrupo(@PathVariable Long id,
+                                   @RequestParam String nombre,
+                                   @RequestParam String email,
+                                   RedirectAttributes redirect) {
+    // Buscar o crear usuario
+    Usuario usuario = usuarioService.buscarOCrearPorEmail(email, nombre);
+
+    // Buscar grupo
+    Grupo grupo = grupoService.buscarPorId(id);
+
+    // Verificar si ya es miembro
+    boolean yaEsMiembro = grupo.getMiembros().stream()
+        .anyMatch(m -> m.getUsuario().getEmail().equals(email));
+    if (yaEsMiembro) {
+        redirect.addFlashAttribute("error", "Este usuario ya es miembro del grupo.");
+        return "redirect:/detalle-grupo/" + id;
+    }
+
+    // Crear miembro con rol "MIEMBRO" y saldo 0
+    Miembro nuevoMiembro = new Miembro();
+    nuevoMiembro.setGrupo(grupo);
+    nuevoMiembro.setUsuario(usuario);
+    nuevoMiembro.setRolEnGrupo("MIEMBRO");
+    nuevoMiembro.setSaldo(BigDecimal.ZERO);
+
+    miembroService.crearMiembro(nuevoMiembro);
+
+    redirect.addFlashAttribute("mensaje", "Miembro añadido correctamente.");
+    return "redirect:/detalle-grupo/" + id;
+}
+
+// Método para eliminar un miembro del grupo
+@PostMapping("/grupo/{idGrupo}/eliminar-miembro/{idMiembro}")
+public String eliminarMiembro(@PathVariable Long idGrupo,
+                              @PathVariable Long idMiembro,
+                              RedirectAttributes redirect) {
+    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    if (auth == null || !auth.isAuthenticated()) {
+        return "redirect:/login";
+    }
+
+    Usuario usuarioActual = usuarioService.buscarPorEmail(auth.getName())
+            .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+    Grupo grupo = grupoService.obtenerGrupoPorId(idGrupo);
+    Miembro miembroAEliminar = miembroService.buscarPorId(idMiembro);
+
+    if (miembroAEliminar == null) {
+        redirect.addFlashAttribute("error", "El miembro no existe.");
+        return "redirect:/detalle-grupo/" + idGrupo;
+    }
+
+    boolean esAdmin = grupo.getMiembros().stream()
+        .anyMatch(m -> m.getUsuario().getId().equals(usuarioActual.getId()) && "ADMIN".equals(m.getRolEnGrupo()));
+
+    if (!esAdmin) {
+        redirect.addFlashAttribute("error", "No tienes permiso para eliminar miembros.");
+        return "redirect:/detalle-grupo/" + idGrupo;
+    }
+
+    if ("ADMIN".equals(miembroAEliminar.getRolEnGrupo())) {
+        long cantidadAdmins = grupo.getMiembros().stream()
+            .filter(m -> "ADMIN".equals(m.getRolEnGrupo()))
+            .count();
+
+        if (cantidadAdmins <= 1) {
+            redirect.addFlashAttribute("error", "No puedes eliminar al único administrador del grupo.");
+            return "redirect:/detalle-grupo/" + idGrupo;
+        }
+    }
+
+    // Verifica que el saldo sea 0
+    if (miembroAEliminar.getSaldoActual().compareTo(BigDecimal.ZERO) != 0) {
+        redirect.addFlashAttribute("error", "No se puede eliminar al miembro: debe saldar sus deudas antes de realizar esta operación.");
+        return "redirect:/detalle-grupo/" + idGrupo;
+    }
+
+
+    // Llamada al método actualizado
+    miembroService.eliminarMiembro(idMiembro);
+
+    redirect.addFlashAttribute("mensaje", "Miembro eliminado correctamente.");
+    return "redirect:/detalle-grupo/" + idGrupo;
+}
+
+
+// Método para abandonar un grupo
+@PostMapping("/grupo/{idGrupo}/abandonar")
+public String abandonarGrupo(@PathVariable Long idGrupo, RedirectAttributes redirect) {
+    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    if (auth == null || !auth.isAuthenticated()) {
+        return "redirect:/login";
+    }
+
+    Usuario usuarioActual = usuarioService.buscarPorEmail(auth.getName())
+            .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+    Grupo grupo = grupoService.obtenerGrupoPorId(idGrupo);
+
+    // Buscar al miembro que representa al usuario
+    Miembro miembro = grupo.getMiembros().stream()
+            .filter(m -> m.getUsuario().getId().equals(usuarioActual.getId()))
+            .findFirst()
+            .orElse(null);
+
+    if (miembro == null) {
+        redirect.addFlashAttribute("error", "No eres miembro de este grupo.");
+        return "redirect:/dashboard";
+    }
+
+    // No permitir que el único admin se vaya
+    if ("ADMIN".equals(miembro.getRolEnGrupo())) {
+        long cantidadAdmins = grupo.getMiembros().stream()
+                .filter(m -> "ADMIN".equals(m.getRolEnGrupo()))
+                .count();
+
+        if (cantidadAdmins <= 1) {
+            redirect.addFlashAttribute("error", "Eres el único administrador. Asigna otro antes de abandonar.");
+            return "redirect:/detalle-grupo/" + idGrupo;
+        }
+    }
+
+    // Solo puede abandonar si no tiene saldo pendiente
+    if (miembro.getSaldo().compareTo(BigDecimal.ZERO) != 0) {
+        redirect.addFlashAttribute("error", "No puedes abandonar el grupo: debes saldar tus deudas antes de realizar esta operación.");
+        return "redirect:/detalle-grupo/" + idGrupo;
+    }
+    
+
+    miembroService.eliminarMiembro(miembro.getId());
+    redirect.addFlashAttribute("mensaje", "Has abandonado el grupo correctamente.");
+    return "redirect:/dashboard";
+}
+
+// Método para cambiar el rol de un miembro
+@PostMapping("/grupo/{idGrupo}/cambiar-rol/{idMiembro}")
+public String cambiarRolMiembro(@PathVariable Long idGrupo,
+                                @PathVariable Long idMiembro,
+                                RedirectAttributes redirect) {
+    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    if (auth == null || !auth.isAuthenticated()) {
+        return "redirect:/login";
+    }
+
+    Usuario usuarioActual = usuarioService.buscarPorEmail(auth.getName())
+            .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+    Grupo grupo = grupoService.obtenerGrupoPorId(idGrupo);
+    Miembro miembro = miembroService.buscarPorId(idMiembro);
+
+    boolean esAdminActual = grupo.getMiembros().stream()
+            .anyMatch(m -> m.getUsuario().getId().equals(usuarioActual.getId()) && "ADMIN".equals(m.getRolEnGrupo()));
+
+    if (!esAdminActual) {
+        redirect.addFlashAttribute("error", "No tienes permiso para cambiar roles.");
+        return "redirect:/detalle-grupo/" + idGrupo;
+    }
+
+    if (!miembro.getGrupo().getId().equals(idGrupo)) {
+        redirect.addFlashAttribute("error", "El miembro no pertenece a este grupo.");
+        return "redirect:/detalle-grupo/" + idGrupo;
+    }
+
+    // Si es admin, lo pasamos a miembro. Si es miembro, lo pasamos a admin.
+    if ("ADMIN".equals(miembro.getRolEnGrupo())) {
+        long admins = grupo.getMiembros().stream().filter(m -> "ADMIN".equals(m.getRolEnGrupo())).count();
+        if (admins <= 1) {
+            redirect.addFlashAttribute("error", "No puedes quitar el rol de admin al único administrador.");
+            return "redirect:/detalle-grupo/" + idGrupo;
+        }
+        miembro.setRolEnGrupo("MIEMBRO");
+    } else {
+        miembro.setRolEnGrupo("ADMIN");
+    }
+
+    miembroService.actualizarMiembro(miembro);
+    redirect.addFlashAttribute("mensaje", "Rol actualizado correctamente.");
+    return "redirect:/detalle-grupo/" + idGrupo;
+}
+
+
+
+
 }

@@ -1,5 +1,5 @@
 // backend/splitit/src/main/java/com/splitit/DTO/DetalleSaldoDTO.java
-package com.splitit.DTO;
+package com.splitit.dto;
 
 import java.math.BigDecimal;
 

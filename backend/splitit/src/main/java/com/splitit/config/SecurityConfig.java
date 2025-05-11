@@ -14,6 +14,12 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
+import org.springframework.boot.web.server.WebServerFactoryCustomizer;
+import org.apache.catalina.connector.Connector;
+
+
+
 
 @Configuration
 @EnableWebSecurity
@@ -87,4 +93,21 @@ public class SecurityConfig {
         handler.setAlwaysUseDefaultTargetUrl(true);
         return handler;
     }
+
+
+    @Bean
+public TomcatServletWebServerFactory servletContainer() {
+    TomcatServletWebServerFactory factory = new TomcatServletWebServerFactory();
+    factory.addAdditionalTomcatConnectors(redirectConnector());
+    return factory;
+}
+
+private Connector redirectConnector() {
+    Connector connector = new Connector(TomcatServletWebServerFactory.DEFAULT_PROTOCOL);
+    connector.setScheme("http");
+    connector.setPort(8080); // escucha en HTTP
+    connector.setSecure(false);
+    connector.setRedirectPort(8443); // redirige a HTTPS
+    return connector;
+}
 }

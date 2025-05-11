@@ -9,9 +9,9 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.splitit.DTO.GrupoDTO;
-import com.splitit.DTO.ParticipanteDTO;
-import com.splitit.DTO.SaldoGrupoDTO;
+import com.splitit.dto.GrupoDTO;
+import com.splitit.dto.ParticipanteDTO;
+import com.splitit.dto.SaldoGrupoDTO;
 import com.splitit.model.Grupo;
 import com.splitit.model.Miembro;
 import com.splitit.model.Usuario;
@@ -84,53 +84,48 @@ public class GrupoService {
         return grupoRepository.findByMiembros_Usuario_Id(idUsuario);
     }
 
-    public Grupo crearGrupoDesdeDTO(GrupoDTO grupoDTO) {
-        if (grupoDTO.getNombre() == null || grupoDTO.getNombre().trim().isEmpty()) {
-            throw new RuntimeException("El nombre del grupo es obligatorio.");
-        }
-
-        Grupo grupo = new Grupo();
-        grupo.setNombre(grupoDTO.getNombre());
-        grupo.setDescripcion(grupoDTO.getDescripcion());
-        grupo.setFechaCreacion(new Date());
-        grupo.setIdCreador(grupoDTO.getIdCreador());
-
-        Grupo grupoGuardado = grupoRepository.save(grupo);
-
-        Usuario usuarioCreador = usuarioRepository.findById(grupoDTO.getIdCreador())
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-
-        Miembro miembroAdmin = new Miembro(usuarioCreador, grupoGuardado, "ADMIN");
-        miembroAdmin.setSaldo(BigDecimal.ZERO);
-        miembroRepository.save(miembroAdmin);
-
-        if (grupoDTO.getMiembros() != null) {
-            for (ParticipanteDTO participante : grupoDTO.getMiembros()) {
-                if (participante.getEmail() == null || participante.getEmail().trim().isEmpty() || 
-                    participante.getEmail().equals(usuarioCreador.getEmail())) {
-                    continue;
-                }
-
-                Optional<Usuario> optionalUsuario = usuarioRepository.findByEmail(participante.getEmail());
-                Usuario usuario;
-
-                if (optionalUsuario.isPresent()) {
-                    usuario = optionalUsuario.get();
-                } else {
-                    usuario = new Usuario();
-                    usuario.setNombre(participante.getNombre());
-                    usuario.setEmail(participante.getEmail());
-                    usuario = usuarioRepository.save(usuario);
-                }
-
-                Miembro nuevoMiembro = new Miembro(usuario, grupoGuardado, "MIEMBRO");
-                nuevoMiembro.setSaldo(BigDecimal.ZERO);
-                miembroRepository.save(nuevoMiembro);
-            }
-        }
-
-        return grupoGuardado;
+public Grupo crearGrupoDesdeDTO(GrupoDTO grupoDTO) {
+    if (grupoDTO.getNombre() == null || grupoDTO.getNombre().trim().isEmpty()) {
+        throw new RuntimeException("El nombre del grupo es obligatorio.");
     }
+
+    Grupo grupo = new Grupo();
+    grupo.setNombre(grupoDTO.getNombre());
+    grupo.setDescripcion(grupoDTO.getDescripcion());
+    grupo.setFechaCreacion(new Date());
+    grupo.setIdCreador(grupoDTO.getIdCreador());
+
+    Grupo grupoGuardado = grupoRepository.save(grupo);
+
+    Usuario usuarioCreador = usuarioRepository.findById(grupoDTO.getIdCreador())
+            .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+    Miembro miembroAdmin = new Miembro(usuarioCreador, grupoGuardado, "ADMIN");
+    miembroAdmin.setSaldo(BigDecimal.ZERO);
+    miembroRepository.save(miembroAdmin);
+
+    if (grupoDTO.getMiembros() != null) {
+        for (ParticipanteDTO participante : grupoDTO.getMiembros()) {
+            if (participante.getEmail() == null || participante.getEmail().trim().isEmpty() || 
+                participante.getEmail().equals(usuarioCreador.getEmail())) {
+                continue;
+            }
+
+            Optional<Usuario> optionalUsuario = usuarioRepository.findByEmail(participante.getEmail());
+
+            if (optionalUsuario.isEmpty()) {
+                throw new RuntimeException("El usuario con email " + participante.getEmail() + " no está registrado.");
+            }
+
+            Usuario usuario = optionalUsuario.get();
+            Miembro nuevoMiembro = new Miembro(usuario, grupoGuardado, "MIEMBRO");
+            nuevoMiembro.setSaldo(BigDecimal.ZERO);
+            miembroRepository.save(nuevoMiembro);
+        }
+    }
+
+    return grupoGuardado;
+}
 
     public Grupo obtenerGrupoPorId(Long id) {
         return buscarPorId(id);
