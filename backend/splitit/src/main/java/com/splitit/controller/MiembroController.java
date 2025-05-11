@@ -17,13 +17,12 @@ public class MiembroController {
     @Autowired
     private MiembroService miembroService;
 
-
-    // Endpoint para invitar a un usuario a un grupo
+    // ✅ CORREGIDO: Invitar por email (ya no por idUsuario)
     @PostMapping("/invitar")
     public ResponseEntity<Miembro> invitarMiembro(@Valid @RequestBody InvitacionDTO invitacionDTO) {
-        Miembro nuevoMiembro = miembroService.invitarMiembro(
+        Miembro nuevoMiembro = miembroService.invitarMiembroPorEmail(
                 invitacionDTO.getIdGrupo(),
-                invitacionDTO.getIdUsuario()
+                invitacionDTO.getEmail() // <- nuevo campo en DTO
         );
         return ResponseEntity.ok(nuevoMiembro);
     }
