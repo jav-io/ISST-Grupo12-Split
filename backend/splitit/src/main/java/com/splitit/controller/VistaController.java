@@ -435,6 +435,52 @@ public String abandonarGrupo(@PathVariable Long idGrupo, RedirectAttributes redi
     return "redirect:/dashboard";
 }
 
+// Método para cambiar el rol de un miembro
+@PostMapping("/grupo/{idGrupo}/cambiar-rol/{idMiembro}")
+public String cambiarRolMiembro(@PathVariable Long idGrupo,
+                                @PathVariable Long idMiembro,
+                                RedirectAttributes redirect) {
+    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    if (auth == null || !auth.isAuthenticated()) {
+        return "redirect:/login";
+    }
+
+    Usuario usuarioActual = usuarioService.buscarPorEmail(auth.getName())
+            .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+    Grupo grupo = grupoService.obtenerGrupoPorId(idGrupo);
+    Miembro miembro = miembroService.buscarPorId(idMiembro);
+
+    boolean esAdminActual = grupo.getMiembros().stream()
+            .anyMatch(m -> m.getUsuario().getId().equals(usuarioActual.getId()) && "ADMIN".equals(m.getRolEnGrupo()));
+
+    if (!esAdminActual) {
+        redirect.addFlashAttribute("error", "No tienes permiso para cambiar roles.");
+        return "redirect:/detalle-grupo/" + idGrupo;
+    }
+
+    if (!miembro.getGrupo().getId().equals(idGrupo)) {
+        redirect.addFlashAttribute("error", "El miembro no pertenece a este grupo.");
+        return "redirect:/detalle-grupo/" + idGrupo;
+    }
+
+    // Si es admin, lo pasamos a miembro. Si es miembro, lo pasamos a admin.
+    if ("ADMIN".equals(miembro.getRolEnGrupo())) {
+        long admins = grupo.getMiembros().stream().filter(m -> "ADMIN".equals(m.getRolEnGrupo())).count();
+        if (admins <= 1) {
+            redirect.addFlashAttribute("error", "No puedes quitar el rol de admin al único administrador.");
+            return "redirect:/detalle-grupo/" + idGrupo;
+        }
+        miembro.setRolEnGrupo("MIEMBRO");
+    } else {
+        miembro.setRolEnGrupo("ADMIN");
+    }
+
+    miembroService.actualizarMiembro(miembro);
+    redirect.addFlashAttribute("mensaje", "Rol actualizado correctamente.");
+    return "redirect:/detalle-grupo/" + idGrupo;
+}
+
 
 
 
