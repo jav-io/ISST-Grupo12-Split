@@ -1,10 +1,19 @@
 package com.splitit.model;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "deuda")
@@ -15,7 +24,7 @@ public class Deuda {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idDeuda;
 
-    @Column(precision = 10, scale = 2)
+    @Column(precision = 10, scale = 2, nullable = false)
     private BigDecimal monto;
 
     private boolean saldada = false;
@@ -23,19 +32,17 @@ public class Deuda {
     private LocalDateTime fecha = LocalDateTime.now();
 
     @ManyToOne
-    @JoinColumn(name = "idMiembro")
+    @JoinColumn(name = "idMiembro", nullable = false)
     private Miembro deudor;
 
     @ManyToOne
-    @JoinColumn(name = "idGasto")
+    @JoinColumn(name = "idGasto", nullable = false)
     private Gasto gasto;
 
-    // Constructor vacío
     public Deuda() {
         this.saldada = false;
     }
 
-    // Constructor con campos
     public Deuda(BigDecimal monto, Gasto gasto, Miembro deudor) {
         this.monto = monto;
         this.gasto = gasto;
@@ -43,7 +50,6 @@ public class Deuda {
         this.saldada = false;
     }
 
-    // Getters y setters
     public Long getIdDeuda() {
         return idDeuda;
     }

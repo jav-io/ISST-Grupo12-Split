@@ -2,13 +2,15 @@ package com.splitit.service;
 
 import java.math.BigDecimal;
 import java.util.List;
-import com.splitit.model.Miembro;
-import com.splitit.model.Grupo;
-import com.splitit.model.Usuario;
-import com.splitit.repository.MiembroRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+
+import com.splitit.model.Grupo;
+import com.splitit.model.Miembro;
+import com.splitit.model.Usuario;
+import com.splitit.repository.MiembroRepository;
 
 @Service
 public class MiembroService {
@@ -55,4 +57,30 @@ public class MiembroService {
     public Miembro actualizarMiembro(Miembro miembro) {
         return miembroRepository.save(miembro);
     }
+
+    // Método para eliminar un miembro de un grupo
+    // Este método no elimina al usuario, solo lo elimina del grupo
+    public void eliminarMiembro(Long idMiembro) {
+        Miembro miembro = miembroRepository.findById(idMiembro)
+            .orElseThrow(() -> new RuntimeException("Miembro no encontrado"));
+    
+        // Elimina todas las deudas asociadas
+        if (miembro.getDeudasPendientes() != null) {
+            miembro.getDeudasPendientes().clear();
+        }
+    
+        // Elimina todos los gastos pagados
+        if (miembro.getGastosPagados() != null) {
+            miembro.getGastosPagados().clear();
+        }
+    
+        // Muy importante: desvincula al miembro de su grupo y usuario
+        miembro.setGrupo(null);
+        miembro.setUsuario(null);
+    
+        miembroRepository.delete(miembro);
+    }
+    
+    
+    
 }
