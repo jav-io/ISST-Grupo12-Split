@@ -1,5 +1,5 @@
 // backend/splitit/src/main/java/com/splitit/DTO/PasswordResetDTO.java
-package com.splitit.DTO;
+package com.splitit.dto;
 
 public class PasswordResetDTO {
     private String email;

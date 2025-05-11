@@ -1,4 +1,4 @@
-package com.splitit.DTO;
+package com.splitit.dto;
 
 import java.math.BigDecimal;
 

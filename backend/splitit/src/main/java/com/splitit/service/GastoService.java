@@ -9,10 +9,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.splitit.DTO.GastoConParticipantesDTO;
-import com.splitit.DTO.GastoDTO;
-import com.splitit.DTO.GastoResponseDTO;
-import com.splitit.DTO.ParticipanteDTO;
+import com.splitit.dto.GastoConParticipantesDTO;
+import com.splitit.dto.GastoDTO;
+import com.splitit.dto.GastoResponseDTO;
+import com.splitit.dto.ParticipanteDTO;
 import com.splitit.model.Deuda;
 import com.splitit.model.Gasto;
 import com.splitit.model.Grupo;

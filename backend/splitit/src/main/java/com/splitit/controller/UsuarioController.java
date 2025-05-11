@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.splitit.DTO.PasswordResetDTO;
+import com.splitit.dto.PasswordResetDTO;
 import com.splitit.model.Usuario;
 import com.splitit.repository.UsuarioRepository;
 import com.splitit.service.CorreoService;

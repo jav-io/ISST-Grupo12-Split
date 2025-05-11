@@ -12,12 +12,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.splitit.DTO.GastoConParticipantesDTO;
-import com.splitit.DTO.GastoDTO;
-import com.splitit.DTO.GastoResponseDTO;
+import com.splitit.dto.GastoConParticipantesDTO;
+import com.splitit.dto.GastoDTO;
+import com.splitit.dto.GastoResponseDTO;
 import com.splitit.model.Gasto;
 import com.splitit.service.GastoService;
 import com.splitit.service.UsuarioService;
+import com.splitit.model.Usuario;
+import org.springframework.http.HttpStatus;
+;
 
 import jakarta.validation.Valid;
 

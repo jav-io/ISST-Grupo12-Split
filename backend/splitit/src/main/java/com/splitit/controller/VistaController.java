@@ -18,10 +18,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.splitit.DTO.GastoConParticipantesDTO;
-import com.splitit.DTO.GastoDTO;
-import com.splitit.DTO.GrupoDTO;
-import com.splitit.DTO.SaldoGrupoDTO;
+import com.splitit.dto.GastoConParticipantesDTO;
+import com.splitit.dto.GastoDTO;
+import com.splitit.dto.GrupoDTO;
+import com.splitit.dto.SaldoGrupoDTO;
 import com.splitit.model.Gasto;
 import com.splitit.model.Grupo;
 import com.splitit.model.Miembro;
@@ -77,20 +77,26 @@ public class VistaController {
         return "crear-grupo";
     }
 
-    @PostMapping("/crear-grupo")
-    public String crearGrupo(@ModelAttribute GrupoDTO grupoDTO) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null || !auth.isAuthenticated()) {
-            return "redirect:/login";
-        }
+   @PostMapping("/crear-grupo")
+public String crearGrupo(@ModelAttribute GrupoDTO grupoDTO, Model model) {
+    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    if (auth == null || !auth.isAuthenticated()) {
+        return "redirect:/login";
+    }
 
+    try {
         Usuario creador = usuarioService.buscarPorEmail(auth.getName())
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
         grupoDTO.setIdCreador(creador.getId());
         grupoService.crearGrupoDesdeDTO(grupoDTO);
-
         return "redirect:/dashboard";
+    } catch (RuntimeException ex) {
+        model.addAttribute("grupo", grupoDTO);
+        model.addAttribute("error", ex.getMessage());
+        return "crear-grupo"; // Asegúrate de que esta plantilla exista
     }
+}
+
 
     @GetMapping("/detalle-grupo/{id}")
     public String mostrarDetalleGrupo(@PathVariable Long id, Model model) {
