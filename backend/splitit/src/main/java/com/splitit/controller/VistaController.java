@@ -30,6 +30,7 @@ import com.splitit.service.GastoService;
 import com.splitit.service.GrupoService;
 import com.splitit.service.MiembroService;
 import com.splitit.service.UsuarioService;
+import java.util.Optional;
 
 @Controller
 public class VistaController {
@@ -306,26 +307,61 @@ public String crearGrupo(@ModelAttribute GrupoDTO grupoDTO, Model model) {
         }
     }
 
-    @PostMapping("/grupo/{id}/añadir-miembro")
+//     @PostMapping("/grupo/{id}/añadir-miembro")
+// public String añadirMiembroAlGrupo(@PathVariable Long id,
+//                                    @RequestParam String nombre,
+//                                    @RequestParam String email,
+//                                    RedirectAttributes redirect) {
+//     // Buscar o crear usuario
+//     Usuario usuario = usuarioService.buscarOCrearPorEmail(email, nombre);
+
+//     // Buscar grupo
+//     Grupo grupo = grupoService.buscarPorId(id);
+
+//     // Verificar si ya es miembro
+//     boolean yaEsMiembro = grupo.getMiembros().stream()
+//         .anyMatch(m -> m.getUsuario().getEmail().equals(email));
+//     if (yaEsMiembro) {
+//         redirect.addFlashAttribute("error", "Este usuario ya es miembro del grupo.");
+//         return "redirect:/detalle-grupo/" + id;
+//     }
+
+//     // Crear miembro con rol "MIEMBRO" y saldo 0
+//     Miembro nuevoMiembro = new Miembro();
+//     nuevoMiembro.setGrupo(grupo);
+//     nuevoMiembro.setUsuario(usuario);
+//     nuevoMiembro.setRolEnGrupo("MIEMBRO");
+//     nuevoMiembro.setSaldo(BigDecimal.ZERO);
+
+//     miembroService.crearMiembro(nuevoMiembro);
+
+//     redirect.addFlashAttribute("mensaje", "Miembro añadido correctamente.");
+//     return "redirect:/detalle-grupo/" + id;
+// }
+@PostMapping("/grupo/{id}/añadir-miembro")
 public String añadirMiembroAlGrupo(@PathVariable Long id,
                                    @RequestParam String nombre,
                                    @RequestParam String email,
                                    RedirectAttributes redirect) {
-    // Buscar o crear usuario
-    Usuario usuario = usuarioService.buscarOCrearPorEmail(email, nombre);
+    // Buscar usuario por email
+    Optional<Usuario> usuarioOpt = usuarioService.buscarPorEmail(email);
 
-    // Buscar grupo
+    if (usuarioOpt.isEmpty()) {
+        redirect.addFlashAttribute("error", "El usuario con email " + email + " no está registrado.");
+        return "redirect:/detalle-grupo/" + id;
+    }
+
+    Usuario usuario = usuarioOpt.get();
+
     Grupo grupo = grupoService.buscarPorId(id);
 
-    // Verificar si ya es miembro
     boolean yaEsMiembro = grupo.getMiembros().stream()
-        .anyMatch(m -> m.getUsuario().getEmail().equals(email));
+        .anyMatch(m -> m.getUsuario().getId().equals(usuario.getId()));
     if (yaEsMiembro) {
         redirect.addFlashAttribute("error", "Este usuario ya es miembro del grupo.");
         return "redirect:/detalle-grupo/" + id;
     }
 
-    // Crear miembro con rol "MIEMBRO" y saldo 0
     Miembro nuevoMiembro = new Miembro();
     nuevoMiembro.setGrupo(grupo);
     nuevoMiembro.setUsuario(usuario);
