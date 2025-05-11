@@ -156,8 +156,8 @@
       <span th:text="${miembro.usuario.nombre} + ' – ' + ${miembro.usuario.email}">Nombre – Email</span>
       <span th:if="${miembro.rolEnGrupo == 'ADMIN'}">(Admin)</span>
 
-      <!-- Botón de eliminar (solo visible para administradores y si no es uno mismo) -->
-      <form th:if="${esAdmin} and ${miembro.usuario.id} != ${usuarioId}" 
+      <!-- Botón de eliminar (solo visible para administradores) -->
+      <form th:if="${esAdmin}" 
             th:action="@{/grupo/{idGrupo}/eliminar-miembro/{idMiembro}(idGrupo=${grupo.id}, idMiembro=${miembro.id})}" 
             method="post" style="display:inline;">
         <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
@@ -167,8 +167,18 @@
         </button>
       </form>
 
-      <!-- Botón de abandonar grupo (si es el usuario, el grupo no está cerrado y no es único admin) -->
-      <form th:if="${miembro.usuario.id == usuarioId} and !${grupo.cerrado}" 
+      <!-- Botón para asignar/quitar rol de admin (solo si eres admin y el miembro no eres tú) -->
+      <form th:if="${esAdmin} and ${miembro.usuario.id} != ${usuarioId}" 
+            th:action="@{'/grupo/' + ${grupo.id} + '/cambiar-rol/' + ${miembro.id}}" 
+            method="post" style="display:inline;">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+        <button type="submit" class="btn btn-sm btn-secondary"
+                th:text="${miembro.rolEnGrupo == 'ADMIN'} ? '👤 Quitar admin' : '⭐ Hacer admin'">
+        </button>
+      </form>
+
+      <!-- Botón para abandonar grupo (si eres tú mismo, el grupo está abierto y no eres único admin) -->
+      <form th:if="${miembro.usuario.id == usuarioId} and !${grupo.cerrado} and !${esUnicoAdmin}" 
             th:action="@{'/grupo/' + ${grupo.id} + '/abandonar'}" 
             method="post" style="display:inline;">
         <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
@@ -180,6 +190,7 @@
     </li>
   </ul>
 </div>
+
 
 <!-- Mensajes de éxito o error -->
 <div th:if="${mensaje}" style="margin: 15px 0; padding: 12px; background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; border-radius: 6px;">
