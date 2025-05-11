@@ -1,73 +1,81 @@
 package com.splitit.selenium;
 
-import org.junit.jupiter.api.*;
-import org.openqa.selenium.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.edge.EdgeDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
-import static org.junit.jupiter.api.Assertions.*;
+import java.time.Duration;
 
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 public class RegistroLoginTest {
 
-    private static WebDriver driver;
-    private static String email;
+    private WebDriver driver;
 
-    @BeforeAll
-    public static void setUp() {
-        // Si no lo tienes en PATH, descomenta y ajusta esta línea:
-        // System.setProperty("webdriver.edge.driver", "C:\\ruta\\msedgedriver.exe");
+    @BeforeEach
+    public void setUp() {
+        System.setProperty("webdriver.edge.driver", "C:\\WebDriver\\msedgedriver.exe");
         driver = new EdgeDriver();
+    }
 
-        // Generar un email único
-        email = "selenium" + System.currentTimeMillis() + "@example.com";
+    @AfterEach
+    public void tearDown() {
+        if (driver != null) {
+            driver.quit();
+        }
     }
 
     @Test
-    @Order(1)
     public void testRegistroUsuario() {
         driver.get("http://localhost:8080/register");
 
-        driver.findElement(By.name("nombre")).sendKeys("Selenium Test");
+        String email = "registro" + System.currentTimeMillis() + "@test.com";
+
+        // Registro
+        driver.findElement(By.name("nombre")).sendKeys("Test Registro");
         driver.findElement(By.name("email")).sendKeys(email);
-        driver.findElement(By.name("password")).sendKeys("123456");
+        driver.findElement(By.name("password")).sendKeys("password123");
+        driver.findElement(By.cssSelector("button[type='submit']")).click();
 
-        driver.findElement(By.cssSelector("form button")).click();
+        // Esperar redirección al login
+        new WebDriverWait(driver, Duration.ofSeconds(10))
+                .until(ExpectedConditions.urlContains("/login"));
 
-        // Asegurar que redirige al login (esto puede cambiar según tu app)
-        assertTrue(driver.getCurrentUrl().contains("/login"));
+        String contenido = driver.getPageSource().toLowerCase();
+        assertTrue(contenido.contains("registro exitoso"), "El registro no redirigió al login con mensaje de éxito");
     }
 
     @Test
-    @Order(2)
-    public void testLoginUsuario() {
-        driver.get("http://localhost:8080/login");
+    public void testLoginUsuario() throws InterruptedException {
+        driver.get("http://localhost:8080/register");
 
-     // Rellenar login con el mismo email generado
+        String email = "usuario" + System.currentTimeMillis() + "@test.com";
+
+        // Registro
+        driver.findElement(By.name("nombre")).sendKeys("Usuario Test");
         driver.findElement(By.name("email")).sendKeys(email);
-        driver.findElement(By.name("password")).sendKeys("123456");
+        driver.findElement(By.name("password")).sendKeys("password123");
+        driver.findElement(By.cssSelector("button[type='submit']")).click();
 
-     driver.findElement(By.cssSelector("form button")).click();
+        // Esperar redirección al login
+        new WebDriverWait(driver, Duration.ofSeconds(10))
+                .until(ExpectedConditions.urlContains("/login"));
 
-        // Esperar un momento para que se procese el login (puedes ajustar el tiempo si lo necesitas)
-        try {
-        Thread.sleep(1000); // puedes usar WebDriverWait para algo más fino si quieres
-     } catch (InterruptedException e) {
-        e.printStackTrace();
-     }
+        // Login
+        driver.findElement(By.name("email")).sendKeys(email);
+        driver.findElement(By.name("password")).sendKeys("password123");
+        driver.findElement(By.cssSelector("button[type='submit']")).click();
 
-     String currentUrl = driver.getCurrentUrl();
-        String pageSource = driver.getPageSource();
+        // Esperar redirección al dashboard
+        new WebDriverWait(driver, Duration.ofSeconds(10))
+                .until(ExpectedConditions.urlContains("/dashboard"));
 
-     System.out.println("URL actual tras login: " + currentUrl);
-        System.out.println("Contenido: " + pageSource);
-
-     // Asegurarse de que NO aparece el mensaje de error
-        assertFalse(currentUrl.contains("error"));
-        assertFalse(pageSource.toLowerCase().contains("incorrectos"));
-    }
-
-    @AfterAll
-    public static void tearDown() {
-        driver.quit();
+        String contenido = driver.getPageSource().toLowerCase();
+        assertTrue(contenido.contains("mis grupos"), "El login no redirigió correctamente al área privada");
     }
 }

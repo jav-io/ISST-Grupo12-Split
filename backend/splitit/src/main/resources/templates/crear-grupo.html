@@ -135,25 +135,13 @@
       <h1>Split.it</h1>
       <nav>
         <a th:href="@{/}"><i class="fas fa-home"></i> Inicio</a>
-        <a th:href="@{/dashboard}"
-          ><i class="fas fa-tachometer-alt"></i> Panel</a
-        >
+        <a th:href="@{/dashboard}"><i class="fas fa-tachometer-alt"></i> Panel</a>
       </nav>
     </header>
 
     <div class="form-container">
       <h2>Crear nuevo grupo</h2>
-      <div
-        th:if="${error}"
-        style="
-          background-color: #ffe5e5;
-          border: 1px solid #cc0000;
-          color: #cc0000;
-          padding: 10px;
-          margin-bottom: 15px;
-          border-radius: 5px;
-        "
-      >
+      <div th:if="${error}" style="background-color: #ffe5e5; border: 1px solid #cc0000; color: #cc0000; padding: 10px; margin-bottom: 15px; border-radius: 5px;">
         <p th:utext="${error}"></p>
       </div>
 
@@ -162,6 +150,7 @@
         <input
           type="text"
           id="nombre"
+          name="nombre"
           th:field="*{nombre}"
           placeholder="Ej. Piso compartido"
           required
@@ -170,6 +159,7 @@
         <label for="descripcion">Descripción</label>
         <textarea
           id="descripcion"
+          name="descripcion"
           th:field="*{descripcion}"
           rows="3"
           placeholder="Describe el grupo..."
@@ -195,11 +185,7 @@
             />
           </div>
         </div>
-        <button
-          type="button"
-          class="add-miembro-btn"
-          onclick="agregarMiembro()"
-        >
+        <button type="button" class="add-miembro-btn" onclick="agregarMiembro()">
           <i class="fas fa-plus"></i> Añadir otro miembro
         </button>
 
