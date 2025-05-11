@@ -331,6 +331,7 @@ public String añadirMiembroAlGrupo(@PathVariable Long id,
     redirect.addFlashAttribute("mensaje", "Miembro añadido correctamente.");
     return "redirect:/detalle-grupo/" + id;
 }
+
 // Método para eliminar un miembro del grupo
 @PostMapping("/grupo/{idGrupo}/eliminar-miembro/{idMiembro}")
 public String eliminarMiembro(@PathVariable Long idGrupo,
@@ -371,10 +372,12 @@ public String eliminarMiembro(@PathVariable Long idGrupo,
         }
     }
 
+    // Verifica que el saldo sea 0
     if (miembroAEliminar.getSaldoActual().compareTo(BigDecimal.ZERO) != 0) {
-        redirect.addFlashAttribute("error", "El miembro tiene saldo pendiente y no puede ser eliminado.");
+        redirect.addFlashAttribute("error", "No se puede eliminar al miembro: debe saldar sus deudas antes de realizar esta operación.");
         return "redirect:/detalle-grupo/" + idGrupo;
     }
+
 
     // Llamada al método actualizado
     miembroService.eliminarMiembro(idMiembro);
@@ -422,9 +425,10 @@ public String abandonarGrupo(@PathVariable Long idGrupo, RedirectAttributes redi
 
     // Solo puede abandonar si no tiene saldo pendiente
     if (miembro.getSaldo().compareTo(BigDecimal.ZERO) != 0) {
-        redirect.addFlashAttribute("error", "No puedes abandonar el grupo con saldo pendiente.");
+        redirect.addFlashAttribute("error", "No puedes abandonar el grupo: debes saldar tus deudas antes de realizar esta operación.");
         return "redirect:/detalle-grupo/" + idGrupo;
     }
+    
 
     miembroService.eliminarMiembro(miembro.getId());
     redirect.addFlashAttribute("mensaje", "Has abandonado el grupo correctamente.");
