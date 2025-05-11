@@ -42,16 +42,32 @@ public class MiembroService {
     }
 
     // Método para invitar a un usuario a un grupo con rol "MEMBER"
-    public Miembro invitarMiembro(Long idGrupo, Long idUsuario) {
-        // Obtener el grupo
-        Grupo grupo = grupoService.buscarPorId(idGrupo);
-        // Obtener el usuario a invitar
-        Usuario usuario = usuarioService.buscarPorId(idUsuario);
-        // Crear el miembro con rol "MEMBER"
-        Miembro miembro = new Miembro(usuario, grupo, "MEMBER");
-        miembro.setSaldo(BigDecimal.ZERO);
-        return miembroRepository.save(miembro);
+    // public Miembro invitarMiembro(Long idGrupo, Long idUsuario) {
+    //     // Obtener el grupo
+    //     Grupo grupo = grupoService.buscarPorId(idGrupo);
+    //     // Obtener el usuario a invitar
+    //     Usuario usuario = usuarioService.buscarPorId(idUsuario);
+    //     // Crear el miembro con rol "MEMBER"
+    //     Miembro miembro = new Miembro(usuario, grupo, "MEMBER");
+    //     miembro.setSaldo(BigDecimal.ZERO);
+    //     return miembroRepository.save(miembro);
+    // }
+public Miembro invitarMiembroPorEmail(Long idGrupo, String email) {
+    Grupo grupo = grupoService.buscarPorId(idGrupo);
+
+    Usuario usuario = usuarioService.buscarPorEmail(email)
+        .orElseThrow(() -> new RuntimeException("El usuario con email " + email + " no está registrado."));
+
+    boolean yaEsMiembro = grupo.getMiembros().stream()
+        .anyMatch(m -> m.getUsuario().getId().equals(usuario.getId()));
+    if (yaEsMiembro) {
+        throw new RuntimeException("Este usuario ya es miembro del grupo.");
     }
+
+    Miembro miembro = new Miembro(usuario, grupo, "MEMBER");
+    miembro.setSaldo(BigDecimal.ZERO);
+    return miembroRepository.save(miembro);
+}
 
     // ✅ Método añadido para actualizar el saldo u otros datos de un miembro
     public Miembro actualizarMiembro(Miembro miembro) {
