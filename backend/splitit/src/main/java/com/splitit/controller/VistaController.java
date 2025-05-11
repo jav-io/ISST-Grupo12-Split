@@ -1,5 +1,6 @@
 package com.splitit.controller;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -14,6 +15,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.splitit.DTO.GastoConParticipantesDTO;
 import com.splitit.DTO.GastoDTO;
@@ -21,10 +24,12 @@ import com.splitit.DTO.GrupoDTO;
 import com.splitit.DTO.SaldoGrupoDTO;
 import com.splitit.model.Gasto;
 import com.splitit.model.Grupo;
+import com.splitit.model.Miembro;
 import com.splitit.model.Usuario;
 import com.splitit.service.GastoService;
 import com.splitit.service.GrupoService;
 import com.splitit.service.UsuarioService;
+import com.splitit.service.MiembroService;
 
 @Controller
 public class VistaController {
@@ -37,6 +42,9 @@ public class VistaController {
 
     @Autowired
     private UsuarioService usuarioService;
+
+    @Autowired
+    private MiembroService miembroService;
 
     @GetMapping("/")
     public String inicio() {
@@ -283,4 +291,37 @@ public class VistaController {
             return "redirect:/error";
         }
     }
+
+    @PostMapping("/grupo/{id}/añadir-miembro")
+public String añadirMiembroAlGrupo(@PathVariable Long id,
+                                   @RequestParam String nombre,
+                                   @RequestParam String email,
+                                   RedirectAttributes redirect) {
+    // Buscar o crear usuario
+    Usuario usuario = usuarioService.buscarOCrearPorEmail(email, nombre);
+
+    // Buscar grupo
+    Grupo grupo = grupoService.buscarPorId(id);
+
+    // Verificar si ya es miembro
+    boolean yaEsMiembro = grupo.getMiembros().stream()
+        .anyMatch(m -> m.getUsuario().getEmail().equals(email));
+    if (yaEsMiembro) {
+        redirect.addFlashAttribute("error", "Este usuario ya es miembro del grupo.");
+        return "redirect:/detalle-grupo/" + id;
+    }
+
+    // Crear miembro con rol "MIEMBRO" y saldo 0
+    Miembro nuevoMiembro = new Miembro();
+    nuevoMiembro.setGrupo(grupo);
+    nuevoMiembro.setUsuario(usuario);
+    nuevoMiembro.setRolEnGrupo("MIEMBRO");
+    nuevoMiembro.setSaldo(BigDecimal.ZERO);
+
+    miembroService.crearMiembro(nuevoMiembro);
+
+    redirect.addFlashAttribute("mensaje", "Miembro añadido correctamente.");
+    return "redirect:/detalle-grupo/" + id;
+}
+
 }

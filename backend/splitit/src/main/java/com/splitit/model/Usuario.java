@@ -1,12 +1,28 @@
 package com.splitit.model;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import jakarta.persistence.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import java.util.*;
+
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "usuario")
@@ -34,6 +50,11 @@ public class Usuario implements UserDetails {
 
     @Column(name = "token_recuperacion")
     private String tokenRecuperacion;
+
+    @Column(nullable = false)
+    private boolean registrado = true;
+
+
 
     public String getTokenRecuperacion() {
         return tokenRecuperacion;
@@ -147,4 +168,13 @@ public class Usuario implements UserDetails {
     public Long getId() {
         return idUsuario;
     }
+
+    public Boolean getRegistrado() {
+        return registrado;
+    }
+    
+    public void setRegistrado(Boolean registrado) {
+        this.registrado = registrado;
+    }
+    
 }

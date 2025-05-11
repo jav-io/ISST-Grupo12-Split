@@ -1,13 +1,14 @@
 package com.splitit.service;
 
-import com.splitit.model.Usuario;
-import com.splitit.repository.UsuarioRepository;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import com.splitit.model.Usuario;
+import com.splitit.repository.UsuarioRepository;
 
 @Service
 public class UsuarioService {
@@ -97,4 +98,20 @@ public class UsuarioService {
             }
         }
     }
+
+public Usuario buscarOCrearPorEmail(String email, String nombre) {
+    Optional<Usuario> existente = usuarioRepository.findByEmail(email);
+    if (existente.isPresent()) {
+        return existente.get();
+    }
+
+    Usuario usuarioFantasma = new Usuario();
+    usuarioFantasma.setEmail(email);
+    usuarioFantasma.setNombre(nombre);
+    usuarioFantasma.setPassword(passwordEncoder.encode("temporal")); // o algo aleatorio
+    usuarioFantasma.setRegistrado(false);
+    return usuarioRepository.save(usuarioFantasma);
+}
+
+    
 }

@@ -152,7 +152,22 @@
         <span th:if="${miembro.rolEnGrupo == 'ADMIN'}" style="font-weight: bold; color: #0d6efd;"> (Admin)</span>
       </li>
     </ul>
+
+    <!-- Formulario para añadir nuevo miembro (visible solo si es admin) -->
+    <div th:if="${esAdmin}" style="margin-top: 20px;">
+      <h5>Añadir nuevo miembro</h5>
+      <form th:action="@{/grupo/{id}/añadir-miembro(id=${grupo.id})}" method="post">
+        <div class="form-group">
+          <input type="text" class="form-control" name="nombre" placeholder="Nombre del nuevo miembro" required />
+        </div>
+        <div class="form-group" style="margin-top: 10px;">
+          <input type="email" class="form-control" name="email" placeholder="Email del nuevo miembro" required />
+        </div>
+        <button type="submit" class="btn btn-primary" style="margin-top: 10px;">Añadir</button>
+      </form>
+    </div>
   </div>
+
 
   <!-- Gastos -->
   <div class="section">
