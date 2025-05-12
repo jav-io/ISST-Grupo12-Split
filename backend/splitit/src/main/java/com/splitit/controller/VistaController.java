@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +33,6 @@ import com.splitit.service.GrupoService;
 import com.splitit.service.MailService;
 import com.splitit.service.MiembroService;
 import com.splitit.service.UsuarioService;
-import java.util.Optional;
 
 @Controller
 public class VistaController {

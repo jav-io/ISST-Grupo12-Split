@@ -297,29 +297,29 @@
               </button>
             </form>
 
-            <!-- Botón para asignar/quitar rol de admin -->
+          <!-- Botón para asignar/quitar rol de admin -->
             <form
-              th:if="${esAdmin and miembro.usuario.id != usuarioId}"
-              th:action="@{/grupo/{id}/cambiar-rol(id=${grupo.id})}"
-              method="post"
-              class="inline-form"
+            th:if="${esAdmin and miembro.usuario.id != usuarioId}"
+            th:action="@{'/grupo/' + ${grupo.id} + '/cambiar-rol/' + ${miembro.id}}"
+            method="post"
+            class="inline-form"
             >
-              <input type="hidden" name="idMiembro" th:value="${miembro.id}" />
-              <input
-                type="hidden"
-                th:name="${_csrf.parameterName}"
-                th:value="${_csrf.token}"
-              />
-              <button type="submit" class="btn">
-                <i
-                  class="fas"
-                  th:classappend="${miembro.rolEnGrupo == 'ADMIN'} ? 'fa-user-shield' : 'fa-user-plus'"
-                ></i>
-                <span
-                  th:text="${miembro.rolEnGrupo == 'ADMIN'} ? 'Quitar admin' : 'Hacer admin'"
-                  >Cambiar rol</span
-                >
-              </button>
+            <input
+              type="hidden"
+              th:name="${_csrf.parameterName}"
+              th:value="${_csrf.token}"
+            />
+            <button type="submit" class="btn">
+              <i
+                class="fas"
+                th:classappend="${miembro.rolEnGrupo == 'ADMIN'} ? 'fa-user-shield' : 'fa-user-plus'"
+              ></i>
+              <span
+                th:text="${miembro.rolEnGrupo == 'ADMIN'} ? 'Quitar admin' : 'Hacer admin'"
+              >
+                Cambiar rol
+              </span>
+            </button>
             </form>
           </li>
         </ul>
