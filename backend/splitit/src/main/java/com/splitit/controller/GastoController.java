@@ -18,9 +18,6 @@ import com.splitit.dto.GastoResponseDTO;
 import com.splitit.model.Gasto;
 import com.splitit.service.GastoService;
 import com.splitit.service.UsuarioService;
-import com.splitit.model.Usuario;
-import org.springframework.http.HttpStatus;
-
 
 import jakarta.validation.Valid;
 

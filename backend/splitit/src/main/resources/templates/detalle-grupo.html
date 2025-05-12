@@ -325,7 +325,7 @@
         </ul>
 
         <!-- Formulario para añadir nuevo miembro -->
-        <div th:if="${esAdmin}" style="margin-top: 20px">
+        <div th:if="${esAdmin and !grupo.cerrado}"  style="margin-top: 20px">
           <h5 style="margin-bottom: 10px">Añadir nuevo miembro</h5>
           <form
             th:action="@{/grupo/{id}/añadir-miembro(id=${grupo.id})}"

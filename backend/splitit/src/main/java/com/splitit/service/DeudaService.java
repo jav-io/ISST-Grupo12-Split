@@ -1,17 +1,19 @@
 package com.splitit.service;
 
-import com.splitit.model.Deuda;
-import com.splitit.repository.DeudaRepository;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import com.splitit.dto.TransferenciaDTO;
+import com.splitit.model.Deuda;
 import com.splitit.model.Grupo;
 import com.splitit.model.Miembro;
+import com.splitit.repository.DeudaRepository;
 import com.splitit.repository.GrupoRepository;
-import java.math.BigDecimal;
-import java.util.*;
-
-import java.util.List;
 
 @Service
 public class DeudaService {
