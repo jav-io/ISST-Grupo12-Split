@@ -326,28 +326,40 @@
 
         <!-- Formulario para añadir nuevo miembro -->
         <div th:if="${esAdmin}" style="margin-top: 20px">
-          <h5>Añadir nuevo miembro</h5>
+          <h5 style="margin-bottom: 10px">Añadir nuevo miembro</h5>
           <form
             th:action="@{/grupo/{id}/añadir-miembro(id=${grupo.id})}"
             method="post"
           >
-            <div class="form-group">
+            <div style="display: flex; gap: 10px; flex-wrap: wrap">
               <input
                 type="text"
                 name="nombre"
                 placeholder="Nombre del nuevo miembro"
                 required
+                style="
+                  flex: 1;
+                  padding: 12px;
+                  border-radius: 8px;
+                  border: 1px solid #ccc;
+                  min-width: 200px;
+                "
               />
-            </div>
-            <div class="form-group" style="margin-top: 10px">
               <input
                 type="email"
                 name="email"
                 placeholder="Email del nuevo miembro"
                 required
+                style="
+                  flex: 1;
+                  padding: 12px;
+                  border-radius: 8px;
+                  border: 1px solid #ccc;
+                  min-width: 200px;
+                "
               />
             </div>
-            <button type="submit" class="btn" style="margin-top: 10px">
+            <button type="submit" class="btn" style="margin-top: 12px">
               Añadir
             </button>
           </form>

@@ -22,6 +22,7 @@ import com.splitit.dto.GastoConParticipantesDTO;
 import com.splitit.dto.GastoDTO;
 import com.splitit.dto.GrupoDTO;
 import com.splitit.dto.SaldoGrupoDTO;
+import com.splitit.dto.TransferenciaDTO;
 import com.splitit.model.Gasto;
 import com.splitit.model.Grupo;
 import com.splitit.model.Miembro;
@@ -139,6 +140,9 @@ public String crearGrupo(@ModelAttribute GrupoDTO grupoDTO, Model model) {
     
         model.addAttribute("grupo", grupo);
         model.addAttribute("gastos", gastos);
+        List<TransferenciaDTO> transferencias = grupoService.calcularTransferenciasSugeridas(id);
+model.addAttribute("transferencias", transferencias);
+
         return "detalle-grupo";
     }
     
@@ -197,24 +201,26 @@ public String crearGrupo(@ModelAttribute GrupoDTO grupoDTO, Model model) {
         }
     }
 
-    @GetMapping("/saldo-grupo/{id}")
-    public String mostrarSaldoGrupo(@PathVariable Long id, Model model) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null || !auth.isAuthenticated()) {
-            return "redirect:/login";
-        }
-
-        Usuario usuario = usuarioService.buscarPorEmail(auth.getName())
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-
-        Grupo grupo = grupoService.obtenerGrupoPorId(id);
-        List<SaldoGrupoDTO> saldos = grupoService.consultarSaldosGrupo(id);
-
-        model.addAttribute("grupo", grupo);
-        model.addAttribute("saldos", saldos);
-
-        return "saldo-grupo";
+  @GetMapping("/saldo-grupo/{id}")
+public String mostrarSaldoGrupo(@PathVariable Long id, Model model) {
+    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    if (auth == null || !auth.isAuthenticated()) {
+        return "redirect:/login";
     }
+
+    Usuario usuario = usuarioService.buscarPorEmail(auth.getName())
+            .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+    Grupo grupo = grupoService.obtenerGrupoPorId(id);
+    List<SaldoGrupoDTO> saldos = grupoService.consultarSaldosGrupo(id);
+    List<TransferenciaDTO> transferencias = grupoService.calcularTransferenciasSugeridas(id); // <-- AÑADE ESTO
+
+    model.addAttribute("grupo", grupo);
+    model.addAttribute("saldos", saldos);
+    model.addAttribute("transferencias", transferencias); // <-- Y ESTO
+
+    return "saldo-grupo";
+}
 
     @GetMapping("/recuperar-password")
     public String mostrarFormularioRecuperarPassword() {
