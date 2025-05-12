@@ -24,43 +24,69 @@ public class AnadirGastoTest {
             // Paso 1: Registro
             driver.get("http://localhost:8080/register");
             String randomId = UUID.randomUUID().toString().substring(0, 8);
-            wait.until(ExpectedConditions.visibilityOfElementLocated(By.name("nombre"))).sendKeys("Test" + randomId);
-            driver.findElement(By.name("email")).sendKeys("test" + randomId + "@test.com");
-            driver.findElement(By.name("password")).sendKeys("1234");
-            driver.findElement(By.name("confirmarPassword")).sendKeys("1234"); 
-            driver.findElement(By.cssSelector("button[type='submit']")).click();
+            String nombre = "Test" + randomId;
+            String email = "test" + randomId + "@test.com";
 
+            wait.until(ExpectedConditions.visibilityOfElementLocated(By.name("nombre"))).sendKeys(nombre);
+            driver.findElement(By.name("email")).sendKeys(email);
+            driver.findElement(By.name("password")).sendKeys("1234");
+            driver.findElement(By.cssSelector("form")).submit();
+            wait.until(ExpectedConditions.urlContains("/login?registered"));
+
+            // Paso 2: Login
+            driver.get("http://localhost:8080/login");
+            wait.until(ExpectedConditions.visibilityOfElementLocated(By.name("email"))).sendKeys(email);
+            driver.findElement(By.name("password")).sendKeys("1234");
+            driver.findElement(By.cssSelector("form")).submit();
             wait.until(ExpectedConditions.urlContains("/dashboard"));
 
-            // Paso 2: Crear grupo
+            // Paso 3: Crear grupo
             driver.get("http://localhost:8080/crear-grupo");
-            wait.until(ExpectedConditions.visibilityOfElementLocated(By.name("nombreGrupo"))).sendKeys("Grupo Test");
-            driver.findElement(By.name("descripcion")).sendKeys("Grupo generado por Selenium");
-            driver.findElement(By.cssSelector("button[type='submit']")).click();
+            wait.until(ExpectedConditions.visibilityOfElementLocated(By.name("nombre"))).sendKeys("Grupo Selenium");
+            driver.findElement(By.name("descripcion")).sendKeys("Grupo de prueba Selenium");
+            driver.findElement(By.cssSelector("form")).submit();
 
-            wait.until(ExpectedConditions.urlContains("/detalle-grupo"));
+            // Paso 4: Acceder a detalles del grupo
+            wait.until(ExpectedConditions.urlContains("/dashboard"));
+            WebElement verDetalles = wait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText("Ver detalles")));
+            verDetalles.click();
 
-            // Paso 3: Añadir gasto
-            driver.findElement(By.linkText("Añadir gasto")).click(); 
+            wait.until(ExpectedConditions.urlContains("/detalle-grupo/"));
+            String url = driver.getCurrentUrl();
+            String grupoId = url.replaceAll(".*/detalle-grupo/(\\d+).*", "$1");
 
-            wait.until(ExpectedConditions.visibilityOfElementLocated(By.name("descripcion"))).sendKeys("Cena");
-            driver.findElement(By.name("monto")).sendKeys("50.00");
+            // Paso 5: Clic en "Añadir gasto"
+            WebElement botonAnadir = wait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText("Añadir gasto")));
+            botonAnadir.click();
 
-            // Simular selección de pagador y participantes
-            WebElement pagador = driver.findElement(By.name("pagador"));
-            pagador.findElement(By.tagName("option")).click(); 
+            // Paso 6: Completar y enviar formulario de gasto
+            wait.until(ExpectedConditions.visibilityOfElementLocated(By.name("monto"))).sendKeys("25.00");
+            driver.findElement(By.name("descripcion")).sendKeys("Comida compartida");
 
-            WebElement participantes = driver.findElement(By.name("participantes"));
-            participantes.findElement(By.tagName("option")).click(); 
+            // Clic en botón de categoría "Comida"
+            WebElement botonCategoria = wait.until(ExpectedConditions.elementToBeClickable(
+                By.cssSelector("div.categoria-option[onclick*='COMIDA']")));
+            botonCategoria.click();
 
-            driver.findElement(By.cssSelector("button[type='submit']")).click();
+            // Seleccionar participante si aparece
+            try {
+                WebElement checkbox = driver.findElement(By.cssSelector("input[name='participantes'][type='checkbox']"));
+                checkbox.click();
+            } catch (Exception e) {
+                System.out.println("⚠ No se encontró checkbox de participante.");
+            }
 
-            wait.until(ExpectedConditions.urlContains("/detalle-grupo"));
-            System.out.println("Gasto añadido correctamente");
+            // Enviar formulario
+            driver.findElement(By.cssSelector("form")).submit();
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("Falló el test");
+            // Esperar a volver a la vista detalle del grupo
+            wait.until(ExpectedConditions.urlContains("/detalle-grupo/" + grupoId));
+
+            // Verificar visualmente que el gasto se muestra en pantalla
+            WebElement gasto = wait.until(ExpectedConditions.visibilityOfElementLocated(
+                By.xpath("//*[contains(text(), 'Comida compartida')]")));
+            System.out.println("✅ Gasto visualizado correctamente: " + gasto.getText());
+
         } finally {
             driver.quit();
         }
