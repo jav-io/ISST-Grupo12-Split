@@ -29,6 +29,7 @@ import com.splitit.model.Miembro;
 import com.splitit.model.Usuario;
 import com.splitit.service.GastoService;
 import com.splitit.service.GrupoService;
+import com.splitit.service.MailService;
 import com.splitit.service.MiembroService;
 import com.splitit.service.UsuarioService;
 import java.util.Optional;
@@ -313,6 +314,39 @@ public String mostrarSaldoGrupo(@PathVariable Long id, Model model) {
         }
     }
 
+    @Autowired
+private MailService mailService;
+
+//   @PostMapping("/recordatorio")
+// public String enviarRecordatorio(@RequestParam String deudor,
+//                                  @RequestParam String acreedor,
+//                                  @RequestParam BigDecimal monto,
+//                                  @RequestParam Long grupoId,
+//                                  RedirectAttributes redirect) {
+
+//     // Obtener correo electrónico del deudor
+//     Optional<Usuario> usuarioDeudorOpt = usuarioService.buscarPorNombre(deudor);
+//     Optional<Usuario> usuarioAcreedorOpt = usuarioService.buscarPorNombre(acreedor);
+//     Grupo grupo = grupoService.obtenerGrupoPorId(grupoId);
+
+//     if (usuarioDeudorOpt.isEmpty() || usuarioAcreedorOpt.isEmpty()) {
+//         redirect.addFlashAttribute("error", "No se pudo enviar el recordatorio.");
+//         return "redirect:/saldo-grupo/" + grupoId;
+//     }
+
+//     String destinatario = usuarioDeudorOpt.get().getEmail();
+//     String nombreGrupo = grupo.getNombre();
+//     String asunto = "Recordatorio de deuda en Split.it";
+//     String cuerpo = "Te recuerdo que le debes " + monto + " € a " + acreedor + " en tu grupo \"" + nombreGrupo + "\".";
+
+//     mailService.enviarRecordatorio(destinatario, asunto, cuerpo);
+//     redirect.addFlashAttribute("mensaje", "Recordatorio enviado a " + deudor);
+
+//     return "redirect:/saldo-grupo/" + grupoId;
+// }
+
+
+
 //     @PostMapping("/grupo/{id}/añadir-miembro")
 // public String añadirMiembroAlGrupo(@PathVariable Long id,
 //                                    @RequestParam String nombre,
@@ -344,6 +378,9 @@ public String mostrarSaldoGrupo(@PathVariable Long id, Model model) {
 //     redirect.addFlashAttribute("mensaje", "Miembro añadido correctamente.");
 //     return "redirect:/detalle-grupo/" + id;
 // }
+
+
+
 @PostMapping("/grupo/{id}/añadir-miembro")
 public String añadirMiembroAlGrupo(@PathVariable Long id,
                                    @RequestParam String nombre,
@@ -530,6 +567,30 @@ public String cambiarRolMiembro(@PathVariable Long idGrupo,
 }
 
 
+@PostMapping("/recordatorio")
+public String enviarRecordatorio(@RequestParam String deudor,
+                                 @RequestParam String acreedor,
+                                 @RequestParam BigDecimal monto,
+                                 @RequestParam Long grupoId,
+                                 RedirectAttributes redirect) {
+
+    Optional<Usuario> usuarioDeudorOpt = usuarioService.buscarPorNombre(deudor);
+    Optional<Usuario> usuarioAcreedorOpt = usuarioService.buscarPorNombre(acreedor);
+    Grupo grupo = grupoService.obtenerGrupoPorId(grupoId);
+
+    if (usuarioDeudorOpt.isEmpty() || usuarioAcreedorOpt.isEmpty()) {
+        redirect.addFlashAttribute("error", "❌ No se pudo enviar el recordatorio.");
+        return "redirect:/saldo-grupo/" + grupoId;
+    }
+
+    String destinatario = usuarioDeudorOpt.get().getEmail();
+    String nombreGrupo = grupo.getNombre();
+
+    mailService.enviarRecordatorio(destinatario, monto.toString(), acreedor, nombreGrupo);
+
+    redirect.addFlashAttribute("mensaje", "✅ Recordatorio enviado a " + deudor);
+    return "redirect:/saldo-grupo/" + grupoId;
+}
 
 
 }

@@ -189,10 +189,12 @@ public class GrupoService {
                 BigDecimal monto = deuda.min(disponible);
                 if (monto.compareTo(BigDecimal.ZERO) > 0) {
                     transferencias.add(new TransferenciaDTO(
-                        deudor.getUsuario().getNombre(),
-                        acreedor.getUsuario().getNombre(),
-                        monto
-                    ));
+    deudor.getUsuario().getNombre(),
+    acreedor.getUsuario().getNombre(),
+    monto,
+    grupo.getNombre()
+));
+
                     deuda = deuda.subtract(monto);
                     acreedor.setSaldo(disponible.subtract(monto));
                 }

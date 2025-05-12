@@ -112,6 +112,9 @@ public Usuario buscarOCrearPorEmail(String email, String nombre) {
     usuarioFantasma.setRegistrado(false);
     return usuarioRepository.save(usuarioFantasma);
 }
+public Optional<Usuario> buscarPorNombre(String nombre) {
+    return usuarioRepository.findByNombre(nombre);
+}
 
     
 }
