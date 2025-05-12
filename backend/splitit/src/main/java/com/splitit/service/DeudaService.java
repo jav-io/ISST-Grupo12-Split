@@ -72,7 +72,8 @@ public List<TransferenciaDTO> calcularTransferenciasParaSaldarGrupo(Long idGrupo
         transferencias.add(new TransferenciaDTO(
                 deudor.getUsuario().getNombre(),
                 acreedor.getUsuario().getNombre(),
-                monto
+                monto,
+                grupo.getNombre()
         ));
 
         deudor.setSaldo(deudor.getSaldo().add(monto));
