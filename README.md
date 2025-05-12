@@ -27,6 +27,9 @@ La imagen de marca de Split.it está basada en un símbolo clave: el **dólar ($
   - Descripción
   - Categoría
   - Fecha
+- 🔁 Consultar saldo y transferencias sugeridas entre miembros para saldar deudas.
+- 📩 Enviar recordatorios por email a deudores.
+
 ---
 
 ## 🧰 Tecnologías previstas
