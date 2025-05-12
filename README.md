@@ -62,6 +62,7 @@ La imagen de marca de Split.it está basada en un símbolo clave: el **dólar ($
 
 - 📋 [Trello del equipo](https://trello.com/invite/b/67b468b6425fb87061c9c33e/ATTI845dd93022dd44fe13a1b588264011b168664F4D/isst-grupo12-split)
 - 📁 [Documentación Sprint 1](./docs/)
+- 🖥 [Demostración del funcionamiento](https://www.youtube.com/watch?v=ub15AHPB8-w)
 
 _Proyecto académico para la asignatura **Ingeniería de Sistemas y Servicios Telemáticos (ISST)** – ETSIT-UPM._
 
